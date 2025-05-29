@@ -1,10 +1,11 @@
 "use client";
 
+import HomeSignedOut from "@/components/HomeSignedOut";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 export default function HomePage() {
   return (
-    <main className="p-6">
+    <main className="p-6 h-[91vh]">
       <SignedIn>
         <h1 className="text-3xl font-bold mb-4">Welcome to VeloCRM 🚀</h1>
         <p className="text-lg text-gray-600">
@@ -14,10 +15,7 @@ export default function HomePage() {
       </SignedIn>
 
       <SignedOut>
-        <h1 className="text-3xl font-bold mb-4">Welcome to VeloCRM 👋</h1>
-        <p className="text-lg text-gray-600 mb-4">
-          Please sign in or sign up to start tracking your client interactions.
-        </p>
+        <HomeSignedOut />
       </SignedOut>
     </main>
   );
