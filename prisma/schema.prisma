@@ -20,12 +20,12 @@ model User {
   createdAt DateTime @default(now())
 
   // Relations
-  tasks       Task[]
-  sprints Sprint[] @relation("UserSprints")
-  notes       Note[]
-  leads       Lead[]       @relation("LeadAssignee")
-  memberships UserOrganization[]
-  ownedOrganizations Organization[] @relation("OrganizationOwner")
+  tasks              Task[]
+  sprints            Sprint[]           @relation("UserSprints")
+  notes              Note[]
+  leads              Lead[]             @relation("LeadAssignee")
+  memberships        UserOrganization[]
+  ownedOrganizations Organization[]     @relation("OrganizationOwner")
 }
 
 enum Role {
@@ -40,19 +40,27 @@ model Organization {
   createdAt DateTime @default(now())
 
   // Relations
-  owner        User    @relation("OrganizationOwner", fields: [ownerId], references: [id])
-  sprints      Sprint[]
-  leads        Lead[]
-  memberships  UserOrganization[]
+  owner       User               @relation("OrganizationOwner", fields: [ownerId], references: [id])
+  sprints     Sprint[]
+  leads       Lead[]
+  memberships UserOrganization[]
+}
+
+enum MembershipRole {
+  ADMIN
+  MEMBER
 }
 
 model UserOrganization {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
   userId         String
   organizationId String
+  role           MembershipRole @default(MEMBER)
 
   user         User         @relation(fields: [userId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([userId, organizationId])
 }
 
 model Sprint {
@@ -66,20 +74,20 @@ model Sprint {
   createdAt      DateTime @default(now())
 
   // Relations
-  createdBy     User        @relation("UserSprints", fields: [createdById], references: [id])
-  organization  Organization @relation(fields: [organizationId], references: [id])
-  tasks         Task[]
-  notes         Note[]
+  createdBy    User         @relation("UserSprints", fields: [createdById], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  tasks        Task[]
+  notes        Note[]
 }
 
 model Task {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   description  String?
   status       TaskStatus @default(PENDING)
   assignedToId String?
   sprintId     String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime   @default(now())
 
   // Relations
   assignedTo User?  @relation(fields: [assignedToId], references: [id])
@@ -105,7 +113,7 @@ model Note {
 }
 
 model Lead {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   email          String?
   phone          String?

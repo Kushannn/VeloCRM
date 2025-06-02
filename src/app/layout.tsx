@@ -4,7 +4,7 @@ import "./globals.css";
 
 import Navbar from "../components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Providers } from "./providers";
+import Providers from "./providers";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -26,7 +26,7 @@ export default function RootLayout({
     <ClerkProvider>
       <Providers>
         <html lang="en">
-          <body className={`${raleway.variable} antialiased`}>
+          <body className={`${raleway.variable} antialiased `}>
             <Navbar />
             {children}
           </body>

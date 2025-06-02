@@ -1,5 +1,5 @@
 import { prisma } from "../prisma";
-import { UserType } from "@/models/User";
+import { UserType } from "../types";
 
 export async function createUser(user: UserType) {
   try {
@@ -15,7 +15,7 @@ export async function createUser(user: UserType) {
         clerkId: user.clerkId,
         email: user.email,
         name: user.name,
-        role: "user",
+        role: "USER",
         createdAt: new Date(),
       },
     });

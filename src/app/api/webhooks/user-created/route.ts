@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createUser } from "../../../../lib/actions/createUser";
+import { redirect } from "next/navigation";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
