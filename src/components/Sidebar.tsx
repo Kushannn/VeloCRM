@@ -5,9 +5,13 @@ import { Building, Home, BookCheck } from "lucide-react";
 import CreateOrganization from "./createOrganization/CreateOrganization";
 // import { UserType } from "@/lib/types";
 import { useUserStore } from "@/stores/setUserStore";
+import CreateProject from "./createProject/CreateProject";
+import { redirect } from "next/navigation";
 
 function Sidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const [organizationName, setOrganizationName] = useState<string | null>(null);
 
@@ -36,25 +40,32 @@ function Sidebar() {
               : "Create an organization"}
           </span>
         </div>
-        <div className="flex h-14 rounded-md gap-4 items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+        <div className="flex h-14 cursor-pointer rounded-md gap-4 items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
           <Home className="text-sky-300" />
           Home
         </div>
-        <div className="flex gap-4 h-14 rounded-md items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+        <div className="flex gap-4 h-14 cursor-pointer rounded-md items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
           <BookCheck className="text-sky-300" />
+          Sprints
+        </div>
+        <div className="flex rounded-md gap-4 h-14 curosr-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+          <Home className="text-sky-300" />
           Tasks
         </div>
-        <div className="flex rounded-md gap-4 h-14 items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+        <div className="flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
           <Home className="text-sky-300" />
           Leads
         </div>
-        <div className="flex gap-4 h-14 rounded-md items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+        <div
+          className="flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
+          onClick={() =>
+            redirect(
+              "/organization/" + user?.ownedOrganizations?.[0]?.id + "/projects"
+            )
+          }
+        >
           <Home className="text-sky-300" />
-          Dashboard
-        </div>
-        <div className="flex gap-4 h-14 rounded-md items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
-          <Home className="text-sky-300" />
-          Home
+          Projects
         </div>
       </div>
 
@@ -62,6 +73,11 @@ function Sidebar() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         setOrganizationName={setOrganizationName}
+      />
+
+      <CreateProject
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
       />
     </>
   );

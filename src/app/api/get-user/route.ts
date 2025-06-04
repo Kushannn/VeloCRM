@@ -13,10 +13,10 @@ export async function GET() {
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
       include: {
-        ownedOrganizations: true, // organizations the user owns
-        memberships: {
+        ownedOrganizations: true,
+        membership: {
           include: {
-            organization: true, // sending full organization details
+            organization: true,
           },
         },
       },

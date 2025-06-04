@@ -1,17 +1,25 @@
 "use client";
 
 import HomeSignedOut from "@/components/HomeSignedOut";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace("/dashboard");
+    }
+  }, [isLoaded, isSignedIn]);
+
   return (
     <main className="p-6">
       <SignedIn>
-        <h1 className="text-3xl font-bold mb-4">Welcome to VeloCRM 🚀</h1>
-        <p className="text-lg text-gray-600">
-          Manage your clients, leads, tasks, and more — all in one powerful CRM
-          platform.
-        </p>
+        {/* While redirecting, we can show a placeholder */}
+        <p className="text-gray-500">Redirecting to dashboard...</p>
       </SignedIn>
 
       <SignedOut>

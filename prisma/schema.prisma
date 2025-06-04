@@ -19,14 +19,16 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
 
-  // Relations
-  tasks              Task[]
-  sprints            Sprint[]           @relation("UserSprints")
-  notes              Note[]
-  leads              Lead[]             @relation("LeadAssignee")
-  memberships        UserOrganization[]
-  ownedOrganizations Organization[]     @relation("OrganizationOwner")
+  // ✅ Relations
+  assignedTasks       Task[]             @relation("AssignedTasks")
+  createdTasks        Task[]             @relation("CreatedTasks")
+  sprints             Sprint[]           @relation("UserSprints")
+  notes               Note[]
+  leads               Lead[]             @relation("LeadAssignee")
+  membership         UserOrganization? 
+  ownedOrganizations  Organization[]     @relation("OrganizationOwner")
 }
+
 
 enum Role {
   USER
@@ -44,7 +46,9 @@ model Organization {
   sprints     Sprint[]
   leads       Lead[]
   memberships UserOrganization[]
+  projects    Project[]          // 👈 Fix added here
 }
+
 
 enum MembershipRole {
   ADMIN
@@ -53,14 +57,27 @@ enum MembershipRole {
 
 model UserOrganization {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String
+  userId         String         @unique 
   organizationId String
   role           MembershipRole @default(MEMBER)
 
   user         User         @relation(fields: [userId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
+}
 
-  @@unique([userId, organizationId])
+
+model Project {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  organizationId String
+  createdAt      DateTime       @default(now())
+
+  // Relations
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  sprints        Sprint[]
+  tasks          Task[]
+  notes          Note[]
 }
 
 model Sprint {
@@ -71,27 +88,41 @@ model Sprint {
   endDate        DateTime
   createdById    String
   organizationId String
+  projectId      String
   createdAt      DateTime @default(now())
 
   // Relations
   createdBy    User         @relation("UserSprints", fields: [createdById], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
+  project      Project?     @relation(fields: [projectId], references: [id])
   tasks        Task[]
   notes        Note[]
 }
 
 model Task {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
   title        String
   description  String?
-  status       TaskStatus @default(PENDING)
+  status       TaskStatus   @default(PENDING)
+  priority     TaskPriority @default(MEDIUM)
   assignedToId String?
+  createdById  String
   sprintId     String
-  createdAt    DateTime   @default(now())
+  projectId    String?
+  createdAt    DateTime     @default(now())
 
-  // Relations
-  assignedTo User?  @relation(fields: [assignedToId], references: [id])
-  sprint     Sprint @relation(fields: [sprintId], references: [id])
+  // ✅ Explicit Relations
+  assignedTo   User?    @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  createdBy    User     @relation("CreatedTasks", fields: [createdById], references: [id])
+  sprint       Sprint   @relation(fields: [sprintId], references: [id])
+  project      Project? @relation(fields: [projectId], references: [id])
+}
+
+
+enum TaskPriority {
+  LOW 
+  MEDIUM 
+  HIGH
 }
 
 enum TaskStatus {
@@ -105,11 +136,13 @@ model Note {
   content   String
   userId    String
   sprintId  String
+  projectId String
   createdAt DateTime @default(now())
 
   // Relations
   user   User   @relation(fields: [userId], references: [id])
   sprint Sprint @relation(fields: [sprintId], references: [id])
+  project Project? @relation(fields: [projectId], references: [id])
 }
 
 model Lead {
