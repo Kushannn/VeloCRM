@@ -25,8 +25,10 @@ model User {
   sprints             Sprint[]           @relation("UserSprints")
   notes               Note[]
   leads               Lead[]             @relation("LeadAssignee")
-  membership         UserOrganization? 
+  //membership for organizations
+  membership         UserOrganization?    
   ownedOrganizations  Organization[]     @relation("OrganizationOwner")
+   userProjects UserProject[]
 }
 
 
@@ -46,7 +48,7 @@ model Organization {
   sprints     Sprint[]
   leads       Lead[]
   memberships UserOrganization[]
-  projects    Project[]          // 👈 Fix added here
+  projects    Project[]         
 }
 
 
@@ -66,11 +68,14 @@ model UserOrganization {
 }
 
 
+
 model Project {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   description    String?
   organizationId String
+  status         projectStatus         @default(ACTIVE)
+
   createdAt      DateTime       @default(now())
 
   // Relations
@@ -78,6 +83,13 @@ model Project {
   sprints        Sprint[]
   tasks          Task[]
   notes          Note[]
+  projectUsers UserProject[]
+}
+
+enum projectStatus {
+  ACTIVE
+  ON_HOLD
+  COMPLETED
 }
 
 model Sprint {
@@ -169,4 +181,16 @@ enum LeadStatus {
   QUALIFIED
   LOST
   CONVERTED
+}
+
+
+model UserProject {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  projectId String   @db.ObjectId
+
+  user    User    @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+
+  @@unique([userId, projectId])
 }

@@ -12,3 +12,13 @@ export interface UserType {
   image?: string;
   ownedOrganizations?: OrganizationType[]; // add this line
 }
+
+export interface ProjectType {
+  _id: string;
+  name: string;
+  description: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  organizationId: string; // reference to the organization
+}

@@ -16,7 +16,12 @@ export default function Navbar() {
 
   return (
     <header className="flex justify-between items-center px-6 py-4 border-b h-16">
-      <div className="text-xl font-semibold tracking-wide">VeloCRM</div>
+      <div
+        className="text-xl font-semibold tracking-wide"
+        onClick={() => redirect("/")}
+      >
+        VeloCRM
+      </div>
 
       {!user.isSignedIn && (
         <div>
