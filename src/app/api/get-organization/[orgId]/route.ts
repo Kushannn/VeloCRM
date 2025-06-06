@@ -11,7 +11,7 @@ export async function GET(
 
     const organization = await prisma.organization.findUnique({
       where: { id: awaitedParams.orgId },
-      include: { projects: true },
+      include: { projects: true, memberships: true },
     });
 
     if (!organization) {
@@ -21,10 +21,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({
-      projects: organization.projects,
-      success: true,
-    });
+    return NextResponse.json({ organization, success: true });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

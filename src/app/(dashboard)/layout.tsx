@@ -16,7 +16,7 @@ export default async function DashboardLayout({
 
   return (
     <>
-      <div className="flex min-h-screen bg-[#0A0A0A] text-white">
+      <div className="flex min-h-screen bg-[#121212] text-white">
         {/* Optional Sidebar */}
         <Sidebar />
         {/* Main Content */}

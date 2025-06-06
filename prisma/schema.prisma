@@ -19,7 +19,7 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
 
-  // ✅ Relations
+  // Relations
   assignedTasks       Task[]             @relation("AssignedTasks")
   createdTasks        Task[]             @relation("CreatedTasks")
   sprints             Sprint[]           @relation("UserSprints")

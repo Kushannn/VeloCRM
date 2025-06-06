@@ -7,31 +7,87 @@ import {
   CardFooter,
   Divider,
   Chip,
+  addToast,
 } from "@heroui/react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useUserStore } from "@/stores/setUserStore";
 import { CircleUser, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
-import CreateProject from "@/components/createProject/CreateProject";
+import CreateProject from "@/components/project/createProject/CreateProject";
 import debounce from "lodash/debounce";
+import { ProjectType } from "@/lib/types";
+import AddMemberModal from "@/components/project/AddMemberModal/AddMemberModal";
+import { set } from "lodash";
 
 export default function DashboardPage() {
+  const STATUS_DISPLAY: Record<string, string> = {
+    ACTIVE: "Active",
+    ON_HOLD: "On Hold",
+    COMPLETED: "Completed",
+  };
+
   const user = useUserStore((state) => state.user);
   const [openProjectModal, setOpenProjectModal] = useState(false);
   const params = useParams() as { orgId: string };
   const orgId = params.orgId;
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<ProjectType[]>([]);
+
+  const [organization, setOrganization] = useState<any>(null);
 
   const [openOptions, setOpenOptions] = useState<string | null>(null);
 
+  const [openAddMemberModal, setOpenAddMemberModal] = useState(false);
+
+  const [orgMembers, setOrgMembers] = useState<
+    {
+      id: string;
+      role: string;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        image: string | null;
+      };
+    }[]
+  >([]);
+
   useEffect(() => {
+    const getOrganization = async () => {
+      if (!orgId) return;
+
+      try {
+        const res = await fetch(`/api/get-organization/${orgId}`);
+        const data = await res.json();
+        if (data.success) {
+          setOrganization(data);
+        }
+      } catch (err) {
+        console.error("Error fetching organization:", err);
+      }
+    };
+
+    const getOrganizationMembers = async () => {
+      if (!orgId) return;
+
+      try {
+        const res = await fetch(`/api/get-organization-members/${orgId}`);
+        const data = await res.json();
+
+        if (data.success) {
+          setOrgMembers(data.members);
+        }
+      } catch (error) {
+        console.log("Error fetching organization members", error);
+      }
+    };
+
     const getProjects = async () => {
       if (!orgId) return;
 
       try {
         const res = await fetch(`/api/get-projects/${orgId}`);
         const data = await res.json();
-        if (data.projects) {
+        if (data.success) {
           setProjects(data.projects);
         }
       } catch (err) {
@@ -40,6 +96,8 @@ export default function DashboardPage() {
     };
 
     getProjects();
+    getOrganization();
+    getOrganizationMembers();
   }, [orgId]);
 
   const debouncedStatusUpdate = useRef(
@@ -54,7 +112,28 @@ export default function DashboardPage() {
           throw new Error("Failed to update project status");
         }
         const data = await res.json();
+
+        if (data.success) {
+          setProjects((prevProjects) =>
+            prevProjects?.map((project) =>
+              project.id === projectId
+                ? { ...project, status: newStatus }
+                : project
+            )
+          );
+
+          addToast({
+            title: "Status updated edited!",
+            variant: "solid",
+            color: "success",
+          });
+        }
       } catch (err) {
+        addToast({
+          title: "Failed to update status.",
+          variant: "solid",
+          color: "danger",
+        });
         console.error("Debounced status update failed:", err);
       }
     }, 2000)
@@ -149,7 +228,7 @@ export default function DashboardPage() {
                       className="bg-gray-700 text-white rounded-md p-2 cursor-pointer"
                     >
                       <option value="ACTIVE">Active</option>
-                      <option value="ON HOLD">On Hold</option>
+                      <option value="ON_HOLD">On Hold</option>
                       <option value="COMPLETED">Completed</option>
                     </select>
                   ) : (
@@ -159,12 +238,12 @@ export default function DashboardPage() {
                         content: "drop-shadow shadow-black text-white",
                       }}
                     >
-                      {project.status || "Status"}
+                      {STATUS_DISPLAY[project.status] || "Status"}
                     </Chip>
                   )}
 
                   <span
-                    className="cursor-pointer"
+                    className="cursor-pointer text-3xl font-bold"
                     onClick={() =>
                       setOpenOptions(
                         openOptions === project.id ? null : project.id
@@ -173,11 +252,11 @@ export default function DashboardPage() {
                   >
                     ...
                     {openOptions === project.id && (
-                      <div className="absolute right-0 mt-2 w-40 bg-white text-white shadow-lg rounded-md z-10 bg-gradient-to-br from-[#232526] to-[#414345]">
+                      <div className="absolute right-0 mt-2 w-40 bg-white text-white shadow-lg rounded-md z-10 bg-gradient-to-br from-[#232526] to-[#414345] text-sm">
                         <button
                           className="block w-full px-4 py-2 text-left"
                           onClick={() => {
-                            console.log("Edit clicked");
+                            setOpenAddMemberModal(true);
                             setOpenOptions(null);
                           }}
                         >
@@ -252,6 +331,13 @@ export default function DashboardPage() {
       <CreateProject
         isOpen={openProjectModal}
         onClose={() => setOpenProjectModal(false)}
+      />
+
+      <AddMemberModal
+        isOpen={openAddMemberModal}
+        onClose={() => setOpenAddMemberModal(false)}
+        organization={organization}
+        organizationMembers={orgMembers}
       />
     </>
   );

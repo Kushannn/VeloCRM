@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Raleway } from "next/font/google";
+import { Raleway, Manrope } from "next/font/google";
 import "./globals.css";
 
 import Navbar from "../components/Navbar";
@@ -10,6 +10,11 @@ const raleway = Raleway({
   subsets: ["latin"],
   weight: ["300", "400", "700"],
   variable: "--font-raleway", // renamed to match the font
+});
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["300", "400", "700"],
+  variable: "--font-manrope", // renamed to match the font
 });
 
 export const metadata: Metadata = {
@@ -26,7 +31,10 @@ export default function RootLayout({
     <ClerkProvider>
       <Providers>
         <html lang="en">
-          <body className={`${raleway.variable} antialiased `}>
+          <body
+            className={`${manrope.variable} antialiased`}
+            style={{ fontFamily: "var(--font-manrope), sans-serif" }}
+          >
             <Navbar />
             {children}
           </body>

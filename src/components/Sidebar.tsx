@@ -5,8 +5,18 @@ import { Building, Home, BookCheck } from "lucide-react";
 import CreateOrganization from "./createOrganization/CreateOrganization";
 // import { UserType } from "@/lib/types";
 import { useUserStore } from "@/stores/setUserStore";
-import CreateProject from "./createProject/CreateProject";
+import CreateProject from "./project/createProject/CreateProject";
 import { redirect } from "next/navigation";
+import {
+  addToast,
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "@heroui/react";
 
 function Sidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,14 +25,58 @@ function Sidebar() {
 
   const [organizationName, setOrganizationName] = useState<string | null>(null);
 
+  const [sendInviteLoading, setSendInviteLoading] = useState(false);
+
   const user = useUserStore((state) => state.user);
 
-  // const [user, setUser] = useState<UserType | null>(null);
+  const [inviteModal, setInviteModal] = useState(false);
 
-  // useEffect(() => {
-  //   const user = useUserStore((state) => state.user);
-  //   setUser(user);
-  // }, []);
+  const [email, setEmail] = useState("");
+
+  async function handleSendInvite() {
+    if (!email) {
+      addToast({
+        title: " Email is required",
+        variant: "solid",
+        color: "danger",
+      });
+      return;
+    }
+
+    setSendInviteLoading(true);
+
+    try {
+      const res = await fetch("/api/invites/send-invite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orgId: user?.membership?.organizationId,
+          email: email,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        addToast({
+          title: "User invited successfully",
+          variant: "solid",
+          color: "success",
+        });
+        return;
+      }
+    } catch (error) {
+      addToast({
+        title: "Could not invite user",
+        variant: "solid",
+        color: "danger",
+      });
+      console.log("Error inviting usre", user);
+      return;
+    }
+  }
 
   return (
     <>
@@ -67,7 +121,55 @@ function Sidebar() {
           <Home className="text-sky-300" />
           Projects
         </div>
+        <div
+          className="flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
+          onClick={() => setInviteModal(true)}
+        >
+          <Home className="text-sky-300" />
+          Invite
+        </div>
       </div>
+
+      <Modal
+        isOpen={inviteModal}
+        onOpenChange={setInviteModal}
+        className="bg-[#1a1a1a] text-white"
+      >
+        <ModalContent className="bg-[#1a1a1a] text-white">
+          <ModalHeader className="border-b border-gray-700">
+            Invite People to the Organization
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-gray-300 mb-2">
+              Enter the email of the person you want to invite
+            </p>
+            <Input
+              label="Email"
+              placeholder="Enter email..."
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              classNames={{
+                input: "text-white placeholder-white",
+                label: "text-white",
+                inputWrapper:
+                  "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+              }}
+            />
+          </ModalBody>
+          <ModalFooter className="border-t border-gray-700">
+            <Button variant="ghost" onClick={() => setInviteModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              onClick={handleSendInvite}
+              isLoading={sendInviteLoading}
+            >
+              Invite
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       <CreateOrganization
         isOpen={isModalOpen}
