@@ -1,13 +1,18 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { orgId: string } }
-) {
-  const { orgId } = await params;
-
+export async function GET(req: NextRequest) {
   try {
+    const urlParts = req.nextUrl.pathname.split("/");
+    const orgId = urlParts[urlParts.indexOf("get-members") - 1]; // gets the [orgId] before "get-members"
+
+    if (!orgId) {
+      return NextResponse.json(
+        { success: false, error: "Organization ID missing in URL" },
+        { status: 400 }
+      );
+    }
+
     const members = await prisma.userOrganization.findMany({
       where: {
         organizationId: orgId,
@@ -36,7 +41,6 @@ export async function GET(
       },
     });
 
-    //formatting the members so that we get can array of projectIds
     const formattedMembers = members.map((member) => ({
       id: member.id,
       role: member.role,

@@ -1,13 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { orgId: string } }
-) {
-  const { orgId } = params;
-
+export async function POST(req: NextRequest) {
   try {
+    // Get the orgId from the URL
+    const orgId = req.nextUrl.pathname.split("/").pop();
+
     const { userIds } = await req.json();
 
     if (!Array.isArray(userIds) || !orgId) {

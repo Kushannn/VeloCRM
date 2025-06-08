@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  request: Request,
+  req: Request,
   { params }: { params: { orgId: string } }
 ) {
+  const { orgId } = params;
+
   try {
-    const awaitedParams = await params;
+    if (!orgId) {
+      return NextResponse.json(
+        { error: "Organization ID is required" },
+        { status: 400 }
+      );
+    }
 
     const organization = await prisma.organization.findUnique({
-      where: { id: awaitedParams.orgId },
+      where: { id: orgId },
       include: { projects: true },
     });
 
@@ -22,11 +28,11 @@ export async function GET(
     }
 
     return NextResponse.json({
-      projects: organization.projects,
       success: true,
+      projects: organization.projects,
     });
   } catch (error) {
-    console.error(error);
+    console.error("[GET_PROJECTS_ERROR]", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
