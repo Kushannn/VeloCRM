@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const handleAcceptInvite = async () => {
     if (!inviteToken) return;
 
-    const res = await fetch("/api/invites/accept-invite", {
+    const res = await fetch("/api/invites/verify-invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: inviteToken }),
