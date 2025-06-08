@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   try {
     const urlParts = req.nextUrl.pathname.split("/");
-    const orgId = urlParts[urlParts.indexOf("get-members") - 1]; // gets the [orgId] before "get-members"
+    const orgId = urlParts[urlParts.indexOf("get-members") - 1];
 
     if (!orgId) {
       return NextResponse.json(

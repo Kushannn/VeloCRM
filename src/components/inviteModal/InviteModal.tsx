@@ -16,7 +16,6 @@ interface CreateOrganizationProps {
   isOpen: boolean;
   onClose: () => void;
   setOrganizationName: (name: string) => void;
-  // This prop is used to set the organization name in the parent component
 }
 
 export default function CreateOrganization({
