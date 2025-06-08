@@ -37,7 +37,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (!dbUser.ownedOrganizations.some((org) => org.id === organizationId)) {
+    if (
+      !dbUser.ownedOrganizations.some((org: any) => org.id === organizationId)
+    ) {
       return NextResponse.json(
         { error: "User does not have permission to create an project" },
         { status: 403 }

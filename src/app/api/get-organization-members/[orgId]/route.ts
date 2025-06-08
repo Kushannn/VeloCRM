@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { UserType } from "@/lib/types";
 
 export async function GET(req: NextRequest) {
   try {
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const formattedMembers = members.map((member) => ({
+    const formattedMembers = members.map((member: any) => ({
       id: member.id,
       role: member.role,
       user: {
@@ -49,7 +50,7 @@ export async function GET(req: NextRequest) {
         name: member.user.name,
         email: member.user.email,
         image: member.user.image,
-        projectIds: member.user.userProjects.map((up) => up.projectId),
+        projectIds: member.user.userProjects.map((up: any) => up.projectId),
       },
     }));
 

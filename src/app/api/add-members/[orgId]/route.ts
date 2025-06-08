@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     });
 
     const alreadyInOrgUserIds = new Set(
-      existingMemberships.map((m) => m.userId)
+      existingMemberships.map((m: any) => m.userId)
     );
     const eligibleUserIds = userIds.filter(
       (id) => !alreadyInOrgUserIds.has(id)

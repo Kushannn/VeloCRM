@@ -1,7 +1,15 @@
 import { prisma } from "../prisma";
-import { UserType } from "../types";
+import { Prisma } from "@prisma/client";
+// import { UserType } from "../types";
 
-export async function createUser(user: UserType) {
+interface CreateUserInput {
+  clerkId: string;
+  email?: string;
+  name: string;
+  image?: string;
+}
+
+export async function createUser(user: CreateUserInput) {
   try {
     const existingUser = await prisma.user.findUnique({
       where: { clerkId: user.clerkId },
@@ -13,7 +21,7 @@ export async function createUser(user: UserType) {
     await prisma.user.create({
       data: {
         clerkId: user.clerkId,
-        email: user.email,
+        email: user.email || "",
         name: user.name,
         role: "USER",
         createdAt: new Date(),
