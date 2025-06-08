@@ -33,6 +33,10 @@ function Sidebar() {
 
   const [email, setEmail] = useState("");
 
+  useEffect(() => {
+    console.log("user data ", user);
+  });
+
   async function handleSendInvite() {
     if (!email) {
       addToast({
@@ -60,6 +64,7 @@ function Sidebar() {
       const data = await res.json();
 
       if (data.success) {
+        setSendInviteLoading(false);
         addToast({
           title: "User invited successfully",
           variant: "solid",
@@ -114,7 +119,7 @@ function Sidebar() {
           className="flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
           onClick={() =>
             redirect(
-              "/organization/" + user?.ownedOrganizations?.[0]?.id + "/projects"
+              "/organization/" + user?.membership?.organizationId + "/projects"
             )
           }
         >
@@ -129,7 +134,7 @@ function Sidebar() {
           Invite
         </div>
       </div>
-
+      //Modal to send Invite to the user
       <Modal
         isOpen={inviteModal}
         onOpenChange={setInviteModal}
@@ -170,13 +175,11 @@ function Sidebar() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
       <CreateOrganization
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         setOrganizationName={setOrganizationName}
       />
-
       <CreateProject
         isOpen={isProjectModalOpen}
         onClose={() => setIsProjectModalOpen(false)}

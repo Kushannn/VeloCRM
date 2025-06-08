@@ -18,7 +18,7 @@ interface CreateOrganizationProps {
   setOrganizationName: (name: string) => void;
 }
 
-export default function CreateOrganization({
+export default function InviteModal({
   isOpen,
   onClose,
   setOrganizationName,
