@@ -33,7 +33,9 @@ export default function RootLayout({
         className={`${manrope.variable} antialiased bg-black h-[100vh]`}
         style={{ fontFamily: "var(--font-manrope), sans-serif" }}
       >
-        <ClerkProvider>
+        <ClerkProvider
+          publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        >
           <Providers>
             {/* <Provider store={store}> */}
             <Navbar />

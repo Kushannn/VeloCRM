@@ -304,12 +304,12 @@ export default function DashboardPage() {
 
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <Card className="flex-1 bg-gray-700">
-                      <CardBody className="flex justify-between items-center">
+                      <CardBody className="flex flex-col justify-between items-center">
                         Sprints <span>{project.sprints || 0}</span>
                       </CardBody>
                     </Card>
                     <Card className="flex-1 bg-gray-700">
-                      <CardBody className="flex justify-between items-center">
+                      <CardBody className="flex flex-col justify-between items-center">
                         Tasks <span>{project.tasks || 0}</span>
                       </CardBody>
                     </Card>
