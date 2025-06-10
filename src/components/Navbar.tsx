@@ -9,16 +9,17 @@ import {
   useAuth,
   useUser,
 } from "@clerk/nextjs";
-import { LogOut } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const reduxUser = useAppSelector((state) => state.auth.user);
   const user = useUser();
   const { signOut } = useAuth();
   const dispatch = useAppDispatch();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
@@ -27,55 +28,86 @@ export default function Navbar() {
 
   useEffect(() => {
     console.log("user in navbar", reduxUser);
-  });
+  }, [reduxUser]);
 
   return (
-    <header className="flex justify-between items-center px-6 py-4 border-b h-16">
-      <Link
-        href={"/"}
-        className="text-xl font-semibold tracking-wide cursor-pointer"
-      >
-        VeloCRM
-      </Link>
+    <header className="bg-[#121212] border-b border-gray-800 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <Link href="/" className="text-xl font-bold">
+            VeloCRM
+          </Link>
 
-      {!user.isSignedIn && (
-        <div>
-          <nav className="flex space-x-4">
-            <a href="/" className="text-gray-200 hover:text-blue-600">
-              Home
-            </a>
-            <a href="/dashboard" className="text-gray-200 hover:text-blue-600">
-              About
-            </a>
-            <a href="/settings" className="text-gray-200 hover:text-blue-600">
-              Pricing
-            </a>
+          {/* Mobile Menu Button */}
+          <div className="sm:hidden">
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              <Menu className="w-6 h-6 text-white" />
+            </button>
+          </div>
+
+          {/* Desktop Nav */}
+          <nav className="hidden sm:flex items-center space-x-6">
+            <SignedOut>
+              <Link href="/" className="hover:text-blue-500">
+                Home
+              </Link>
+              <Link href="/dashboard" className="hover:text-blue-500">
+                About
+              </Link>
+              <Link href="/settings" className="hover:text-blue-500">
+                Pricing
+              </Link>
+              <SignUpButton />
+              <button onClick={() => redirect("/sign-in")}>Sign In</button>
+            </SignedOut>
+
+            <SignedIn>
+              <div className="flex items-center gap-4">
+                <img
+                  src={user.user?.imageUrl}
+                  alt="User"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <button onClick={handleLogout}>
+                  <LogOut />
+                </button>
+              </div>
+            </SignedIn>
           </nav>
         </div>
-      )}
+      </div>
 
-      {user.isSignedIn && (
-        <div>
-          <div className="h-6 w-md rounded-lg bg-[#222222]"></div>
+      {/* Mobile Nav */}
+      {mobileMenuOpen && (
+        <div className="sm:hidden px-4 pb-4 space-y-3">
+          <SignedOut>
+            <Link href="/" className="block hover:text-blue-500">
+              Home
+            </Link>
+            <Link href="/dashboard" className="block hover:text-blue-500">
+              About
+            </Link>
+            <Link href="/settings" className="block hover:text-blue-500">
+              Pricing
+            </Link>
+            <SignUpButton />
+            <button onClick={() => redirect("/sign-in")}>Sign In</button>
+          </SignedOut>
+
+          <SignedIn>
+            <div className="flex items-center gap-3">
+              <img
+                src={user.user?.imageUrl}
+                alt="User"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <button onClick={handleLogout}>
+                <LogOut />
+              </button>
+            </div>
+          </SignedIn>
         </div>
       )}
-
-      <div className="flex items-center gap-4">
-        <SignedOut>
-          <SignUpButton />
-          <button onClick={() => redirect("/sign-in")}> Sign in</button>
-        </SignedOut>
-        <SignedIn>
-          <img
-            src={user.user?.imageUrl}
-            alt="User"
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <button onClick={handleLogout} className="cursor-pointer">
-            <LogOut />
-          </button>
-        </SignedIn>
-      </div>
     </header>
   );
 }

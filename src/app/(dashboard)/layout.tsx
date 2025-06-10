@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
-import { auth } from "@clerk/nextjs/server"; // or your auth provider
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
+import DashboardLayoutClient from "@/components/layouts/DashboardLayoutClient";
 
 export default async function DashboardLayout({
   children,
@@ -11,17 +11,8 @@ export default async function DashboardLayout({
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/"); // or to /sign-in
+    redirect("/");
   }
 
-  return (
-    <>
-      <div className="flex min-h-screen bg-[#121212] text-white">
-        {/* Optional Sidebar */}
-        <Sidebar />
-        {/* Main Content */}
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-    </>
-  );
+  return <DashboardLayoutClient>{children}</DashboardLayoutClient>;
 }

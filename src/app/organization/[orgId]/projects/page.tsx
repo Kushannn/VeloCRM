@@ -156,21 +156,21 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="p-8 space-y-6">
-        <div className="flex flex-row gap-4">
+      <div className="p-4 sm:p-8 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl">Projects</h1>
-            <p>Track all the projects here!</p>
+            <h1 className="text-3xl sm:text-4xl">Projects</h1>
+            <p className="text-sm sm:text-base">Track all the projects here!</p>
           </div>
           <button
-            className="flex cursor-pointer items-center gap-2 bg-[#0a2540cc] text-sky-300 hover:bg-black p-2 rounded-md font-bold"
+            className="flex items-center gap-2 bg-[#0a2540cc] text-sky-300 hover:bg-black p-2 rounded-md font-bold"
             onClick={() => setOpenProjectModal(true)}
           >
             <Plus /> <span>Create New</span>
           </button>
         </div>
 
-        <div className="flex flex-row gap-10 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {[
             {
               label: "Active",
@@ -190,30 +190,30 @@ export default function DashboardPage() {
           ].map((stat, idx) => (
             <Card
               key={idx}
-              className={`w-[20vw] bg-gradient-to-br ${stat.color} text-[${stat.text}]`}
+              className={`w-full bg-gradient-to-br ${stat.color} text-[${stat.text}]`}
             >
-              <CardBody className="flex gap-3">
-                <div className="flex justify-evenly items-center w-full">
-                  <div className="flex flex-col">
-                    <p className="text-3xl">{stat.label}</p>
-                    <p className="text-small">{stat.label} Projects</p>
-                  </div>
-                  <div className="text-2xl">12</div>
+              <CardBody className="flex flex-row justify-between items-center px-4 py-6">
+                <div className="flex flex-col">
+                  <p className="text-2xl">{stat.label}</p>
+                  <p className="text-sm">{stat.label} Projects</p>
                 </div>
+                <div className="text-xl">12</div>
               </CardBody>
               <Divider />
             </Card>
           ))}
         </div>
 
-        <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.length === 0 ? (
-            <p className="text-center text-gray-400">No projects found.</p>
+            <p className="text-center text-gray-400 col-span-full">
+              No projects found.
+            </p>
           ) : (
             projects.map((project: any, index: number) => (
               <Card
                 key={project.id || index}
-                className={`w-[30vw] p-2 mb-6 ${
+                className={`w-full p-4 ${
                   project.status === "ACTIVE"
                     ? "bg-gradient-to-br from-[#3a7bd5] to-[#3a6073] text-[#dbeafe]"
                     : project.status === "ON HOLD"
@@ -252,7 +252,7 @@ export default function DashboardPage() {
                   )}
 
                   <span
-                    className="cursor-pointer text-3xl font-bold"
+                    className="relative cursor-pointer text-2xl font-bold"
                     onClick={() =>
                       setOpenOptions(
                         openOptions === project.id ? null : project.id
@@ -295,27 +295,28 @@ export default function DashboardPage() {
                 </CardHeader>
 
                 <CardBody>
-                  <h1 className="text-white text-2xl font-bold">
+                  <h1 className="text-white text-xl font-bold">
                     {project.name}
                   </h1>
-                  <p className="text-sm text-gray-300 pt-3">
+                  <p className="text-sm text-gray-300 pt-2">
                     {project.description}
                   </p>
-                  <div className="flex flex-row gap-5 pt-5">
-                    <Card className="w-[10vw] bg-gray-700">
-                      <CardBody className="flex flex-row justify-evenly items-center">
+
+                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <Card className="flex-1 bg-gray-700">
+                      <CardBody className="flex justify-between items-center">
                         Sprints <span>{project.sprints || 0}</span>
                       </CardBody>
                     </Card>
-                    <Card className="w-[10vw] bg-gray-700">
-                      <CardBody className="flex flex-row justify-evenly items-center">
+                    <Card className="flex-1 bg-gray-700">
+                      <CardBody className="flex justify-between items-center">
                         Tasks <span>{project.tasks || 0}</span>
                       </CardBody>
                     </Card>
                   </div>
                 </CardBody>
 
-                <CardFooter className="flex justify-between items-center">
+                <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <div className="flex items-center">
                     {[...Array(3)].map((_, i) => (
                       <CircleUser

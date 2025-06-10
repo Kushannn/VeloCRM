@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Building,
   Home,
@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import CreateOrganization from "./createOrganization/CreateOrganization";
 import CreateProject from "./project/createProject/CreateProject";
-import { redirect } from "next/navigation";
 import {
   addToast,
   Button,
@@ -27,45 +26,34 @@ import Link from "next/link";
 
 function Sidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-
   const [organizationName, setOrganizationName] = useState<string | null>(null);
-
   const [sendInviteLoading, setSendInviteLoading] = useState(false);
+  const [inviteModal, setInviteModal] = useState(false);
+  const [email, setEmail] = useState("");
 
   const user = useAppSelector((state) => state.auth.user);
-
-  const [inviteModal, setInviteModal] = useState(false);
-
-  const [email, setEmail] = useState("");
 
   async function handleSendInvite() {
     if (!email) {
       addToast({
-        title: " Email is required",
+        title: "Email is required",
         variant: "solid",
         color: "danger",
       });
       return;
     }
-
     setSendInviteLoading(true);
-
     try {
       const res = await fetch("/api/invites/send-invite", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orgId: user?.membership?.organizationId,
           email: email,
         }),
       });
-
       const data = await res.json();
-
       if (data.success) {
         setSendInviteLoading(false);
         addToast({
@@ -81,63 +69,63 @@ function Sidebar() {
         variant: "solid",
         color: "danger",
       });
-      console.log("Error inviting usre", user);
       return;
     }
   }
 
   return (
     <>
-      <div className="w-64 p-4 flex flex-col gap-4">
+      <div className="w-full sm:w-64 p-4 flex flex-col gap-4 bg-[#111] min-h-screen">
         <div
-          className="h-14 cursor-pointer mt-4 font-bold text-lg p-2 hover:bg-[#171717] rounded-md text-white flex items-center gap-2"
+          className="h-12 sm:h-14 cursor-pointer mt-2 font-bold text-base sm:text-lg p-2 hover:bg-[#171717] rounded-md text-white flex items-center gap-2"
           onClick={() => setIsModalOpen(true)}
         >
           <span>
             <Building />
           </span>
-          <span>
+          <span className="truncate">
             {user?.ownedOrganizations
               ? user.ownedOrganizations[0].name
               : "Create an organization"}
           </span>
         </div>
-        <div className="flex pl-4 h-14 cursor-pointer rounded-md gap-4 items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+
+        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
           <Home className="text-sky-300" />
-          Home
+          <span>Home</span>
         </div>
-        <div className=" pl-4 flex gap-4 h-14 cursor-pointer rounded-md items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+
+        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
           <BookCheck className="text-sky-300" />
-          Sprints
+          <span>Sprints</span>
         </div>
-        <div className=" pl-4 flex rounded-md gap-4 h-14 curosr-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+
+        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
           <ClipboardList className="text-sky-300" />
-          Tasks
+          <span>Tasks</span>
         </div>
-        <div className=" pl-4 flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+
+        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
           <Home className="text-sky-300" />
-          Leads
+          <span>Leads</span>
         </div>
+
         <Link
           href={
             "/organization/" + user?.membership?.organizationId + "/projects"
           }
-          className=" pl-4 flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
-          // onClick={() =>
-          //   redirect(
-          //     "/organization/" + user?.membership?.organizationId + "/projects"
-          //   )
-          // }
+          className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
         >
           <FolderOpenDot className="text-sky-300" />
-          Projects
+          <span>Projects</span>
         </Link>
+
         <div
-          className=" pl-4 flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
+          className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
           onClick={() => setInviteModal(true)}
         >
           <UserPlus className="text-sky-300" />
-          Invite
+          <span>Invite</span>
         </div>
       </div>
 
@@ -181,6 +169,7 @@ function Sidebar() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
       <CreateOrganization
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

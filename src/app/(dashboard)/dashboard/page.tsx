@@ -79,28 +79,30 @@ export default function DashboardPage() {
   if (!reduxUser) {
     return <p className="text-center mt-10">Loading...</p>;
   }
-
   return (
     <>
-      <div className="p-8 space-y-6">
+      <div className="p-4 sm:p-6 md:p-8 space-y-6">
         <div>
-          <h1 className="text-4xl font-bold text-white">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
             Welcome back, {reduxUser.name} 👋
           </h1>
-          <p className="text-gray-400">Here’s your CRM dashboard overview</p>
+          <p className="text-gray-400 text-sm sm:text-base">
+            Here’s your CRM dashboard overview
+          </p>
         </div>
 
-        <div className="flex flex-row gap-10">
-          <Card className="w-xl relative p-[2px] rounded-xl overflow-hidden group">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-10">
+          {/* Card 1 */}
+          <Card className="w-full md:w-1/2 relative p-[2px] rounded-xl overflow-hidden group">
             <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg] z-0 rounded-xl" />
 
             <div className="relative h-full rounded-[calc(0.75rem-2px)] bg-[#141414] z-10">
               <CardHeader className="border-b border-gray-700">
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-lg sm:text-xl font-semibold text-white">
                   Recent Activity
                 </h2>
               </CardHeader>
-              <CardBody className="text-[#B0B0B0] space-y-2">
+              <CardBody className="text-[#B0B0B0] space-y-2 text-sm sm:text-base">
                 <p>✅ You closed a deal with XYZ Corp.</p>
                 <p>📞 Follow-up call with Emma completed.</p>
                 <p>📩 Sent email to new lead: Ankit Patel.</p>
@@ -108,16 +110,17 @@ export default function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="w-xl relative p-[2px] rounded-xl overflow-hidden group">
+          {/* Card 2 */}
+          <Card className="w-full md:w-1/2 relative p-[2px] rounded-xl overflow-hidden group">
             <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg] z-0 rounded-xl" />
 
             <div className="relative h-full rounded-[calc(0.75rem-2px)] bg-[#141414] z-10">
               <CardHeader className="border-b border-gray-700">
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-lg sm:text-xl font-semibold text-white">
                   Recent Activity
                 </h2>
               </CardHeader>
-              <CardBody className="text-[#B0B0B0] space-y-2">
+              <CardBody className="text-[#B0B0B0] space-y-2 text-sm sm:text-base">
                 <p>✅ You closed a deal with XYZ Corp.</p>
                 <p>📞 Follow-up call with Emma completed.</p>
                 <p>📩 Sent email to new lead: Ankit Patel.</p>

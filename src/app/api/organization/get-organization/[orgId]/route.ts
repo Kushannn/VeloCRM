@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ orgId: string }> }
+) {
   try {
-    const orgId = request.nextUrl.pathname.split("/").pop();
+    const { orgId } = await params;
 
     if (!orgId) {
       return NextResponse.json(

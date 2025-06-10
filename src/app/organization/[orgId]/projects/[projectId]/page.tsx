@@ -3,16 +3,14 @@
 import { Card, CardHeader, CardBody, Skeleton } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { ProjectType, UserType } from "@/lib/types";
+import { useAppSelector } from "@/redux/hooks";
+import { ProjectType } from "@/lib/types";
 import { Calendar } from "lucide-react";
 
 export default function DashboardPage() {
   const user = useAppSelector((state) => state.auth.user);
   const [project, setProject] = useState<ProjectType>();
   const params = useParams<{ orgId: string; projectId: string }>();
-
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -35,28 +33,24 @@ export default function DashboardPage() {
     getProject();
   }, []);
 
-  useEffect(() => {
-    console.log("project", loading);
-  });
-
   return (
-    <>
-      <Card className="bg-[#191919] text-white w-[95vw] h-[70vh] m-6">
-        <CardHeader className="flex flex-col items-start m-3">
+    <div className="w-full px-4 py-6">
+      <Card className="bg-[#191919] text-white w-full max-w-7xl mx-auto">
+        <CardHeader className="flex flex-col items-start m-4">
           {loading ? (
-            <>
-              <div className="flex gap-10">
-                <Skeleton className="h-8 w-[20vw] rounded-lg bg-gray-600" />
-                <Skeleton className="h-[50px] w-[10vw] rounded-lg bg-gray-600" />
+            <div className="w-full space-y-4">
+              <div className="flex flex-wrap gap-4">
+                <Skeleton className="h-8 w-full sm:w-1/2 rounded-lg bg-gray-600" />
+                <Skeleton className="h-[50px] w-full sm:w-[150px] rounded-lg bg-gray-600" />
               </div>
-              <Skeleton className="h-6 w-[10vw] rounded-lg bg-gray-600 mt-6" />
-            </>
+              <Skeleton className="h-6 w-1/2 sm:w-[120px] rounded-lg bg-gray-600" />
+            </div>
           ) : (
             <>
-              <div className="flex justify-center items-center gap-2.5">
-                <h1 className="text-5xl p-3">{project?.name}</h1>
+              <div className="flex flex-wrap justify-start items-center gap-4">
+                <h1 className="text-3xl sm:text-4xl p-2">{project?.name}</h1>
                 <div
-                  className={`rounded-lg w-[10vw] h-[50px] p-2 font-bold text-xl  ${
+                  className={`rounded-lg px-4 py-2 text-center font-bold text-sm sm:text-lg ${
                     project?.status === "ACTIVE"
                       ? "bg-gradient-to-br from-[#3a7bd5] to-[#3a6073] text-[#dbeafe]"
                       : project?.status === "ON HOLD"
@@ -69,8 +63,8 @@ export default function DashboardPage() {
                   {project?.status}
                 </div>
               </div>
-              <div className="flex gap-2 p-3">
-                Created At <Calendar />{" "}
+              <div className="flex items-center gap-2 mt-3 p-1 text-sm sm:text-base">
+                Created At <Calendar className="w-4 h-4" />
                 {project?.createdAt
                   ? new Date(project.createdAt).toLocaleDateString()
                   : "N/A"}
@@ -78,27 +72,29 @@ export default function DashboardPage() {
             </>
           )}
         </CardHeader>
-        <CardBody className="flex flex-row gap-20">
-          <Card className="w-[40%] relative bg-[#191919] h-full p-[2px] rounded-lg overflow-hidden group">
-            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
 
-            <div className="relative bg-[#191919] h-full rounded-[calc(0.5rem-2px)]">
+        <CardBody className="flex flex-col lg:flex-row gap-6 px-4 pb-6">
+          {/* Members Card */}
+          <Card className="w-full lg:w-1/2 relative bg-[#191919] p-[2px] rounded-lg overflow-hidden group">
+            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
+            <div className="relative bg-[#191919] rounded-[calc(0.5rem-2px)]">
               <CardHeader>
-                <h1 className="text-2xl p-3">Members</h1>
+                <h1 className="text-xl sm:text-2xl p-3">Members</h1>
               </CardHeader>
             </div>
           </Card>
 
-          <Card className="w-[40%] relative bg-[#191919] h-full p-[2px] rounded-lg overflow-hidden">
-            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] [--border-angle:0deg]" />
-            <div className="relative bg-[#191919] h-full rounded-[calc(0.5rem-2px)]">
+          {/* Sprints Card */}
+          <Card className="w-full lg:w-1/2 relative bg-[#191919] p-[2px] rounded-lg overflow-hidden group">
+            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
+            <div className="relative bg-[#191919] rounded-[calc(0.5rem-2px)]">
               <CardHeader>
-                <h1 className="text-2xl p-3">Sprints</h1>
+                <h1 className="text-xl sm:text-2xl p-3">Sprints</h1>
               </CardHeader>
             </div>
           </Card>
         </CardBody>
       </Card>
-    </>
+    </div>
   );
 }
