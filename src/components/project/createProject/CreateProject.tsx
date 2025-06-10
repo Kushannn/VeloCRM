@@ -11,7 +11,7 @@ import {
   Input,
   addToast,
 } from "@heroui/react";
-import { useUserStore } from "@/stores/setUserStore";
+import { useAppSelector } from "@/redux/hooks";
 
 interface CreateProjectProps {
   isOpen: boolean;
@@ -22,8 +22,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const user = useUserStore((state) => state.user);
+  const user = useAppSelector((state) => state.auth.user);
 
   async function handleSubmit() {
     if (!projectName.trim()) {
@@ -37,7 +36,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/create-project", {
+      const res = await fetch("/api/project/create-project", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

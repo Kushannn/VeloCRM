@@ -1,27 +1,42 @@
 "use client";
 
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { logout } from "@/redux/slices/authSlice";
 import {
-  SignInButton,
   SignUpButton,
   SignedIn,
   SignedOut,
-  UserButton,
+  useAuth,
   useUser,
 } from "@clerk/nextjs";
+import { LogOut } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Navbar() {
+  const reduxUser = useAppSelector((state) => state.auth.user);
   const user = useUser();
+  const { signOut } = useAuth();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = async () => {
+    await signOut();
+    dispatch(logout());
+  };
+
+  useEffect(() => {
+    console.log("user in navbar", reduxUser);
+  });
 
   return (
     <header className="flex justify-between items-center px-6 py-4 border-b h-16">
-      <div
-        className="text-xl font-semibold tracking-wide"
-        onClick={() => redirect("/")}
+      <Link
+        href={"/"}
+        className="text-xl font-semibold tracking-wide cursor-pointer"
       >
         VeloCRM
-      </div>
+      </Link>
 
       {!user.isSignedIn && (
         <div>
@@ -51,7 +66,14 @@ export default function Navbar() {
           <button onClick={() => redirect("/sign-in")}> Sign in</button>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <img
+            src={user.user?.imageUrl}
+            alt="User"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <button onClick={handleLogout} className="cursor-pointer">
+            <LogOut />
+          </button>
         </SignedIn>
       </div>
     </header>

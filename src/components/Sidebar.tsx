@@ -1,10 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Building, Home, BookCheck } from "lucide-react";
+import {
+  Building,
+  Home,
+  BookCheck,
+  FolderOpenDot,
+  UserPlus,
+  ClipboardList,
+} from "lucide-react";
 import CreateOrganization from "./createOrganization/CreateOrganization";
-// import { UserType } from "@/lib/types";
-import { useUserStore } from "@/stores/setUserStore";
 import CreateProject from "./project/createProject/CreateProject";
 import { redirect } from "next/navigation";
 import {
@@ -17,6 +22,8 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@heroui/react";
+import { useAppSelector } from "@/redux/hooks";
+import Link from "next/link";
 
 function Sidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,15 +34,11 @@ function Sidebar() {
 
   const [sendInviteLoading, setSendInviteLoading] = useState(false);
 
-  const user = useUserStore((state) => state.user);
+  const user = useAppSelector((state) => state.auth.user);
 
   const [inviteModal, setInviteModal] = useState(false);
 
   const [email, setEmail] = useState("");
-
-  useEffect(() => {
-    console.log("user data ", user);
-  });
 
   async function handleSendInvite() {
     if (!email) {
@@ -99,42 +102,45 @@ function Sidebar() {
               : "Create an organization"}
           </span>
         </div>
-        <div className="flex h-14 cursor-pointer rounded-md gap-4 items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+        <div className="flex pl-4 h-14 cursor-pointer rounded-md gap-4 items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
           <Home className="text-sky-300" />
           Home
         </div>
-        <div className="flex gap-4 h-14 cursor-pointer rounded-md items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+        <div className=" pl-4 flex gap-4 h-14 cursor-pointer rounded-md items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
           <BookCheck className="text-sky-300" />
           Sprints
         </div>
-        <div className="flex rounded-md gap-4 h-14 curosr-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
-          <Home className="text-sky-300" />
+        <div className=" pl-4 flex rounded-md gap-4 h-14 curosr-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+          <ClipboardList className="text-sky-300" />
           Tasks
         </div>
-        <div className="flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
+        <div className=" pl-4 flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2">
           <Home className="text-sky-300" />
           Leads
         </div>
-        <div
-          className="flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
-          onClick={() =>
-            redirect(
-              "/organization/" + user?.membership?.organizationId + "/projects"
-            )
+        <Link
+          href={
+            "/organization/" + user?.membership?.organizationId + "/projects"
           }
+          className=" pl-4 flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
+          // onClick={() =>
+          //   redirect(
+          //     "/organization/" + user?.membership?.organizationId + "/projects"
+          //   )
+          // }
         >
-          <Home className="text-sky-300" />
+          <FolderOpenDot className="text-sky-300" />
           Projects
-        </div>
+        </Link>
         <div
-          className="flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
+          className=" pl-4 flex gap-4 h-14 rounded-md cursor-pointer items-center font-bold bg-[#0a2540cc] text-sky-300 hover:bg-black p-2"
           onClick={() => setInviteModal(true)}
         >
-          <Home className="text-sky-300" />
+          <UserPlus className="text-sky-300" />
           Invite
         </div>
       </div>
-      //Modal to send Invite to the user
+
       <Modal
         isOpen={inviteModal}
         onOpenChange={setInviteModal}

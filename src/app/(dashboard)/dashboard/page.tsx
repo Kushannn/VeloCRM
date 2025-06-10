@@ -13,29 +13,42 @@ import {
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { login } from "@/redux/slices/authSlice";
 import { UserType } from "@/lib/types";
-import { useUserStore } from "@/stores/setUserStore";
+import { useUser } from "@clerk/nextjs";
+import Cookies from "js-cookie";
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<UserType | null>(null);
+  const reduxUser = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const { isSignedIn, user: clerkUser } = useUser();
+
   const [showModal, setShowModal] = useState(false);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
-
   const searchParams = useSearchParams();
   const router = useRouter();
-  const setUserGlobal = useUserStore((state) => state.setUser);
 
   useEffect(() => {
-    async function fetchUser() {
-      const res = await fetch("/api/get-user");
-      const data = await res.json();
-      setUser(data);
-      setUserGlobal(data);
-    }
-    fetchUser();
-  }, []);
+    const fetchAndStoreUser = async () => {
+      if (isSignedIn && clerkUser && !reduxUser) {
+        try {
+          const res = await fetch("/api/get-user");
+          const data = await res.json();
 
-  // Detect invite token
+          const userData = data as UserType;
+          Cookies.set("userToken", userData.id, { expires: 7 });
+          dispatch(login(userData));
+        } catch (err) {
+          console.error("Error fetching user:", err);
+        }
+      }
+    };
+
+    fetchAndStoreUser();
+  }, [isSignedIn, clerkUser, reduxUser, dispatch]);
+
   useEffect(() => {
     const token = searchParams.get("token");
     if (token) {
@@ -63,45 +76,53 @@ export default function DashboardPage() {
     }
   };
 
-  if (!user) return <p className="text-center mt-10">Loading...</p>;
+  if (!reduxUser) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
 
   return (
     <>
       <div className="p-8 space-y-6">
         <div>
           <h1 className="text-4xl font-bold text-white">
-            Welcome back, {user.name} 👋
+            Welcome back, {reduxUser.name} 👋
           </h1>
           <p className="text-gray-400">Here’s your CRM dashboard overview</p>
         </div>
 
         <div className="flex flex-row gap-10">
-          <Card className="bg-[#141414] w-xl">
-            <CardHeader className="border-b border-gray-700">
-              <h2 className="text-xl font-semibold text-white">
-                Recent Activity
-              </h2>
-            </CardHeader>
-            <CardBody className="text-[#B0B0B0] space-y-2">
-              <p>✅ You closed a deal with XYZ Corp.</p>
-              <p>📞 Follow-up call with Emma completed.</p>
-              <p>📩 Sent email to new lead: Ankit Patel.</p>
-            </CardBody>
+          <Card className="w-xl relative p-[2px] rounded-xl overflow-hidden group">
+            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg] z-0 rounded-xl" />
+
+            <div className="relative h-full rounded-[calc(0.75rem-2px)] bg-[#141414] z-10">
+              <CardHeader className="border-b border-gray-700">
+                <h2 className="text-xl font-semibold text-white">
+                  Recent Activity
+                </h2>
+              </CardHeader>
+              <CardBody className="text-[#B0B0B0] space-y-2">
+                <p>✅ You closed a deal with XYZ Corp.</p>
+                <p>📞 Follow-up call with Emma completed.</p>
+                <p>📩 Sent email to new lead: Ankit Patel.</p>
+              </CardBody>
+            </div>
           </Card>
 
-          <Card className="bg-[#141414] w-xl">
-            <CardHeader className="border-b border-gray-700">
-              <h2 className="text-xl font-semibold text-white">
-                Today's Tasks
-              </h2>
-            </CardHeader>
-            <CardBody>
-              <ul className="text-[#B0B0B0] list-disc pl-6 space-y-2">
-                <li>Call lead: John Doe</li>
-                <li>Prepare proposal for ACME Corp</li>
-                <li>Email follow-up to Sam</li>
-              </ul>
-            </CardBody>
+          <Card className="w-xl relative p-[2px] rounded-xl overflow-hidden group">
+            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg] z-0 rounded-xl" />
+
+            <div className="relative h-full rounded-[calc(0.75rem-2px)] bg-[#141414] z-10">
+              <CardHeader className="border-b border-gray-700">
+                <h2 className="text-xl font-semibold text-white">
+                  Recent Activity
+                </h2>
+              </CardHeader>
+              <CardBody className="text-[#B0B0B0] space-y-2">
+                <p>✅ You closed a deal with XYZ Corp.</p>
+                <p>📞 Follow-up call with Emma completed.</p>
+                <p>📩 Sent email to new lead: Ankit Patel.</p>
+              </CardBody>
+            </div>
           </Card>
         </div>
       </div>

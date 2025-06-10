@@ -12,7 +12,7 @@ import {
   addToast,
   Avatar,
 } from "@heroui/react";
-import { useUserStore } from "@/stores/setUserStore";
+import { useAppSelector } from "@/redux/hooks";
 
 interface AddMemberModalProps {
   isOpen: boolean;
@@ -38,7 +38,7 @@ export default function AddMemberModal({
 }: AddMemberModalProps) {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
-  const user = useUserStore((state) => state.user);
+  const user = useAppSelector((state) => state.auth.user);
 
   function handleSelect(userId: string) {
     setSelectedUserIds((prev) =>

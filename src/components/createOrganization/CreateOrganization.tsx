@@ -39,7 +39,7 @@ export default function CreateOrganization({
 
     setLoading(true);
     try {
-      const res = await fetch("/api/create-organization", {
+      const res = await fetch("/api/organization/create-organization", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

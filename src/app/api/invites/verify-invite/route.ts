@@ -22,13 +22,26 @@ export async function POST(req: NextRequest) {
     const { orgId, email } = decoded;
 
     const client = await clerkClient();
-
     const user = await client.users.getUser(userId);
 
     if (!user || user.emailAddresses[0].emailAddress !== email) {
       return NextResponse.json(
         { success: false, error: "Email mismatch" },
         { status: 403 }
+      );
+    }
+
+    const existingMembership = await prisma.userOrganization.findFirst({
+      where: {
+        userId,
+        organizationId: orgId,
+      },
+    });
+
+    if (existingMembership) {
+      return NextResponse.json(
+        { success: false, error: "User is already in the organization" },
+        { status: 400 }
       );
     }
 

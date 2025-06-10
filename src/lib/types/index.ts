@@ -20,7 +20,7 @@ export interface UserType {
   name?: string;
   image?: string | null;
   role: string;
-  createdAt: string;
+  // createdAt: string;
   ownedOrganizations?: OrganizationType[];
   membership?: MembershipType | null;
 }

@@ -9,12 +9,12 @@ import Providers from "./providers";
 const raleway = Raleway({
   subsets: ["latin"],
   weight: ["300", "400", "700"],
-  variable: "--font-raleway", // renamed to match the font
+  variable: "--font-raleway",
 });
 const manrope = Manrope({
   subsets: ["latin"],
   weight: ["300", "400", "700"],
-  variable: "--font-manrope", // renamed to match the font
+  variable: "--font-manrope",
 });
 
 export const metadata: Metadata = {
@@ -28,18 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <Providers>
-        <html lang="en">
-          <body
-            className={`${manrope.variable} antialiased`}
-            style={{ fontFamily: "var(--font-manrope), sans-serif" }}
-          >
+    <html lang="en">
+      <body
+        className={`${manrope.variable} antialiased bg-black h-[100vh]`}
+        style={{ fontFamily: "var(--font-manrope), sans-serif" }}
+      >
+        <ClerkProvider>
+          <Providers>
+            {/* <Provider store={store}> */}
             <Navbar />
             {children}
-          </body>
-        </html>
-      </Providers>
-    </ClerkProvider>
+            {/* </Provider> */}
+          </Providers>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

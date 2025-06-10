@@ -10,14 +10,14 @@ import {
   addToast,
 } from "@heroui/react";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useUserStore } from "@/stores/setUserStore";
 import { CircleUser, Plus } from "lucide-react";
-import { useParams } from "next/navigation";
+import { redirect, useParams } from "next/navigation";
 import CreateProject from "@/components/project/createProject/CreateProject";
 import debounce from "lodash/debounce";
 import { ProjectType } from "@/lib/types";
 import AddMemberModal from "@/components/project/AddMemberModal/AddMemberModal";
-import { set } from "lodash";
+import { useAppSelector } from "@/redux/hooks";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const STATUS_DISPLAY: Record<string, string> = {
@@ -26,7 +26,7 @@ export default function DashboardPage() {
     COMPLETED: "Completed",
   };
 
-  const user = useUserStore((state) => state.user);
+  const user = useAppSelector((state) => state.auth.user);
   const [openProjectModal, setOpenProjectModal] = useState(false);
   const params = useParams() as { orgId: string };
   const orgId = params.orgId;
@@ -56,7 +56,7 @@ export default function DashboardPage() {
       if (!orgId) return;
 
       try {
-        const res = await fetch(`/api/get-organization/${orgId}`);
+        const res = await fetch(`/api/organization/get-organization/${orgId}`);
         const data = await res.json();
         if (data.success) {
           setOrganization(data);
@@ -70,7 +70,9 @@ export default function DashboardPage() {
       if (!orgId) return;
 
       try {
-        const res = await fetch(`/api/get-organization-members/${orgId}`);
+        const res = await fetch(
+          `/api/organization/get-organization-members/${orgId}`
+        );
         const data = await res.json();
 
         if (data.success) {
@@ -85,7 +87,7 @@ export default function DashboardPage() {
       if (!orgId) return;
 
       try {
-        const res = await fetch(`/api/get-projects/${orgId}`);
+        const res = await fetch(`/api/project/get-projects/${orgId}`);
         const data = await res.json();
         if (data.success) {
           setProjects(data.projects);
@@ -98,16 +100,23 @@ export default function DashboardPage() {
     getProjects();
     getOrganization();
     getOrganizationMembers();
-  }, [orgId]);
+  }, []);
+
+  useEffect(() => {
+    console.log("user", user);
+  });
 
   const debouncedStatusUpdate = useRef(
     debounce(async (projectId: string, newStatus: string) => {
       try {
-        const res = await fetch(`/api/upate-project-status/${projectId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus }),
-        });
+        const res = await fetch(
+          `/api/project/upate-project-status/${projectId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: newStatus }),
+          }
+        );
         if (!res.ok) {
           throw new Error("Failed to update project status");
         }
@@ -318,9 +327,12 @@ export default function DashboardPage() {
                     ))}
                   </div>
 
-                  <div className="cursor-pointer hover:bg-gray-800 px-4 py-2 rounded-md text-white font-bold">
+                  <Link
+                    href={`/organization/${orgId}/projects/${project.id}`}
+                    className="cursor-pointer hover:bg-gray-800 px-4 py-2 rounded-md text-white font-bold"
+                  >
                     View Details
-                  </div>
+                  </Link>
                 </CardFooter>
               </Card>
             ))

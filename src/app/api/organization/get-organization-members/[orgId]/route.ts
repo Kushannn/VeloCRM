@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { UserType } from "@/lib/types";
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { orgId: string } }
+) {
+  const orgId = params.orgId;
+
+  if (!orgId) {
+    return NextResponse.json(
+      { success: false, error: "Organization ID missing in URL" },
+      { status: 400 }
+    );
+  }
+
   try {
-    const urlParts = req.nextUrl.pathname.split("/");
-    const orgId = urlParts[urlParts.indexOf("get-members") - 1];
-
-    if (!orgId) {
-      return NextResponse.json(
-        { success: false, error: "Organization ID missing in URL" },
-        { status: 400 }
-      );
-    }
-
     const members = await prisma.userOrganization.findMany({
       where: {
         organizationId: orgId,
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const formattedMembers = members.map((member: any) => ({
+    const formattedMembers = members.map((member) => ({
       id: member.id,
       role: member.role,
       user: {
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
         name: member.user.name,
         email: member.user.email,
         image: member.user.image,
-        projectIds: member.user.userProjects.map((up: any) => up.projectId),
+        projectIds: member.user.userProjects.map((up) => up.projectId),
       },
     }));
 
