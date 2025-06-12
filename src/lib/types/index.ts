@@ -25,6 +25,26 @@ export interface UserType {
   membership?: MembershipType | null;
 }
 
+export interface SprintType {
+  id: string;
+  title: string;
+  description?: string;
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+
+  createdById: string;
+  organizationId: string;
+  projectId: string;
+}
+
+export interface ProjectUserType {
+  id: string;
+  userId: string;
+  projectId: string;
+  user: UserType;
+}
+
 export interface ProjectType {
   id: string;
   name: string;
@@ -33,4 +53,6 @@ export interface ProjectType {
   createdAt: Date;
   updatedAt: Date;
   organizationId: string;
+  projectUsers: ProjectUserType[];
+  sprints: SprintType[];
 }

@@ -13,11 +13,13 @@ import {
   Avatar,
 } from "@heroui/react";
 import { useAppSelector } from "@/redux/hooks";
+import { useParams } from "next/navigation";
 
 interface AddMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
   organization: any;
+  projectId: string;
   organizationMembers: {
     id: string;
     role: string;
@@ -34,6 +36,7 @@ export default function AddMemberModal({
   isOpen,
   onClose,
   organization,
+  projectId,
   organizationMembers,
 }: AddMemberModalProps) {
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
@@ -46,6 +49,53 @@ export default function AddMemberModal({
         ? prev.filter((id) => id !== userId)
         : [...prev, userId]
     );
+  }
+
+  async function handleSubmit() {
+    if (selectedUserIds.length === 0) {
+      addToast({
+        title: "No users selected",
+        variant: "solid",
+        color: "danger",
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `/api/project/${projectId}/add-member-to-project`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userIds: selectedUserIds,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to add members");
+      }
+
+      addToast({
+        title: "Members added successfully!",
+        variant: "solid",
+        color: "success",
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Error adding users to project", error);
+      addToast({
+        title: "Error adding members",
+        variant: "solid",
+        color: "danger",
+      });
+    }
   }
 
   return (
@@ -127,7 +177,7 @@ export default function AddMemberModal({
               <Button
                 color="primary"
                 onPress={() => {
-                  console.log("Selected user IDs:", selectedUserIds);
+                  handleSubmit();
                   close();
                 }}
                 isDisabled={selectedUserIds.length === 0}

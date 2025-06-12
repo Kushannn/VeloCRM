@@ -18,6 +18,8 @@ import { ProjectType } from "@/lib/types";
 import AddMemberModal from "@/components/project/AddMemberModal/AddMemberModal";
 import { useAppSelector } from "@/redux/hooks";
 import Link from "next/link";
+import useFetchOrganization from "@/hooks/useFetchOrganization";
+import useFetchOrgMembers from "@/hooks/useFetchOrgMembers";
 
 export default function DashboardPage() {
   const STATUS_DISPLAY: Record<string, string> = {
@@ -27,61 +29,41 @@ export default function DashboardPage() {
   };
 
   const user = useAppSelector((state) => state.auth.user);
+
+  useFetchOrganization();
+  useFetchOrgMembers();
+
+  const organization = useAppSelector((state) => state.organization.currentOrg);
+  const orgMembers = useAppSelector((state) => state.organization.members);
+
   const [openProjectModal, setOpenProjectModal] = useState(false);
   const params = useParams() as { orgId: string };
   const orgId = params.orgId;
   const [projects, setProjects] = useState<ProjectType[]>([]);
 
-  const [organization, setOrganization] = useState<any>(null);
-
   const [openOptions, setOpenOptions] = useState<string | null>(null);
 
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false);
 
-  const [orgMembers, setOrgMembers] = useState<
-    {
-      id: string;
-      role: string;
-      user: {
-        id: string;
-        name: string;
-        email: string;
-        image: string | null;
-      };
-    }[]
-  >([]);
+  const [projectId, setProjectId] = useState("");
 
   useEffect(() => {
-    const getOrganization = async () => {
-      if (!orgId) return;
+    // const getOrganizationMembers = async () => {
+    //   if (!orgId) return;
 
-      try {
-        const res = await fetch(`/api/organization/get-organization/${orgId}`);
-        const data = await res.json();
-        if (data.success) {
-          setOrganization(data);
-        }
-      } catch (err) {
-        console.error("Error fetching organization:", err);
-      }
-    };
+    //   try {
+    //     const res = await fetch(
+    //       `/api/organization/get-organization-members/${orgId}`
+    //     );
+    //     const data = await res.json();
 
-    const getOrganizationMembers = async () => {
-      if (!orgId) return;
-
-      try {
-        const res = await fetch(
-          `/api/organization/get-organization-members/${orgId}`
-        );
-        const data = await res.json();
-
-        if (data.success) {
-          setOrgMembers(data.members);
-        }
-      } catch (error) {
-        console.log("Error fetching organization members", error);
-      }
-    };
+    //     if (data.success) {
+    //       setOrgMembers(data.members);
+    //     }
+    //   } catch (error) {
+    //     console.log("Error fetching organization members", error);
+    //   }
+    // };
 
     const getProjects = async () => {
       if (!orgId) return;
@@ -98,19 +80,14 @@ export default function DashboardPage() {
     };
 
     getProjects();
-    getOrganization();
-    getOrganizationMembers();
+    // getOrganizationMembers();
   }, []);
-
-  useEffect(() => {
-    console.log("user", user);
-  });
 
   const debouncedStatusUpdate = useRef(
     debounce(async (projectId: string, newStatus: string) => {
       try {
         const res = await fetch(
-          `/api/project/upate-project-status/${projectId}`,
+          `/api/project/${projectId}/upate-project-status`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -267,6 +244,7 @@ export default function DashboardPage() {
                           onClick={() => {
                             setOpenAddMemberModal(true);
                             setOpenOptions(null);
+                            setProjectId(project.id);
                           }}
                         >
                           Add new member
@@ -351,6 +329,7 @@ export default function DashboardPage() {
         onClose={() => setOpenAddMemberModal(false)}
         organization={organization}
         organizationMembers={orgMembers}
+        projectId={projectId}
       />
     </>
   );

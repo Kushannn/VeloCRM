@@ -18,7 +18,15 @@ export async function GET(
 
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      include: { sprints: true, tasks: true, projectUsers: true },
+      include: {
+        sprints: true,
+        tasks: true,
+        projectUsers: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
 
     if (!project) {

@@ -14,40 +14,17 @@ import {
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { login } from "@/redux/slices/authSlice";
-import { UserType } from "@/lib/types";
+import { useAppSelector } from "@/redux/hooks";
 import { useUser } from "@clerk/nextjs";
-import Cookies from "js-cookie";
+import useFetchUser from "@/hooks/useFetchUser";
 
 export default function DashboardPage() {
   const reduxUser = useAppSelector((state) => state.auth.user);
-  const dispatch = useAppDispatch();
-  const { isSignedIn, user: clerkUser } = useUser();
-
+  useFetchUser();
   const [showModal, setShowModal] = useState(false);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchAndStoreUser = async () => {
-      if (isSignedIn && clerkUser && !reduxUser) {
-        try {
-          const res = await fetch("/api/get-user");
-          const data = await res.json();
-
-          const userData = data as UserType;
-          Cookies.set("userToken", userData.id, { expires: 7 });
-          dispatch(login(userData));
-        } catch (err) {
-          console.error("Error fetching user:", err);
-        }
-      }
-    };
-
-    fetchAndStoreUser();
-  }, [isSignedIn, clerkUser, reduxUser, dispatch]);
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -92,7 +69,6 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-6 md:gap-10">
-          {/* Card 1 */}
           <Card className="w-full md:w-1/2 relative p-[2px] rounded-xl overflow-hidden group">
             <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg] z-0 rounded-xl" />
 
@@ -110,7 +86,6 @@ export default function DashboardPage() {
             </div>
           </Card>
 
-          {/* Card 2 */}
           <Card className="w-full md:w-1/2 relative p-[2px] rounded-xl overflow-hidden group">
             <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg] z-0 rounded-xl" />
 

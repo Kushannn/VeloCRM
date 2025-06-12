@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${manrope.variable} antialiased bg-black h-[100vh]`}
+        className={`${manrope.variable} antialiased min-h-screen`}
         style={{ fontFamily: "var(--font-manrope), sans-serif" }}
       >
         <ClerkProvider
