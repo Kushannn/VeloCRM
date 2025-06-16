@@ -26,10 +26,6 @@ export default function Navbar() {
     dispatch(logout());
   };
 
-  useEffect(() => {
-    console.log("user in navbar", reduxUser);
-  }, [reduxUser]);
-
   return (
     <header className="bg-[#121212] border-b border-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

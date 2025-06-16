@@ -101,6 +101,7 @@ export default function CreateOrganization({
             <ModalBody className="space-y-4">
               <Input
                 label="Organization Name"
+                variant="bordered"
                 placeholder="Enter name..."
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}

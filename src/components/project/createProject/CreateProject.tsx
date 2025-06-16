@@ -103,6 +103,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
               <Input
                 label="Project Name"
                 labelPlacement="outside"
+                variant="bordered"
                 placeholder="Enter name..."
                 value={projectName}
                 isRequired
@@ -117,6 +118,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
               <Input
                 label="Project Description"
                 labelPlacement="outside"
+                variant="bordered"
                 placeholder="Enter description..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}

@@ -53,6 +53,7 @@ export default function InviteModal({
             <ModalBody className="space-y-4">
               <Input
                 label="Email ID "
+                variant="bordered"
                 placeholder="Enter email..."
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}

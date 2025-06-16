@@ -22,7 +22,7 @@ import {
   ModalHeader,
 } from "@heroui/react";
 import { useAppSelector } from "@/redux/hooks";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 function Sidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +31,8 @@ function Sidebar() {
   const [sendInviteLoading, setSendInviteLoading] = useState(false);
   const [inviteModal, setInviteModal] = useState(false);
   const [email, setEmail] = useState("");
+
+  const router = useRouter();
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -110,15 +112,17 @@ function Sidebar() {
           <span>Leads</span>
         </div>
 
-        <Link
-          href={
-            "/organization/" + user?.membership?.organizationId + "/projects"
-          }
+        <div
+          onClick={() => {
+            router.push(
+              "/organization/" + user?.membership?.organizationId + "/projects"
+            );
+          }}
           className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
         >
           <FolderOpenDot className="text-sky-300" />
           <span>Projects</span>
-        </Link>
+        </div>
 
         <div
           className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
@@ -144,6 +148,7 @@ function Sidebar() {
             </p>
             <Input
               label="Email"
+              variant="bordered"
               placeholder="Enter email..."
               value={email}
               onChange={(e) => setEmail(e.target.value)}

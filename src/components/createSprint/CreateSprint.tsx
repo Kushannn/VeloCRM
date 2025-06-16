@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -11,7 +11,9 @@ import {
   Input,
   Textarea,
   addToast,
+  DateRangePicker,
 } from "@heroui/react";
+import { parseDate } from "@internationalized/date";
 
 interface CreateSprintProps {
   isOpen: boolean;
@@ -30,12 +32,12 @@ export default function CreateSprint({
 }: CreateSprintProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [dateValue, setDateValue] = useState<any>(undefined);
+
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit() {
-    if (!title.trim() || !startDate || !endDate) {
+    if (!title.trim() || !dateValue) {
       addToast({
         title: "All required fields must be filled.",
         variant: "solid",
@@ -46,6 +48,10 @@ export default function CreateSprint({
 
     setLoading(true);
     try {
+      // Convert DateValue to ISO strings
+      const startDate = dateValue.start.toDate("UTC").toISOString();
+      const endDate = dateValue.end.toDate("UTC").toISOString();
+
       const res = await fetch(
         `/api/project/${projectId}/sprint/create-sprint`,
         {
@@ -74,8 +80,7 @@ export default function CreateSprint({
         onClose();
         setTitle("");
         setDescription("");
-        setStartDate("");
-        setEndDate("");
+        setDateValue(null);
         onSprintCreated?.();
       } else {
         addToast({
@@ -122,9 +127,9 @@ export default function CreateSprint({
                 label="Sprint Title"
                 placeholder="Enter title..."
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                variant="bordered"
+                onChange={(e: any) => setTitle(e.target.value)}
                 classNames={{
-                  input: "text-white placeholder-gray-400",
                   label: "text-gray-300",
                   inputWrapper:
                     "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
@@ -134,8 +139,9 @@ export default function CreateSprint({
               <Textarea
                 label="Description"
                 placeholder="Sprint description..."
+                variant="bordered"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e: any) => setDescription(e.target.value)}
                 classNames={{
                   input: "text-white placeholder-gray-400",
                   label: "text-gray-300",
@@ -144,30 +150,22 @@ export default function CreateSprint({
                 }}
               />
 
-              <Input
-                type="date"
-                label="Start Date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+              <DateRangePicker
+                label="Select Duration"
+                variant="bordered"
+                value={dateValue}
+                minValue={parseDate(new Date().toISOString().split("T")[0])}
+                onChange={(newRange: any) => setDateValue(newRange)}
                 classNames={{
-                  input: "text-white",
-                  label: "text-gray-300",
-                  inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+                  base: "bg-[#262626] text-white rounded-md",
+                  label: "text-gray-400",
+                  calendar: "bg-gray-800 text-white",
+                  selectorButton: "bg-gray-700 text-gray-200",
+                  selectorIcon: "text-purple-400",
+                  popoverContent: "bg-gray-900  shadow-lg",
+                  calendarContent: "bg-gray-800",
                 }}
-              />
-
-              <Input
-                type="date"
-                label="End Date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                classNames={{
-                  input: "text-white",
-                  label: "text-gray-300",
-                  inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
-                }}
+                className="font-black"
               />
             </ModalBody>
 

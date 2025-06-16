@@ -17,9 +17,9 @@ import debounce from "lodash/debounce";
 import { ProjectType } from "@/lib/types";
 import AddMemberModal from "@/components/project/AddMemberModal/AddMemberModal";
 import { useAppSelector } from "@/redux/hooks";
-import Link from "next/link";
 import useFetchOrganization from "@/hooks/useFetchOrganization";
 import useFetchOrgMembers from "@/hooks/useFetchOrgMembers";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const STATUS_DISPLAY: Record<string, string> = {
@@ -46,6 +46,8 @@ export default function DashboardPage() {
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false);
 
   const [projectId, setProjectId] = useState("");
+
+  const router = useRouter();
 
   useEffect(() => {
     // const getOrganizationMembers = async () => {
@@ -306,12 +308,16 @@ export default function DashboardPage() {
                     ))}
                   </div>
 
-                  <Link
-                    href={`/organization/${orgId}/projects/${project.id}`}
+                  <div
+                    onClick={() =>
+                      router.push(
+                        `/organization/${orgId}/projects/${project.id}`
+                      )
+                    }
                     className="cursor-pointer hover:bg-gray-800 px-4 py-2 rounded-md text-white font-bold"
                   >
                     View Details
-                  </Link>
+                  </div>
                 </CardFooter>
               </Card>
             ))

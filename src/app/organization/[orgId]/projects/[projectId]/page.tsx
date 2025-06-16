@@ -1,12 +1,20 @@
 "use client";
 
-import { Card, CardHeader, CardBody, Skeleton, Divider } from "@heroui/react";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  Skeleton,
+  Divider,
+  Progress,
+} from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 import { ProjectType } from "@/lib/types";
-import { Calendar, Plus } from "lucide-react";
+import { ArrowBigRight, Calendar, Plus, Users } from "lucide-react";
 import CreateSprint from "@/components/createSprint/CreateSprint";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const user = useAppSelector((state) => state.auth.user);
@@ -14,6 +22,8 @@ export default function DashboardPage() {
   const params = useParams<{ orgId: string; projectId: string }>();
   const [loading, setLoading] = useState(false);
   const [openSprintModal, setOpenSprintModal] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const getProject = async () => {
@@ -34,6 +44,20 @@ export default function DashboardPage() {
 
     getProject();
   }, []);
+
+  function getProgress(startDate: Date, endDate: Date) {
+    const currentDate = new Date();
+    const totalDuration =
+      new Date(endDate).getTime() - new Date(startDate).getTime();
+    const timePassed = currentDate.getTime() - new Date(startDate).getTime();
+
+    const percentage = Math.min(
+      100,
+      Math.max(0, (timePassed / totalDuration) * 100)
+    );
+
+    return percentage;
+  }
 
   return (
     <div className="w-full px-4 py-6">
@@ -81,7 +105,12 @@ export default function DashboardPage() {
             <div className="relative bg-[#191919] rounded-[calc(0.5rem-2px)]">
               <CardHeader>
                 <div className="flex flex-col w-full">
-                  <h1 className="text-xl sm:text-2xl p-3 text-left">Members</h1>
+                  <div className="flex flex-row items-center pl-2">
+                    <Users className="text-[#8c75ff]" />
+                    <h1 className="text-xl sm:text-2xl p-3 text-left">
+                      Members
+                    </h1>
+                  </div>
                   <Divider className="w-full bg-gray-700" />
                 </div>
               </CardHeader>
@@ -115,7 +144,6 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </div>
-                    <Divider className="bg-gray-700 my-2" />
                   </>
                 ))}
               </CardBody>
@@ -141,7 +169,67 @@ export default function DashboardPage() {
               <CardBody>
                 {project?.sprints?.map((sprint) => (
                   <>
-                    <div key={sprint.id}>{sprint.title}</div>
+                    <div
+                      key={sprint?.id}
+                      className="flex flex-col items-start justify-between p-4 bg-[#262626] rounded-lg border border-gray-700 w-full"
+                    >
+                      <div className="flex flex-col gap-1 text-left w-full">
+                        <p className="text-white font-semibold text-lg">
+                          {sprint?.title}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {sprint?.description}
+                        </p>
+                      </div>
+
+                      <div className="w-full mt-4">
+                        <Progress
+                          aria-label="Sprint Progress"
+                          className="w-full"
+                          value={getProgress(
+                            sprint?.startDate,
+                            sprint?.endDate
+                          )}
+                        />
+                      </div>
+
+                      <div className="font-medium text-gray-400 mt-5 flex justify-between items-center w-full">
+                        <div className="flex gap-2">
+                          <span>
+                            {new Date(sprint?.startDate).toLocaleDateString(
+                              "en-GB",
+                              {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </span>
+                          <span>-</span>
+                          <span>
+                            {new Date(sprint?.endDate).toLocaleDateString(
+                              "en-GB",
+                              {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </span>
+                        </div>
+
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            router.push(
+                              `/organization/${params.orgId}/projects/${params.projectId}/sprint/${sprint?.id}`
+                            )
+                          }
+                        >
+                          <ArrowBigRight />
+                        </div>
+                      </div>
+                    </div>
                   </>
                 ))}
               </CardBody>
