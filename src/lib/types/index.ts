@@ -25,6 +25,32 @@ export interface UserType {
   membership?: MembershipType | null;
 }
 
+// export interface SprintType {
+//   id: string;
+//   title: string;
+//   description?: string;
+//   startDate: Date;
+//   endDate: Date;
+//   createdAt: Date;
+
+//   createdById: string;
+//   organizationId: string;
+//   projectId: string;
+// }
+
+export interface TaskType {
+  id: string;
+  title: string;
+  description?: string;
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  createdAt: string;
+  sprintId: string;
+  projectId?: string;
+  assignedToId?: string;
+  createdById: string;
+}
+
 export interface SprintType {
   id: string;
   title: string;
@@ -36,6 +62,11 @@ export interface SprintType {
   createdById: string;
   organizationId: string;
   projectId: string;
+
+  createdBy?: UserType;
+  organization?: OrganizationType;
+  project?: ProjectType;
+  tasks?: TaskType[];
 }
 
 export interface ProjectUserType {

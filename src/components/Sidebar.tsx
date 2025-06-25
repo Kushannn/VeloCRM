@@ -87,7 +87,7 @@ function Sidebar() {
           </span>
           <span className="truncate">
             {user?.ownedOrganizations
-              ? user.ownedOrganizations[0].name
+              ? user?.ownedOrganizations[0]?.name
               : "Create an organization"}
           </span>
         </div>

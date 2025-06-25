@@ -14,11 +14,14 @@ export async function GET(
         { status: 400 }
       );
     }
-
     const sprint = await prisma.sprint.findUnique({
-      where: { id: sprintId, projectId: projectId },
+      where: { id: sprintId, projectId },
       include: {
-        tasks: true,
+        tasks: {
+          include: {
+            assignedTo: true, // 👈 include assigned user details
+          },
+        },
         createdBy: true,
         notes: true,
       },
