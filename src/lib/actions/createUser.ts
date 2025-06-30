@@ -1,5 +1,4 @@
 import { prisma } from "../prisma";
-import { Prisma } from "@prisma/client";
 // import { UserType } from "../types";
 
 interface CreateUserInput {

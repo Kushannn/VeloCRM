@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Raleway, Manrope } from "next/font/google";
 import "./globals.css";
 
-import Navbar from "../components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import Providers from "./providers";
+import LayoutWithSidebar from "@/components/layouts/LayoutWithSidebar";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
@@ -37,10 +37,7 @@ export default function RootLayout({
           publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
         >
           <Providers>
-            {/* <Provider store={store}> */}
-            <Navbar />
-            {children}
-            {/* </Provider> */}
+            <LayoutWithSidebar>{children}</LayoutWithSidebar>
           </Providers>
         </ClerkProvider>
       </body>

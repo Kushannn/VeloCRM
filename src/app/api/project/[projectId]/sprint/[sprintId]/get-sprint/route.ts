@@ -19,7 +19,7 @@ export async function GET(
       include: {
         tasks: {
           include: {
-            assignedTo: true, // 👈 include assigned user details
+            assignedTo: true,
           },
         },
         createdBy: true,

@@ -7,12 +7,13 @@ import {
   Skeleton,
   Divider,
   Progress,
+  Button,
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 import { ProjectType } from "@/lib/types";
-import { ArrowBigRight, Calendar, Plus, Users } from "lucide-react";
+import { ArrowBigRight, BookCheck, Calendar, Plus, Users } from "lucide-react";
 import CreateSprint from "@/components/createSprint/CreateSprint";
 import { useRouter } from "next/navigation";
 
@@ -60,8 +61,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full px-4 py-6">
-      <Card className="bg-[#191919] text-white w-full max-w-7xl mx-auto">
+    <div className="w-full px-4">
+      <Card className="bg-gradient-to-br from-[#1d1d1e] to-[#1c1d1e] text-white w-full max-w-7xl mx-auto">
         <CardHeader className="flex flex-col items-start m-4">
           {loading ? (
             <div className="w-full space-y-4">
@@ -74,7 +75,9 @@ export default function DashboardPage() {
           ) : (
             <>
               <div className="flex flex-wrap justify-start items-center gap-4">
-                <h1 className="text-3xl sm:text-4xl p-2">{project?.name}</h1>
+                <h1 className="text-3xl sm:text-4xl font-semibold p-2">
+                  {project?.name}
+                </h1>
                 <div
                   className={`rounded-lg px-4 py-2 text-center font-bold text-sm sm:text-lg ${
                     project?.status === "ACTIVE"
@@ -101,7 +104,7 @@ export default function DashboardPage() {
 
         <CardBody className="flex flex-col lg:flex-row items-start gap-6 px-4 pb-6">
           <Card className="w-full lg:w-1/2 relative bg-[#191919] p-[2px] rounded-lg overflow-hidden group">
-            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
+            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#B33791_0%,#C562AF_25%,#DB8DD0_50%,#B33791_75%,#B33791_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
             <div className="relative bg-[#191919] rounded-[calc(0.5rem-2px)]">
               <CardHeader>
                 <div className="flex flex-col w-full">
@@ -151,17 +154,20 @@ export default function DashboardPage() {
           </Card>
 
           <Card className="w-full lg:w-1/2 relative bg-[#191919] p-[2px] rounded-lg overflow-hidden group">
-            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#ec4899_0%,#8b5cf6_25%,#3b82f6_50%,#8b5cf6_75%,#ec4899_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
+            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#B33791_0%,#C562AF_25%,#DB8DD0_50%,#B33791_75%,#B33791_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
             <div className="relative bg-[#191919] rounded-[calc(0.5rem-2px)]">
               <CardHeader className="flex flex-col">
                 <div className="flex justify-between items-center w-full px-3">
-                  <h1 className="text-xl sm:text-2xl p-3">Sprints</h1>
-                  <button
-                    className="flex items-center gap-2 bg-[#0a2540cc] text-sky-300 hover:bg-black p-2 rounded-md font-bold"
+                  <div className="flex items-center">
+                    <BookCheck className="text-[#4a2040]" />
+                    <h1 className="text-xl sm:text-2xl p-3">Sprints</h1>
+                  </div>
+                  <Button
+                    className="h-8 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-md shadow-purple-500/20"
                     onClick={() => setOpenSprintModal(true)}
                   >
                     <Plus /> <span>Create New</span>
-                  </button>
+                  </Button>
                 </div>
                 <Divider className="my-2 bg-gray-700" />
               </CardHeader>
@@ -185,6 +191,7 @@ export default function DashboardPage() {
                       <div className="w-full mt-4">
                         <Progress
                           aria-label="Sprint Progress"
+                          color="secondary"
                           className="w-full"
                           value={getProgress(
                             sprint?.startDate,

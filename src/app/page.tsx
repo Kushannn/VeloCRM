@@ -20,7 +20,6 @@ export default function HomePage() {
     <>
       <main className="p-6">
         <SignedIn>
-          {/* While redirecting, we can show a placeholder */}
           <p className="text-gray-500">Redirecting to dashboard...</p>
         </SignedIn>
 

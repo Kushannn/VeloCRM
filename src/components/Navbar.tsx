@@ -27,7 +27,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-[#121212] border-b border-gray-800 text-white">
+    <header className="bg-[#121212] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="text-xl font-bold">

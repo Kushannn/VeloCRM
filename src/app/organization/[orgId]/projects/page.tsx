@@ -8,6 +8,7 @@ import {
   Divider,
   Chip,
   addToast,
+  Button,
 } from "@heroui/react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { CircleUser, Plus } from "lucide-react";
@@ -135,45 +136,45 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="p-4 sm:p-8 space-y-6">
+      <div className="px-4 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl sm:text-4xl">Projects</h1>
             <p className="text-sm sm:text-base">Track all the projects here!</p>
           </div>
-          <button
-            className="flex items-center gap-2 bg-[#0a2540cc] text-sky-300 hover:bg-black p-2 rounded-md font-bold"
+          <Button
+            className="h-8 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-md shadow-purple-500/20"
             onClick={() => setOpenProjectModal(true)}
           >
             <Plus /> <span>Create New</span>
-          </button>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {[
             {
               label: "Active",
-              color: "from-[#3a7bd5] to-[#3a6073]",
+              color: "from-[#0d9488] via-[#0e7490] to-[#1e40af]",
               text: "#dbeafe",
             },
             {
               label: "On Hold",
-              color: "from-[#FF512F] to-[#F09819]",
+              color: "from-[#f59e0b] via-[#ea580c] to-[#b91c1c]",
               text: "#fef3c7",
             },
             {
               label: "Completed",
-              color: "from-[#11998e] to-[#38ef7d]",
+              color: "from-[#15803d] via-[#115e59] to-[#164e63]",
               text: "#bbf7d0",
             },
           ].map((stat, idx) => (
             <Card
               key={idx}
-              className={`w-full bg-gradient-to-br ${stat.color} text-[${stat.text}]`}
+              className={`w-full bg-gradient-to-br ${stat.color} text-[${stat.text}] h-20`}
             >
-              <CardBody className="flex flex-row justify-between items-center px-4 py-6">
+              <CardBody className="flex flex-row justify-between items-center px-4 py-3">
                 <div className="flex flex-col">
-                  <p className="text-2xl">{stat.label}</p>
+                  <p className="text-xl">{stat.label}</p>
                   <p className="text-sm">{stat.label} Projects</p>
                 </div>
                 <div className="text-xl">12</div>
@@ -192,13 +193,13 @@ export default function DashboardPage() {
             projects.map((project: any, index: number) => (
               <Card
                 key={project.id || index}
-                className={`w-full p-4 ${
+                className={`w-sm p-4 ${
                   project.status === "ACTIVE"
-                    ? "bg-gradient-to-br from-[#3a7bd5] to-[#3a6073] text-[#dbeafe]"
+                    ? "bg-gradient-to-tr from-[#0d9488] via-[#0e7490] to-[#1e40af]"
                     : project.status === "ON HOLD"
-                    ? "bg-gradient-to-br from-[#FF512F] to-[#F09819] text-[#fef3c7]"
+                    ? "bg-gradient-to-br from-[#f59e0b] via-[#ea580c] to-[#b91c1c]"
                     : project.status === "COMPLETED"
-                    ? "bg-gradient-to-br from-[#11998e] to-[#38ef7d] text-[#bbf7d0]"
+                    ? "bg-gradient-to-tl from-[#15803d] via-[#115e59] to-[#164e63]"
                     : "bg-gray-600 text-white"
                 }`}
               >
@@ -213,11 +214,26 @@ export default function DashboardPage() {
                       onChange={(e) =>
                         handleProjectStatusChange(project.id, e.target.value)
                       }
-                      className="bg-gray-700 text-white rounded-md p-2 cursor-pointer"
+                      className="p-2 cursor-pointer text-white shadow-lg rounded-md z-10 bg-white/10 backdrop-blur-md border border-white/20 text-sm"
                     >
-                      <option value="ACTIVE">Active</option>
-                      <option value="ON_HOLD">On Hold</option>
-                      <option value="COMPLETED">Completed</option>
+                      <option
+                        className="bg-black backdrop-blur-md text-white"
+                        value="ACTIVE"
+                      >
+                        Active
+                      </option>
+                      <option
+                        className="bg-black backdrop-blur-md text-white"
+                        value="ON_HOLD"
+                      >
+                        On Hold
+                      </option>
+                      <option
+                        className="bg-black backdrop-blur-md text-white"
+                        value="COMPLETED"
+                      >
+                        Completed
+                      </option>
                     </select>
                   ) : (
                     <Chip
@@ -240,7 +256,7 @@ export default function DashboardPage() {
                   >
                     ...
                     {openOptions === project.id && (
-                      <div className="absolute right-0 mt-2 w-40 bg-white text-white shadow-lg rounded-md z-10 bg-gradient-to-br from-[#232526] to-[#414345] text-sm">
+                      <div className="absolute right-0 mt-2 w-40 text-white shadow-lg rounded-md z-10 bg-white/10 backdrop-blur-md border border-white/20 text-sm">
                         <button
                           className="block w-full px-4 py-2 text-left"
                           onClick={() => {
@@ -283,12 +299,13 @@ export default function DashboardPage() {
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <Card className="flex-1 bg-gray-700">
+                    {/* <Card className="flex-1 bg-[#62A388]"> */}
+                    <Card className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl rounded-xl text-white">
                       <CardBody className="flex flex-col justify-between items-center">
                         Sprints <span>{project.sprints || 0}</span>
                       </CardBody>
                     </Card>
-                    <Card className="flex-1 bg-gray-700">
+                    <Card className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl rounded-xl text-white">
                       <CardBody className="flex flex-col justify-between items-center">
                         Tasks <span>{project.tasks || 0}</span>
                       </CardBody>
@@ -314,7 +331,7 @@ export default function DashboardPage() {
                         `/organization/${orgId}/projects/${project.id}`
                       )
                     }
-                    className="cursor-pointer hover:bg-gray-800 px-4 py-2 rounded-md text-white font-bold"
+                    className="cursor-pointer hover:bg-white/10 px-4 py-2 rounded-md text-white font-bold"
                   >
                     View Details
                   </div>

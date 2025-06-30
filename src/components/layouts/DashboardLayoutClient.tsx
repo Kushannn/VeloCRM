@@ -20,14 +20,6 @@ export default function DashboardLayoutClient({
         </button>
       </div>
 
-      <div
-        className={`${
-          showSidebar ? "block" : "hidden"
-        } sm:block w-64 bg-[#111111] transition-all duration-300 z-50 sm:z-auto fixed sm:relative inset-y-0 left-0`}
-      >
-        <Sidebar />
-      </div>
-
       {showSidebar && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 sm:hidden z-40"

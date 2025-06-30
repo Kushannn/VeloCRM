@@ -1,27 +1,11 @@
 "use client";
 
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Skeleton,
-  Divider,
-  Progress,
-  Button,
-} from "@heroui/react";
+import { Card, CardBody, Button } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 import { ProjectType, SprintType } from "@/lib/types";
-import {
-  ArrowBigRight,
-  Calendar,
-  ClipboardList,
-  Clock,
-  Plus,
-  Users,
-} from "lucide-react";
-import CreateSprint from "@/components/createSprint/CreateSprint";
+import { Calendar, ClipboardList, Clock } from "lucide-react";
 import CreateTask from "@/components/createTask/CreateTask";
 
 export default function DashboardPage() {
@@ -33,7 +17,6 @@ export default function DashboardPage() {
     sprintId: string;
   }>();
   const [loading, setLoading] = useState(true);
-  const [openSprintModal, setOpenSprintModal] = useState(false);
   const [openTaskModal, setOpenTaskModal] = useState(false);
   const [project, setProject] = useState<ProjectType>();
 
@@ -44,7 +27,6 @@ export default function DashboardPage() {
         `/api/project/${params.projectId}/sprint/${params.sprintId}/get-sprint`
       );
       const data = await res.json();
-
       if (data.success) {
         setSprint(data.sprint);
       }
@@ -83,11 +65,9 @@ export default function DashboardPage() {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const today = new Date();
-
     start.setHours(0, 0, 0, 0);
     end.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
-
     if (today < start) {
       return Math.ceil(
         (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
@@ -101,25 +81,23 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => {
-    console.log("sprint", sprint);
-  });
-
   return (
     <>
-      <div className="p-6">
-        {/* Sprint Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <ClipboardList className="w-7 h-7 text-blue-500" />
-            Sprint: {sprint?.title || "Untitled"}
-          </h1>
-          <p className="text-gray-400 mt-2">{sprint?.description}</p>
-        </div>
+      <div className="px-3 min-h-screen flex gap-6">
+        {/* Sprint Sidebar */}
+        <div className="w-60 space-y-6 bg-gradient-to-br from-[#121213] to-[#1c1d1e] p-3 min-h-screen rounded-xl">
+          <div>
+            <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <ClipboardList className="w-6 h-6 text-blue-500" />
+              Sprint:{" "}
+              <span className="text-gray-300 font-semibold">
+                {sprint?.title || "Untitled"}
+              </span>
+            </h1>
+            <p className="text-sm text-gray-400 mt-1">{sprint?.description}</p>
+          </div>
 
-        {/* Sprint Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <Card className="bg-[#1E1E1E] hover:shadow-lg transition">
+          <Card className="bg-[#1E1E1E] border border-gray-700">
             <CardBody className="text-center">
               <p className="text-sm text-gray-400">Start Date</p>
               <div className="flex justify-center items-center gap-2 text-white mt-2">
@@ -131,7 +109,7 @@ export default function DashboardPage() {
             </CardBody>
           </Card>
 
-          <Card className="bg-[#1E1E1E] hover:shadow-lg transition">
+          <Card className="bg-[#1E1E1E] border border-gray-700">
             <CardBody className="text-center">
               <p className="text-sm text-gray-400">End Date</p>
               <div className="flex justify-center items-center gap-2 text-white mt-2">
@@ -143,7 +121,7 @@ export default function DashboardPage() {
             </CardBody>
           </Card>
 
-          <Card className="bg-[#1E1E1E] hover:shadow-lg transition">
+          <Card className="bg-[#1E1E1E] border border-gray-700">
             <CardBody className="text-center">
               <p className="text-sm text-gray-400">Days Remaining</p>
               <div className="flex justify-center items-center gap-2 text-white mt-2">
@@ -157,84 +135,95 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <div>
-          <Card className="bg-[#1E1E1E]">
-            <CardHeader className="text-xl font-semibold text-white flex gap-5">
-              Tasks
-              <Button
-                onClick={() => setOpenTaskModal(true)}
-                color="primary"
-                className="h-8"
-              >
-                + New Task
-              </Button>
-            </CardHeader>
-            <CardBody className="grid gap-4">
+        {/* Tasks Section */}
+        <div className="flex-1 space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold text-white">Tasks</h2>
+            <Button
+              onClick={() => setOpenTaskModal(true)}
+              className="h-8 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-md shadow-purple-500/20"
+            >
+              + New Task
+            </Button>
+          </div>
+
+          <Card className="bg-[#1E1E1E] border border-gray-700">
+            <CardBody>
               {sprint?.tasks?.length ? (
-                sprint.tasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="p-4 border border-gray-700 rounded-lg bg-[#2a2a2a] hover:bg-[#333] transition w-56 h-40"
-                  >
-                    <h3 className="text-white font-medium text-lg">
-                      {task.title}
-                    </h3>
-                    <p className="text-sm text-gray-400">{task.description}</p>
-                    <div className="text-sm mt-2 text-gray-300 space-y-1">
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold">Status:</span>
-                        <span className="bg-blue-600 px-2 py-0.5 rounded text-white text-xs">
+                <div className="flex flex-col gap-4">
+                  {sprint.tasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className="rounded-xl px-6 py-4 flex items-center justify-between bg-[#2a2a2a] hover:bg-[#333] transition border border-gray-700"
+                    >
+                      <div className="flex-1 min-w-[150px]">
+                        <p className="text-xs text-gray-400 uppercase">Task</p>
+                        <p className="text-white font-medium text-base">
+                          {task.title}
+                        </p>
+                      </div>
+
+                      <div className="flex-1 min-w-[100px]">
+                        <p className="text-xs text-gray-400 uppercase">
+                          Estimate
+                        </p>
+                        <p className="text-white font-medium">2d 4h</p>
+                      </div>
+
+                      <div className="flex-1 min-w-[80px]">
+                        <p className="text-xs text-gray-400 uppercase">
+                          Assignee
+                        </p>
+                        <img
+                          src="/avatar.jpg"
+                          alt="User"
+                          className="w-8 h-8 rounded-full border border-gray-600 mt-1"
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-[60px]">
+                        <p className="text-xs text-gray-400 uppercase">
+                          Priority
+                        </p>
+                        <p
+                          className={`flex items-center gap-1 font-semibold text-sm ${
+                            task.priority === "HIGH"
+                              ? "text-red-500"
+                              : task.priority === "MEDIUM"
+                              ? "text-yellow-400"
+                              : "text-green-400"
+                          }`}
+                        >
+                          ↑ {task.priority}
+                        </p>
+                      </div>
+
+                      <div className="min-w-[80px] pr-4">
+                        <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-lg">
                           {task.status}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold">Priority:</span>
-                        <span
-                          className={`px-2 py-0.5 rounded text-white text-xs ${
-                            task.priority === "HIGH"
-                              ? "bg-red-600"
-                              : task.priority === "MEDIUM"
-                              ? "bg-yellow-500"
-                              : "bg-green-600"
-                          }`}
-                        >
-                          {task.priority}
-                        </span>
-                      </div>
                     </div>
-                    <div className="mt-4 flex items-center gap-2">
-                      <span className="text-sm text-gray-400">
-                        Assigned to:
-                      </span>
-                      {/* {task?.assignedToId?.map((user) => (
-                        <img
-                          key={user.id}
-                          src={user.image || "/default-avatar.png"}
-                          alt={user.name || "User"}
-                          className="w-8 h-8 rounded-full border border-gray-600 object-cover"
-                          title={user.name}
-                        />
-                      ))} */}
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : (
-                <p className="text-gray-500">No tasks found for this sprint.</p>
+                <p className="text-gray-500 text-center italic py-6">
+                  💤 No tasks found for this sprint.
+                </p>
               )}
             </CardBody>
           </Card>
         </div>
       </div>
 
+      {/* Modal */}
       <CreateTask
         isOpen={openTaskModal}
         onClose={() => setOpenTaskModal(false)}
         sprintId={params.sprintId}
         sprint={sprint!}
         project={project!}
-        onTaskCreated={() => {
-          fetchSprint();
-        }}
+        onTaskCreated={fetchSprint}
       />
     </>
   );

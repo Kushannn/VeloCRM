@@ -8,6 +8,7 @@ import {
   FolderOpenDot,
   UserPlus,
   ClipboardList,
+  Users,
 } from "lucide-react";
 import CreateOrganization from "./createOrganization/CreateOrganization";
 import CreateProject from "./project/createProject/CreateProject";
@@ -77,7 +78,7 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full sm:w-64 p-4 flex flex-col gap-4 bg-[#111] min-h-screen">
+      <div className="w-full sm:w-64 p-4 flex flex-col gap-4 ml-3 min-h-full rounded-xl bg-gradient-to-br from-[#121213] to-[#1c1d1e] text-white">
         <div
           className="h-12 sm:h-14 cursor-pointer mt-2 font-bold text-base sm:text-lg p-2 hover:bg-[#171717] rounded-md text-white flex items-center gap-2"
           onClick={() => setIsModalOpen(true)}
@@ -92,24 +93,14 @@ function Sidebar() {
           </span>
         </div>
 
-        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
-          <Home className="text-sky-300" />
+        <div
+          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          onClick={() => {
+            router.push("/");
+          }}
+        >
+          <Home className="text-[#4a2040]" />
           <span>Home</span>
-        </div>
-
-        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
-          <BookCheck className="text-sky-300" />
-          <span>Sprints</span>
-        </div>
-
-        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
-          <ClipboardList className="text-sky-300" />
-          <span>Tasks</span>
-        </div>
-
-        <div className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
-          <Home className="text-sky-300" />
-          <span>Leads</span>
         </div>
 
         <div
@@ -118,17 +109,34 @@ function Sidebar() {
               "/organization/" + user?.membership?.organizationId + "/projects"
             );
           }}
-          className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
         >
-          <FolderOpenDot className="text-sky-300" />
+          <FolderOpenDot className="text-[#4a2040]" />
           <span>Projects</span>
         </div>
 
         <div
-          className="flex items-center gap-4 font-bold text-sky-300 bg-[#0a2540cc] hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          onClick={() => {
+            router.push(
+              "/organization/" + user?.membership?.organizationId + "/employees"
+            );
+          }}
+        >
+          <Users className="text-[#4a2040]" />
+          <span>Employees</span>
+        </div>
+
+        <div className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
+          <Home className="text-[#4a2040]" />
+          <span>Leads</span>
+        </div>
+
+        <div
+          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
           onClick={() => setInviteModal(true)}
         >
-          <UserPlus className="text-sky-300" />
+          <UserPlus className="text-[#4a2040]" />
           <span>Invite</span>
         </div>
       </div>
