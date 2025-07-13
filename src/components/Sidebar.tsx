@@ -127,7 +127,14 @@ function Sidebar() {
           <span>Employees</span>
         </div>
 
-        <div className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base">
+        <div
+          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          onClick={() => {
+            router.push(
+              "/organization/" + user?.membership?.organizationId + "/leads"
+            );
+          }}
+        >
           <Home className="text-[#4a2040]" />
           <span>Leads</span>
         </div>

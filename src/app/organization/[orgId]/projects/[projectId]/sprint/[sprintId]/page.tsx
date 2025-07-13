@@ -81,142 +81,122 @@ export default function DashboardPage() {
     }
   };
 
+  const renderTasks = (status: "PENDING" | "IN_PROGRESS" | "COMPLETED") => {
+    const filtered = sprint?.tasks?.filter((t) => t.status === status) || [];
+
+    if (!filtered.length) {
+      return <p className="text-gray-500 italic">No tasks</p>;
+    }
+
+    return filtered.map((task) => (
+      <Card
+        key={task.id}
+        className="bg-[#2a2a2a] border border-gray-700 hover:bg-[#333] transition"
+      >
+        <CardBody className="flex flex-col justify-between h-full">
+          <div className="mb-3">
+            <p className="text-white text-base font-semibold">{task.title}</p>
+            <p className="text-sm text-gray-400">{task.description}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Priority: {task.priority}
+            </p>
+          </div>
+
+          <div className="flex justify-end">
+            <span
+              className={`inline-flex items-center text-xs font-semibold px-2 py-1 rounded-md ${
+                task.status === "PENDING"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : task.status === "IN_PROGRESS"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-green-100 text-green-800"
+              }`}
+            >
+              {task.status.replace("_", " ")}
+            </span>
+          </div>
+        </CardBody>
+      </Card>
+    ));
+  };
+
   return (
     <>
-      <div className="px-3 min-h-screen flex gap-6">
-        {/* Sprint Sidebar */}
-        <div className="w-60 space-y-6 bg-gradient-to-br from-[#121213] to-[#1c1d1e] p-3 min-h-screen rounded-xl">
-          <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <ClipboardList className="w-6 h-6 text-blue-500" />
-              Sprint:{" "}
-              <span className="text-gray-300 font-semibold">
-                {sprint?.title || "Untitled"}
-              </span>
-            </h1>
+      <div className="px-3 min-h-screen space-y-6">
+        {/* Sprint Info */}
+        <div className="w-full bg-gradient-to-br from-[#121213] to-[#1c1d1e] p-4 rounded-xl">
+          <div className="mb-4">
+            <div className="flex items-center gap-5 flex-wrap">
+              <h1 className="text-xl font-bold text-white flex items-center gap-2">
+                <ClipboardList className="w-6 h-6 text-blue-500" />
+                Sprint:
+                <span className="text-gray-300 font-semibold">
+                  {sprint?.title || "Untitled"}
+                </span>
+              </h1>
+
+              <div className="flex items-center text-white">
+                <Calendar />
+                <span className="ml-2 mr-2">
+                  {sprint?.startDate
+                    ? new Date(sprint.startDate).toLocaleDateString("en-GB")
+                    : "N/A"}
+                </span>
+                -
+                <span className="ml-2">
+                  {sprint?.endDate
+                    ? new Date(sprint.endDate).toLocaleDateString("en-GB")
+                    : "N/A"}
+                </span>
+              </div>
+
+              <div className="flex items-center text-white">
+                <Clock className="ml-4" />
+                <span className="ml-2">
+                  {sprint?.startDate && sprint?.endDate
+                    ? `${calculateDaysRemaining(
+                        sprint.startDate,
+                        sprint.endDate
+                      )} days left`
+                    : "N/A"}
+                </span>
+              </div>
+            </div>
             <p className="text-sm text-gray-400 mt-1">{sprint?.description}</p>
           </div>
-
-          <Card className="bg-[#1E1E1E] border border-gray-700">
-            <CardBody className="text-center">
-              <p className="text-sm text-gray-400">Start Date</p>
-              <div className="flex justify-center items-center gap-2 text-white mt-2">
-                <Calendar className="w-5 h-5" />
-                {sprint?.startDate
-                  ? new Date(sprint?.startDate).toLocaleDateString()
-                  : "N/A"}
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card className="bg-[#1E1E1E] border border-gray-700">
-            <CardBody className="text-center">
-              <p className="text-sm text-gray-400">End Date</p>
-              <div className="flex justify-center items-center gap-2 text-white mt-2">
-                <Calendar className="w-5 h-5" />
-                {sprint?.endDate
-                  ? new Date(sprint?.endDate).toLocaleDateString()
-                  : "N/A"}
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card className="bg-[#1E1E1E] border border-gray-700">
-            <CardBody className="text-center">
-              <p className="text-sm text-gray-400">Days Remaining</p>
-              <div className="flex justify-center items-center gap-2 text-white mt-2">
-                <Clock className="w-5 h-5" />
-                {sprint?.startDate && sprint?.endDate
-                  ? calculateDaysRemaining(sprint.startDate, sprint.endDate)
-                  : "N/A"}{" "}
-                days
-              </div>
-            </CardBody>
-          </Card>
         </div>
 
-        {/* Tasks Section */}
-        <div className="flex-1 space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold text-white">Tasks</h2>
-            <Button
-              onClick={() => setOpenTaskModal(true)}
-              className="h-8 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-md shadow-purple-500/20"
-            >
-              + New Task
-            </Button>
+        {/* Task Header */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold text-white">Tasks</h2>
+          <Button
+            onClick={() => setOpenTaskModal(true)}
+            className="h-8 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-md shadow-purple-500/20"
+          >
+            + New Task
+          </Button>
+        </div>
+
+        {/* Tasks Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-[#1E1E1E] rounded-xl p-4 border border-gray-700">
+            <h3 className="text-lg font-bold text-white mb-3">To-Do</h3>
+            {renderTasks("PENDING")}
           </div>
-
-          <Card className="bg-[#1E1E1E] border border-gray-700">
-            <CardBody>
-              {sprint?.tasks?.length ? (
-                <div className="flex flex-col gap-4">
-                  {sprint.tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="rounded-xl px-6 py-4 flex items-center justify-between bg-[#2a2a2a] hover:bg-[#333] transition border border-gray-700"
-                    >
-                      <div className="flex-1 min-w-[150px]">
-                        <p className="text-xs text-gray-400 uppercase">Task</p>
-                        <p className="text-white font-medium text-base">
-                          {task.title}
-                        </p>
-                      </div>
-
-                      <div className="flex-1 min-w-[100px]">
-                        <p className="text-xs text-gray-400 uppercase">
-                          Estimate
-                        </p>
-                        <p className="text-white font-medium">2d 4h</p>
-                      </div>
-
-                      <div className="flex-1 min-w-[80px]">
-                        <p className="text-xs text-gray-400 uppercase">
-                          Assignee
-                        </p>
-                        <img
-                          src="/avatar.jpg"
-                          alt="User"
-                          className="w-8 h-8 rounded-full border border-gray-600 mt-1"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-[60px]">
-                        <p className="text-xs text-gray-400 uppercase">
-                          Priority
-                        </p>
-                        <p
-                          className={`flex items-center gap-1 font-semibold text-sm ${
-                            task.priority === "HIGH"
-                              ? "text-red-500"
-                              : task.priority === "MEDIUM"
-                              ? "text-yellow-400"
-                              : "text-green-400"
-                          }`}
-                        >
-                          ↑ {task.priority}
-                        </p>
-                      </div>
-
-                      <div className="min-w-[80px] pr-4">
-                        <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-lg">
-                          {task.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center italic py-6">
-                  💤 No tasks found for this sprint.
-                </p>
-              )}
-            </CardBody>
-          </Card>
+          <div className="bg-[#1E1E1E] rounded-xl p-4 border border-gray-700">
+            <h3 className="text-lg font-bold text-white mb-3">
+              In Development
+            </h3>
+            {renderTasks("IN_PROGRESS")}
+          </div>
+          <div className="bg-[#1E1E1E] rounded-xl p-4 border border-gray-700">
+            <h3 className="text-lg font-bold text-white mb-3">Completed</h3>
+            {renderTasks("COMPLETED")}
+          </div>
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Task Creation Modal */}
       <CreateTask
         isOpen={openTaskModal}
         onClose={() => setOpenTaskModal(false)}

@@ -87,3 +87,20 @@ export interface ProjectType {
   projectUsers: ProjectUserType[];
   sprints: SprintType[];
 }
+
+export interface LeadType {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  source?: string;
+  notes?: string;
+  status: "NEW" | "CONTACTED" | "QUALIFIED" | "LOST" | "CONVERTED";
+  createdAt: string;
+  updatedAt: string;
+  assignedToId?: string;
+  organizationId: string;
+
+  assignedTo?: UserType;
+  organization?: OrganizationType;
+}
