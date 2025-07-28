@@ -31,7 +31,15 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${manrope.variable} antialiased min-h-screen`}
-        style={{ fontFamily: "var(--font-manrope), sans-serif" }}
+        style={{
+          fontFamily: "var(--font-manrope), sans-serif",
+          backgroundColor: "#000000", // solid black fallback
+          backgroundImage:
+            "radial-gradient(125% 125% at 50% 100%, #000000 40%, #350136 100%)",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center bottom",
+          backgroundSize: "cover",
+        }}
       >
         <ClerkProvider
           publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}

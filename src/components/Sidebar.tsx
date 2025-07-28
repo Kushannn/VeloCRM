@@ -78,10 +78,19 @@ function Sidebar() {
 
   return (
     <>
-      <div className="w-full sm:w-64 p-4 flex flex-col gap-4 ml-3 min-h-full rounded-xl bg-gradient-to-br from-[#121213] to-[#1c1d1e] text-white">
+      <div
+        className="w-full sm:w-64 p-4 flex flex-col gap-4 ml-3 min-h-full rounded-xl text-white"
+        style={{
+          background:
+            "radial-gradient(125% 125% at 50% 100%, #000000 40%, #350136 100%)",
+          // Optional: subtle border to separate from main content
+          border: "1px solid rgba(255, 255, 255, 0.05)",
+        }}
+      >
         <div
-          className="h-12 sm:h-14 cursor-pointer mt-2 font-bold text-base sm:text-lg p-2 hover:bg-[#171717] rounded-md text-white flex items-center gap-2"
+          className="h-12 sm:h-14 cursor-pointer mt-2 font-bold text-base sm:text-lg p-2 rounded-md text-white flex items-center gap-2 transition-colors duration-300"
           onClick={() => setIsModalOpen(true)}
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
         >
           <span>
             <Building />
@@ -94,12 +103,19 @@ function Sidebar() {
         </div>
 
         <div
-          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          className="flex items-center gap-4 font-bold cursor-pointer text-sm sm:text-base p-2 rounded-md transition-colors duration-300"
           onClick={() => {
             router.push("/");
           }}
+          style={{ color: "#d1d5db" }} // soft gray color
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
         >
-          <Home className="text-[#4a2040]" />
+          <Home className="text-[#9e94a8]" />
           <span>Home</span>
         </div>
 
@@ -109,45 +125,74 @@ function Sidebar() {
               "/organization/" + user?.membership?.organizationId + "/projects"
             );
           }}
-          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          className="flex items-center gap-4 font-bold cursor-pointer text-sm sm:text-base p-2 rounded-md transition-colors duration-300"
+          style={{ color: "#d1d5db" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
         >
-          <FolderOpenDot className="text-[#4a2040]" />
+          <FolderOpenDot className="text-[#9e94a8]" />
           <span>Projects</span>
         </div>
 
         <div
-          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          className="flex items-center gap-4 font-bold cursor-pointer text-sm sm:text-base p-2 rounded-md transition-colors duration-300"
           onClick={() => {
             router.push(
               "/organization/" + user?.membership?.organizationId + "/employees"
             );
           }}
+          style={{ color: "#d1d5db" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
         >
-          <Users className="text-[#4a2040]" />
+          <Users className="text-[#9e94a8]" />
           <span>Employees</span>
         </div>
 
         <div
-          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          className="flex items-center gap-4 font-bold cursor-pointer text-sm sm:text-base p-2 rounded-md transition-colors duration-300"
           onClick={() => {
             router.push(
               "/organization/" + user?.membership?.organizationId + "/leads"
             );
           }}
+          style={{ color: "#d1d5db" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
         >
-          <Home className="text-[#4a2040]" />
+          <Home className="text-[#9e94a8]" />
           <span>Leads</span>
         </div>
 
         <div
-          className="flex items-center gap-4 font-bold hover:bg-black p-2 rounded-md cursor-pointer text-sm sm:text-base"
+          className="flex items-center gap-4 font-bold cursor-pointer text-sm sm:text-base p-2 rounded-md transition-colors duration-300"
           onClick={() => setInviteModal(true)}
+          style={{ color: "#d1d5db" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
         >
-          <UserPlus className="text-[#4a2040]" />
+          <UserPlus className="text-[#9e94a8]" />
           <span>Invite</span>
         </div>
       </div>
 
+      {/* Invite Modal */}
       <Modal
         isOpen={inviteModal}
         onOpenChange={setInviteModal}
