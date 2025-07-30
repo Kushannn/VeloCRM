@@ -3,10 +3,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ProjectState {
   projects: ProjectType[] | null;
+  selectedProject: ProjectType | null;
 }
 
 const initialState: ProjectState = {
   projects: null,
+  selectedProject: null,
 };
 
 const projectsSlice = createSlice({
@@ -14,8 +16,6 @@ const projectsSlice = createSlice({
   initialState,
   reducers: {
     setProjects(state, action: PayloadAction<ProjectType[]>) {
-      console.log("State ", state);
-      console.log("action", action.payload);
       state.projects = action.payload;
     },
     clearProjects(state) {
@@ -29,10 +29,13 @@ const projectsSlice = createSlice({
       }
       // Optionally add else: state.projects.push(action.payload);
     },
+    setSelectedProject(state, action: PayloadAction<ProjectType>) {
+      state.selectedProject = action.payload;
+    },
   },
 });
 
-export const { setProjects, clearProjects, updateProject } =
+export const { setProjects, clearProjects, updateProject, setSelectedProject } =
   projectsSlice.actions;
 
 export default projectsSlice.reducer;

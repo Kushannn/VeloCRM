@@ -1,24 +1,24 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
-import { setProjects } from "@/redux/slices/projectSlice";
+import { setSelectedProject } from "@/redux/slices/projectSlice";
 
-export default function useFetchProjects() {
+export default function useFetchSingleProject(projectId: string) {
   const dispatch = useDispatch();
   const orgId = Cookies.get("orgId");
 
   useEffect(() => {
     const fetchAndStoreProjects = async () => {
-      if (!orgId) return;
+      if (!orgId || !projectId) return;
 
       try {
-        const res = await fetch(`/api/project/get-projects/${orgId}`);
+        const res = await fetch(`/api/project/${projectId}/get-project`);
         const data = await res.json();
         if (data.success) {
-          dispatch(setProjects(data.projects));
+          dispatch(setSelectedProject(data.project));
         }
-      } catch (err) {
-        console.error("Error fetching projects:", err);
+      } catch (error) {
+        console.log("Error getting the project", error);
       }
     };
 

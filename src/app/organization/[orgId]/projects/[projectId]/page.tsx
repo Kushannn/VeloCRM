@@ -44,7 +44,7 @@ export default function DashboardPage() {
     };
 
     getProject();
-  }, []);
+  }, [params.projectId]);
 
   function getProgress(startDate: Date, endDate: Date) {
     const currentDate = new Date();
@@ -56,188 +56,171 @@ export default function DashboardPage() {
       100,
       Math.max(0, (timePassed / totalDuration) * 100)
     );
-
     return percentage;
   }
 
   return (
     <div className="w-full px-4">
-      <Card className="bg-gradient-to-br from-[#1d1d1e] to-[#1c1d1e] text-white w-full max-w-7xl mx-auto">
-        <CardHeader className="flex flex-col items-start m-4">
+      <Card className="w-full mx-auto text-white bg-transparent">
+        <CardHeader className="flex flex-col items-start space-y-2">
           {loading ? (
             <div className="w-full space-y-4">
               <div className="flex flex-wrap gap-4">
-                <Skeleton className="h-8 w-full sm:w-1/2 rounded-lg bg-gray-600" />
-                <Skeleton className="h-[50px] w-full sm:w-[150px] rounded-lg bg-gray-600" />
+                <Skeleton className="h-8 w-full sm:w-1/2 rounded-lg bg-gray-700" />
+                <Skeleton className="h-[50px] w-full sm:w-[150px] rounded-lg bg-gray-700" />
               </div>
-              <Skeleton className="h-6 w-1/2 sm:w-[120px] rounded-lg bg-gray-600" />
+              <Skeleton className="h-6 w-1/2 sm:w-[120px] rounded-lg bg-gray-700" />
             </div>
           ) : (
             <>
-              <div className="flex flex-wrap justify-start items-center gap-4">
-                <h1 className="text-3xl sm:text-4xl font-semibold p-2">
+              <div className="flex flex-wrap items-center gap-4">
+                <h1 className="p-2 text-4xl sm:text-5xl font-extrabold tracking-wide">
                   {project?.name}
                 </h1>
                 <div
-                  className={`rounded-lg px-4 py-2 text-center font-bold text-sm sm:text-lg ${
+                  className={`rounded-lg px-5 py-2 text-center font-semibold text-sm sm:text-lg tracking-wide ${
                     project?.status === "ACTIVE"
                       ? "bg-gradient-to-br from-[#3a7bd5] to-[#3a6073] text-[#dbeafe]"
                       : project?.status === "ON HOLD"
                       ? "bg-gradient-to-br from-[#FF512F] to-[#F09819] text-[#fef3c7]"
                       : project?.status === "COMPLETED"
                       ? "bg-gradient-to-br from-[#11998e] to-[#38ef7d] text-[#bbf7d0]"
-                      : "bg-gray-600 text-white"
+                      : "bg-gray-700 text-white"
                   }`}
                 >
                   {project?.status}
                 </div>
               </div>
-              <div className="flex items-center gap-2 mt-3 p-1 text-sm sm:text-base">
-                Created At <Calendar className="w-4 h-4" />
-                {project?.createdAt
-                  ? new Date(project.createdAt).toLocaleDateString()
-                  : "N/A"}
+              <div className="flex items-center gap-2 p-1 text-sm sm:text-lg text-neutral-300">
+                <Calendar className="w-5 h-5" />
+                <span>
+                  {project?.createdAt
+                    ? "Created At :  " +
+                      new Date(project.createdAt).toLocaleDateString()
+                    : "N/A"}
+                </span>
               </div>
             </>
           )}
         </CardHeader>
 
         <CardBody className="flex flex-col lg:flex-row items-start gap-6 px-4 pb-6">
-          <Card className="w-full lg:w-1/2 relative bg-[#191919] p-[2px] rounded-lg overflow-hidden group">
-            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#B33791_0%,#C562AF_25%,#DB8DD0_50%,#B33791_75%,#B33791_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
-            <div className="relative bg-[#191919] rounded-[calc(0.5rem-2px)]">
-              <CardHeader>
-                <div className="flex flex-col w-full">
-                  <div className="flex flex-row items-center pl-2">
-                    <Users className="text-[#8c75ff]" />
-                    <h1 className="text-xl sm:text-2xl p-3 text-left">
-                      Members
-                    </h1>
-                  </div>
-                  <Divider className="w-full bg-gray-700" />
+          {/* Members Card */}
+          <Card className="w-full lg:w-1/2 relative rounded-lg p-[2px] overflow-hidden group bg-[#1f1a2e] border border-[#4a305c] shadow-lg shadow-[#3a2b63cc] self-start">
+            <div
+              className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#B33791_0%,#C562AF_25%,#DB8DD0_50%,#B33791_75%,#B33791_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused]"
+              style={{ "--border-angle": "0deg" } as React.CSSProperties}
+            />
+            <div className="relative rounded-lg bg-[#1c172c] p-4">
+              <CardHeader className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <Users className="text-[#b58eff]" />
+                  <h1 className="text-xl sm:text-2xl font-semibold">Members</h1>
                 </div>
+                <Divider className="my-2 border-gray-700" />
               </CardHeader>
-              <CardBody>
+              <CardBody className="space-y-3 max-h-[420px] overflow-auto">
                 {project?.projectUsers?.map((projectUser) => (
-                  <>
-                    <div
-                      key={projectUser?.id}
-                      className="flex items-center justify-between p-3 bg-[#262626] rounded-lg border border-gray-700"
-                    >
-                      <div className="flex items-center gap-4">
-                        {projectUser?.user?.image ? (
-                          <img
-                            src={projectUser?.user?.image}
-                            alt={projectUser?.user?.name}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center">
-                            {projectUser?.user?.name?.charAt(0).toUpperCase() ??
-                              "U"}
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-white font-semibold">
-                            {projectUser?.user?.name}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {projectUser?.user?.email}
-                          </p>
+                  <div
+                    key={projectUser?.id}
+                    className="flex items-center justify-between p-3 rounded-lg border border-gray-700 bg-[#2a223f]"
+                  >
+                    <div className="flex items-center gap-4">
+                      {projectUser?.user?.image ? (
+                        <img
+                          src={projectUser?.user?.image}
+                          alt={projectUser?.user?.name}
+                          className="w-10 h-10 rounded-full object-cover shadow-md"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-600 text-white font-semibold text-lg shadow-md">
+                          {projectUser?.user?.name?.charAt(0).toUpperCase() ??
+                            "U"}
                         </div>
+                      )}
+                      <div>
+                        <p className="font-semibold text-white">
+                          {projectUser?.user?.name}
+                        </p>
+                        <p className="text-sm text-gray-400 truncate max-w-[200px]">
+                          {projectUser?.user?.email}
+                        </p>
                       </div>
                     </div>
-                  </>
+                  </div>
                 ))}
               </CardBody>
             </div>
           </Card>
 
-          <Card className="w-full lg:w-1/2 relative bg-[#191919] p-[2px] rounded-lg overflow-hidden group">
-            <div className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#B33791_0%,#C562AF_25%,#DB8DD0_50%,#B33791_75%,#B33791_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused] [--border-angle:0deg]" />
-            <div className="relative bg-[#191919] rounded-[calc(0.5rem-2px)]">
-              <CardHeader className="flex flex-col">
-                <div className="flex justify-between items-center w-full px-3">
-                  <div className="flex items-center">
-                    <BookCheck className="text-[#4a2040]" />
-                    <h1 className="text-xl sm:text-2xl p-3">Sprints</h1>
-                  </div>
-                  <Button
-                    className="h-8 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-md shadow-purple-500/20"
-                    onClick={() => setOpenSprintModal(true)}
-                  >
-                    <Plus /> <span>Create New</span>
-                  </Button>
+          {/* Sprints Card */}
+          <Card className="w-full lg:w-1/2 relative rounded-lg p-[2px] overflow-hidden group bg-[#1f1a2e] border border-[#4a305c] shadow-lg shadow-[#3a2b63cc] self-start">
+            <div
+              className="absolute inset-0 bg-[conic-gradient(from_var(--border-angle),#B33791_0%,#C562AF_25%,#DB8DD0_50%,#B33791_75%,#B33791_100%)] animate-[border-spin_3s_linear_infinite] group-hover:[animation-play-state:paused]"
+              style={{ "--border-angle": "0deg" } as React.CSSProperties}
+            />
+            <div className="relative rounded-lg bg-[#1c172c] p-4 flex flex-col">
+              <CardHeader className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BookCheck className="text-[#b58eff]" />
+                  <h1 className="text-xl sm:text-2xl font-semibold">Sprints</h1>
                 </div>
-                <Divider className="my-2 bg-gray-700" />
+                <Button
+                  className="h-9 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white shadow-md shadow-purple-500/30"
+                  onClick={() => setOpenSprintModal(true)}
+                >
+                  <Plus /> <span>Create New</span>
+                </Button>
               </CardHeader>
-
-              <CardBody>
+              <Divider className="my-2 border-gray-700" />
+              <CardBody className="space-y-4 max-h-[520px] overflow-auto">
                 {project?.sprints?.map((sprint) => (
-                  <>
-                    <div
-                      key={sprint?.id}
-                      className="flex flex-col items-start justify-between p-4 bg-[#262626] rounded-lg border border-gray-700 w-full"
-                    >
-                      <div className="flex flex-col gap-1 text-left w-full">
-                        <p className="text-white font-semibold text-lg">
-                          {sprint?.title}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          {sprint?.description}
-                        </p>
-                      </div>
+                  <div
+                    key={sprint?.id}
+                    className="flex flex-col justify-between gap-2 p-4 rounded-lg border border-gray-700 bg-[#2a223f] shadow-sm transition hover:shadow-md cursor-pointer"
+                    onClick={() =>
+                      router.push(
+                        `/organization/${params.orgId}/projects/${params.projectId}/sprint/${sprint?.id}`
+                      )
+                    }
+                  >
+                    <div className="w-full">
+                      <p className="text-lg font-semibold text-white truncate">
+                        {sprint?.title}
+                      </p>
+                      <p className="text-sm text-gray-400 truncate">
+                        {sprint?.description}
+                      </p>
+                    </div>
 
-                      <div className="w-full mt-4">
-                        <Progress
-                          aria-label="Sprint Progress"
-                          color="secondary"
-                          className="w-full"
-                          value={getProgress(
-                            sprint?.startDate,
-                            sprint?.endDate
+                    <Progress
+                      aria-label="Sprint Progress"
+                      color="secondary"
+                      className="w-full mt-3"
+                      value={getProgress(sprint?.startDate, sprint?.endDate)}
+                    />
+
+                    <div className="mt-4 flex justify-between items-center text-gray-400 font-medium text-sm select-none">
+                      <div className="flex gap-2 whitespace-nowrap">
+                        <span>
+                          {new Date(sprint?.startDate).toLocaleDateString(
+                            "en-GB",
+                            { day: "2-digit", month: "long", year: "numeric" }
                           )}
-                        />
+                        </span>
+                        <span>-</span>
+                        <span>
+                          {new Date(sprint?.endDate).toLocaleDateString(
+                            "en-GB",
+                            { day: "2-digit", month: "long", year: "numeric" }
+                          )}
+                        </span>
                       </div>
-
-                      <div className="font-medium text-gray-400 mt-5 flex justify-between items-center w-full">
-                        <div className="flex gap-2">
-                          <span>
-                            {new Date(sprint?.startDate).toLocaleDateString(
-                              "en-GB",
-                              {
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric",
-                              }
-                            )}
-                          </span>
-                          <span>-</span>
-                          <span>
-                            {new Date(sprint?.endDate).toLocaleDateString(
-                              "en-GB",
-                              {
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric",
-                              }
-                            )}
-                          </span>
-                        </div>
-
-                        <div
-                          className="cursor-pointer"
-                          onClick={() =>
-                            router.push(
-                              `/organization/${params.orgId}/projects/${params.projectId}/sprint/${sprint?.id}`
-                            )
-                          }
-                        >
-                          <ArrowBigRight />
-                        </div>
+                      <div className="cursor-pointer hover:text-purple-400">
+                        <ArrowBigRight />
                       </div>
                     </div>
-                  </>
+                  </div>
                 ))}
               </CardBody>
             </div>
@@ -248,8 +231,8 @@ export default function DashboardPage() {
       <CreateSprint
         isOpen={openSprintModal}
         onClose={() => setOpenSprintModal(false)}
-        projectId={project?.id ? project?.id : ""}
-        userId={user?.id ? user?.id : ""}
+        projectId={project?.id ?? ""}
+        userId={user?.id ?? ""}
       />
     </div>
   );

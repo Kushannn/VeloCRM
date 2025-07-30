@@ -35,7 +35,7 @@ export default function StatusColumn({
         border border-neutral-800
         text-neutral-100
         select-none
-        overflow-hidden
+        overflow-visible
         sm:flex-shrink-0
         transition-colors
       `}
@@ -50,7 +50,7 @@ export default function StatusColumn({
       >
         <div
           className="flex flex-col space-y-4 overflow-auto"
-          style={{ maxHeight: "calc(100vh - 260px)" }}
+          style={{ maxHeight: "calc(100vh - 280px)" }}
         >
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
