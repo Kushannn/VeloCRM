@@ -97,13 +97,11 @@ export default function SprintBoard({
     const column = TASK_STATUSES.find((status) => status.id === over.id);
     if (!column || task.status === column.status) return;
 
-    // ✅ 1. Optimistically update local state
     const updatedTasks = tasks.map((t) =>
       t.id === task.id ? { ...t, status: column.status } : t
     );
-    setTasks(updatedTasks); // <- update your tasks state here
+    setTasks(updatedTasks);
 
-    // ✅ 2. Debounced backend update
     debouncedUpdate(task.id, column.status);
   };
 

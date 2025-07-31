@@ -3,9 +3,8 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskType } from "@/lib/types";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import TaskDetailsCard from "../taskDetails/TaskDetailsCard";
-import { Modal } from "@heroui/react";
 
 interface SprintTaskCardProps {
   task: TaskType;
@@ -31,13 +30,8 @@ export default function SprintTaskCard({ task }: SprintTaskCardProps) {
   };
 
   const handleClick = () => {
-    console.log("handle click");
     if (!isDragging) setOpenDetails(true);
   };
-
-  useEffect(() => {
-    console.log("open Detaiols ", openDetails);
-  });
 
   return (
     <>
