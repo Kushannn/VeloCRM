@@ -64,7 +64,7 @@ export default function CreateTask({
             priority,
             assignedTo,
           }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -162,7 +162,7 @@ export default function CreateTask({
                   }}
                 >
                   {project?.projectUsers?.map((user) => (
-                    <SelectItem key={user.user.id}>{user.user.name}</SelectItem>
+                    <SelectItem key={user.id}>{user.user?.name}</SelectItem>
                   ))}
                 </Select>
               </div>
