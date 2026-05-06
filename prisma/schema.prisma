@@ -1,9 +1,7 @@
-// schema.prisma
-// MongoDB + Prisma Schema
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
+  url=env("DATABASE_URL")
 }
 
 generator client {
@@ -25,7 +23,7 @@ model User {
   notes               Note[]
   leads               Lead[]             @relation("LeadAssignee")
   //membership for organizations
-  membership         UserOrganization?    
+  membership         UserOrganization[]   
   ownedOrganizations  Organization[]     @relation("OrganizationOwner")
    userProjects UserProject[]
 }
@@ -41,6 +39,7 @@ model Organization {
   name      String
   ownerId   String
   createdAt DateTime @default(now())
+  slug      String   @unique
 
   owner       User               @relation("OrganizationOwner", fields: [ownerId], references: [id])
   sprints     Sprint[]
@@ -57,12 +56,13 @@ enum MembershipRole {
 
 model UserOrganization {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String         @unique 
+  userId         String          
   organizationId String
   role           MembershipRole @default(MEMBER)
 
   user         User         @relation(fields: [userId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
+  @@unique([userId,organizationId])
 }
 
 
@@ -73,6 +73,7 @@ model Project {
   description    String?
   organizationId String
   status         projectStatus         @default(ACTIVE)
+  slug      String     @unique
 
   createdAt      DateTime       @default(now())
 
@@ -99,6 +100,7 @@ model Sprint {
   organizationId String
   projectId      String
   createdAt      DateTime @default(now())
+  slug      String  @unique
 
   // Relations
   createdBy    User         @relation("UserSprints", fields: [createdById], references: [id])

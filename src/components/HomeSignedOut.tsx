@@ -5,6 +5,7 @@ import { Card, CardBody } from "@heroui/react";
 import { Clock } from "lucide-react";
 
 import baseImage from "../../public/baseImage1.jpg";
+import Navbar from "./Navbar";
 
 function HomeSignedOut() {
   return (

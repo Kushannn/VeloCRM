@@ -3,6 +3,7 @@ export interface OrganizationType {
   name: string;
   ownerId: string;
   createdAt: string;
+  slug: string;
 }
 
 export interface MembershipType {
@@ -17,26 +18,24 @@ export interface UserType {
   id: string;
   clerkId: string;
   email: string;
-  name?: string;
+  name?: string | null;
   image?: string | null;
   role: string;
   // createdAt: string;
   ownedOrganizations?: OrganizationType[];
-  membership?: MembershipType | null;
+  membership?: MembershipType[] | null;
 }
 
-// export interface SprintType {
-//   id: string;
-//   title: string;
-//   description?: string;
-//   startDate: Date;
-//   endDate: Date;
-//   createdAt: Date;
+export type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 
-//   createdById: string;
-//   organizationId: string;
-//   projectId: string;
-// }
+export interface ColumnType {
+  key: TaskStatus;
+  label: string;
+  tasks: TaskType[];
+  dot: string;
+  badge: string;
+  empty: string;
+}
 
 export interface TaskType {
   id: string;
@@ -54,7 +53,7 @@ export interface TaskType {
 export interface SprintType {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   startDate: Date;
   endDate: Date;
   createdAt: Date;
@@ -73,17 +72,17 @@ export interface ProjectUserType {
   id: string;
   userId: string;
   projectId: string;
-  user: UserType;
+  user: UserType | null;
 }
 
 export interface ProjectType {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   status: string;
   createdAt: Date;
   updatedAt: Date;
   organizationId: string;
   projectUsers: ProjectUserType[];
-  sprints: SprintType[];
+  sprints: SprintType[] | null;
 }

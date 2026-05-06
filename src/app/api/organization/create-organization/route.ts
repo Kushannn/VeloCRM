@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
+function generateSlug(name: string) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
+}
+
 export async function POST(req: Request) {
   try {
     const { userId: clerkId } = await auth();
@@ -15,9 +23,11 @@ export async function POST(req: Request) {
     if (!name) {
       return NextResponse.json(
         { error: "Organization name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
+
+    console.log("clerkId ", clerkId);
 
     const dbUser = await prisma.user.findUnique({
       where: { clerkId },
@@ -27,10 +37,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // ✅ Generate slug
+    const baseSlug = generateSlug(name);
+    const slug = `${baseSlug}-${Date.now()}`; // prevents duplicate errors
+
     const organization = await prisma.organization.create({
       data: {
         name,
         ownerId: dbUser.id,
+        slug,
       },
     });
 
@@ -38,7 +53,7 @@ export async function POST(req: Request) {
       data: {
         userId: dbUser.id,
         organizationId: organization.id,
-        role: "ADMIN", // or "OWNER", based on your enum
+        role: "ADMIN",
       },
     });
 
@@ -47,7 +62,7 @@ export async function POST(req: Request) {
     console.error("Error creating organization:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

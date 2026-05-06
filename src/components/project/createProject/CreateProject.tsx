@@ -95,7 +95,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
       <ModalContent>
         {(close) => (
           <>
-            <ModalHeader className="text-white text-2xl font-semibold">
+            <ModalHeader className="  text-2xl font-semibold">
               Create Projects
             </ModalHeader>
 
@@ -109,10 +109,10 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
                 isRequired
                 onChange={(e) => setProjectName(e.target.value)}
                 classNames={{
-                  input: "text-white placeholder-gray-400",
+                  input: "  placeholder-gray-400",
                   label: "text-gray-300",
                   inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
                 }}
               />
               <Input
@@ -123,10 +123,10 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 classNames={{
-                  input: "text-white placeholder-gray-400",
+                  input: "  placeholder-gray-400",
                   label: "text-gray-300",
                   inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
                 }}
               />
             </ModalBody>
@@ -136,7 +136,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
                 variant="light"
                 onPress={close}
                 disabled={loading}
-                className="text-white"
+                className=" "
               >
                 Cancel
               </Button>

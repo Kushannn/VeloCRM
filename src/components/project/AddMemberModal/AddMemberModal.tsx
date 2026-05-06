@@ -116,7 +116,7 @@ export default function AddMemberModal({
       <ModalContent>
         {(close) => (
           <>
-            <ModalHeader className="text-white text-2xl font-semibold">
+            <ModalHeader className="  text-2xl font-semibold">
               Select a Member
             </ModalHeader>
 
@@ -139,12 +139,12 @@ export default function AddMemberModal({
                           className="w-10 h-10 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-gray-500   flex items-center justify-center">
                           {member.user.name?.charAt(0).toUpperCase() ?? "U"}
                         </div>
                       )}
                       <div>
-                        <p className="text-white font-semibold">
+                        <p className="  font-semibold">
                           {member.user.name}
                         </p>
                         <p className="text-sm text-gray-400">
@@ -171,7 +171,7 @@ export default function AddMemberModal({
             </ModalBody>
 
             <ModalFooter>
-              <Button variant="light" onPress={close} className="text-white">
+              <Button variant="light" onPress={close} className=" ">
                 Cancel
               </Button>
               <Button

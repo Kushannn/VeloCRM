@@ -60,13 +60,13 @@ export default function DashboardPage() {
                     <div className="text-md text-black font-semibold">
                       {member?.user.name}
                     </div>
-                    <div className="text-sm text-white">
+                    <div className="text-sm  ">
                       {member?.user.email}
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-sm text-white">Birthday</div>
+                    <div className="text-sm  ">Birthday</div>
                     <div className="text-md text-black font-semibold">
                       13 Nov 2003
                     </div>

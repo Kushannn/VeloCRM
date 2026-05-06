@@ -18,14 +18,14 @@ export default function LayoutWithSidebar({
   const isPublicRoute = noSidebarRoutes.includes(pathname);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white">
+    <div className="min-h-screen flex flex-col bg-[#121212]  ">
       <Navbar />
 
       {!isPublicRoute && (
         <div className="flex items-center justify-between sm:hidden px-4 py-3 bg-[#1f1f1f] border-b border-gray-800">
           <h1 className="text-lg font-bold">VeloCRM</h1>
           <button onClick={() => setShowSidebar(!showSidebar)}>
-            <Menu className="w-6 h-6 text-white" />
+            <Menu className="w-6 h-6  " />
           </button>
         </div>
       )}

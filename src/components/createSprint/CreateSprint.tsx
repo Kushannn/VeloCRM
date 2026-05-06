@@ -118,7 +118,7 @@ export default function CreateSprint({
       <ModalContent>
         {(close) => (
           <>
-            <ModalHeader className="text-white text-2xl font-semibold">
+            <ModalHeader className="  text-2xl font-semibold">
               Create Sprint
             </ModalHeader>
 
@@ -132,7 +132,7 @@ export default function CreateSprint({
                 classNames={{
                   label: "text-gray-300",
                   inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
                 }}
               />
 
@@ -143,10 +143,10 @@ export default function CreateSprint({
                 value={description}
                 onChange={(e: any) => setDescription(e.target.value)}
                 classNames={{
-                  input: "text-white placeholder-gray-400",
+                  input: "  placeholder-gray-400",
                   label: "text-gray-300",
                   inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
                 }}
               />
 
@@ -157,9 +157,9 @@ export default function CreateSprint({
                 minValue={parseDate(new Date().toISOString().split("T")[0])}
                 onChange={(newRange: any) => setDateValue(newRange)}
                 classNames={{
-                  base: "bg-[#262626] text-white rounded-md",
+                  base: "bg-[#262626]   rounded-md",
                   label: "text-gray-400",
-                  calendar: "bg-gray-800 text-white",
+                  calendar: "bg-gray-800  ",
                   selectorButton: "bg-gray-700 text-gray-200",
                   selectorIcon: "text-purple-400",
                   popoverContent: "bg-gray-900  shadow-lg",
@@ -174,7 +174,7 @@ export default function CreateSprint({
                 variant="light"
                 onPress={close}
                 disabled={loading}
-                className="text-white"
+                className=" "
               >
                 Cancel
               </Button>

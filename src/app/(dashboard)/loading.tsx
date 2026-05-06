@@ -1,4 +1,4 @@
-import "../loading.css";
+// import "../loading.css";
 
 export default function Loading() {
   return <div className="loader"></div>;

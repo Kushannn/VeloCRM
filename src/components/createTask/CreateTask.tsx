@@ -117,7 +117,7 @@ export default function CreateTask({
       <ModalContent>
         {(close) => (
           <>
-            <ModalHeader className="text-white text-2xl font-semibold">
+            <ModalHeader className="  text-2xl font-semibold">
               Create Task
             </ModalHeader>
 
@@ -131,7 +131,7 @@ export default function CreateTask({
                 classNames={{
                   label: "text-gray-300",
                   inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
                 }}
               />
 
@@ -142,10 +142,10 @@ export default function CreateTask({
                 value={description}
                 onChange={(e: any) => setDescription(e.target.value)}
                 classNames={{
-                  input: "text-white placeholder-gray-400",
+                  input: "  placeholder-gray-400",
                   label: "text-gray-300",
                   inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg text-white focus-within:ring-0 focus-within:ring-offset-0",
+                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
                 }}
               />
 
@@ -157,7 +157,7 @@ export default function CreateTask({
                     setAssignedTo(Array.from(keys)[0] as string)
                   }
                   classNames={{
-                    base: "bg-[#262626] border border-gray-700 text-white rounded-lg",
+                    base: "bg-[#262626] border border-gray-700   rounded-lg",
                     label: "text-gray-300",
                   }}
                 >
@@ -175,7 +175,7 @@ export default function CreateTask({
                     setStatus(Array.from(keys)[0] as string)
                   }
                   classNames={{
-                    base: "bg-[#262626] border border-gray-700 text-white rounded-lg",
+                    base: "bg-[#262626] border border-gray-700   rounded-lg",
                     label: "text-gray-300",
                   }}
                 >
@@ -191,7 +191,7 @@ export default function CreateTask({
                     setPriority(Array.from(keys)[0] as string)
                   }
                   classNames={{
-                    base: "bg-[#262626] border border-gray-700 text-white rounded-lg",
+                    base: "bg-[#262626] border border-gray-700   rounded-lg",
                     label: "text-gray-300",
                   }}
                 >
@@ -207,7 +207,7 @@ export default function CreateTask({
                 variant="light"
                 onPress={close}
                 disabled={loading}
-                className="text-white"
+                className=" "
               >
                 Cancel
               </Button>
