@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { taskId: string } }
+  { params }: { params: Promise<{ taskId: string }> },
 ) {
   const { taskId } = await params;
 
@@ -13,7 +13,7 @@ export async function PATCH(
     if (!taskId || !status) {
       return NextResponse.json(
         { success: false, error: "Task ID and status are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -24,13 +24,13 @@ export async function PATCH(
 
     return NextResponse.json(
       { success: true, task: updatedTask },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error updating task status:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
