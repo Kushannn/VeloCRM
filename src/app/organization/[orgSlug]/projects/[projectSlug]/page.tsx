@@ -9,7 +9,16 @@ export default async function Page({
   params: Promise<{ projectSlug: string; orgSlug: string }>;
 }) {
   const { projectSlug, orgSlug } = await params;
-  const user = await currentUser();
+  const clerkUser = await currentUser();
+  const user = clerkUser
+    ? {
+        id: clerkUser.id,
+        firstName: clerkUser.firstName,
+        lastName: clerkUser.lastName,
+        imageUrl: clerkUser.imageUrl,
+        email: clerkUser.emailAddresses[0]?.emailAddress || "",
+      }
+    : null;
 
   // Get org by slug instead of using Redux
   const organization = await prisma.organization.findUnique({
@@ -33,8 +42,8 @@ export default async function Page({
   return (
     <SingleProjectDetails
       project={project}
-      orgId={organization.id}
-      projectId={project.id}
+      orgSlug={orgSlug}
+      projectSlug={projectSlug}
       user={user}
     />
   );

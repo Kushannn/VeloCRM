@@ -6,11 +6,20 @@ import { notFound } from "next/navigation";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ orgSlug: string }>;
+  params: Promise<{ orgSlug: string}>;
 }) {
-  const { orgSlug } = await params;
+  const { orgSlug  } = await params;
 
-  const user = await currentUser();
+  const clerkUser = await currentUser();
+  const user = clerkUser
+    ? {
+        id: clerkUser.id,
+        firstName: clerkUser.firstName,
+        lastName: clerkUser.lastName,
+        imageUrl: clerkUser.imageUrl,
+        email: clerkUser.emailAddresses[0]?.emailAddress || "",
+      }
+    : null;
 
   const organization = await prisma.organization.findUnique({
     where: { slug: orgSlug },
@@ -30,6 +39,7 @@ export default async function Page({
   return (
     <ProjectSummaryDashboard
       orgId={organization.id}
+      orgSlug={orgSlug}
       projects={projects}
       organization={organization}
       organizationMembers={members}

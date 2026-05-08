@@ -1,33 +1,19 @@
 "use client";
 
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Divider,
-  Chip,
-  addToast,
-  Button,
-} from "@heroui/react";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { CircleUser, Plus } from "lucide-react";
-import { redirect, useParams } from "next/navigation";
-import CreateProject from "@/components/project/createProject/CreateProject";
-import debounce from "lodash/debounce";
-import { ProjectType } from "@/lib/types";
-import AddMemberModal from "@/components/project/AddMemberModal/AddMemberModal";
+import { Card, CardBody } from "@heroui/react";
+import { useParams } from "next/navigation";
+
 import { useAppSelector } from "@/redux/hooks";
 import useFetchOrganization from "@/hooks/useFetchOrganization";
 import useFetchOrgMembers from "@/hooks/useFetchOrgMembers";
 import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  const STATUS_DISPLAY: Record<string, string> = {
-    ACTIVE: "Active",
-    ON_HOLD: "On Hold",
-    COMPLETED: "Completed",
-  };
+  // const STATUS_DISPLAY: Record<string, string> = {
+  //   ACTIVE: "Active",
+  //   ON_HOLD: "On Hold",
+  //   COMPLETED: "Completed",
+  // };
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -60,9 +46,7 @@ export default function DashboardPage() {
                     <div className="text-md text-black font-semibold">
                       {member?.user.name}
                     </div>
-                    <div className="text-sm  ">
-                      {member?.user.email}
-                    </div>
+                    <div className="text-sm  ">{member?.user.email}</div>
                   </div>
 
                   <div>

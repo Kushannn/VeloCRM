@@ -22,8 +22,8 @@ export async function createUser(user: CreateUserInput) {
         clerkId: user.clerkId,
         email: user.email || "",
         name: user.name,
+        image: user?.image,
         role: "USER",
-        createdAt: new Date(),
       },
     });
 

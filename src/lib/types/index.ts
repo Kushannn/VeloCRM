@@ -57,6 +57,7 @@ export interface SprintType {
   startDate: Date;
   endDate: Date;
   createdAt: Date;
+  slug: string;
 
   createdById: string;
   organizationId: string;

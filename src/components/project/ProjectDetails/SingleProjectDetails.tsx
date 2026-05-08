@@ -17,15 +17,15 @@ import { useState } from "react";
 
 type Props = {
   project: ProjectType | null;
-  orgId: string;
-  projectId: string;
+  orgSlug: string;
+  projectSlug: string;
   user: any;
 };
 
 export default function SingleProjectDetails({
   project,
-  orgId,
-  projectId,
+  orgSlug,
+  projectSlug,
   user,
 }: Props) {
   const router = useRouter();
@@ -198,7 +198,7 @@ export default function SingleProjectDetails({
                         className="cursor-pointer"
                         onClick={() =>
                           router.push(
-                            `/organization/${orgId}/projects/${projectId}/sprint/${sprint?.id}`,
+                            `/organization/${orgSlug}/projects/${projectSlug}/sprint/${sprint?.slug}`,
                           )
                         }
                       >

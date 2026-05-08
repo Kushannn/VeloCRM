@@ -14,11 +14,12 @@ import { CircleUser, Plus } from "lucide-react";
 import CreateProject from "../createProject/CreateProject";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
 import { useRef, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
 
 type Props = {
   orgId: string;
+  orgSlug: string;
   projects: any[];
   organization: any;
   organizationMembers: any[];
@@ -27,6 +28,7 @@ type Props = {
 
 export default async function ProjectSummaryDashboard({
   orgId,
+  orgSlug,
   projects: initialProjects,
   organization,
   organizationMembers,
@@ -277,7 +279,7 @@ export default async function ProjectSummaryDashboard({
                   <div
                     onClick={() =>
                       router.push(
-                        `/organization/${orgId}/projects/${project.id}`,
+                        `/organization/${orgSlug}/projects/${project.slug}`,
                       )
                     }
                     className="cursor-pointer hover:bg-white/10 px-4 py-2 rounded-md text-white font-bold"

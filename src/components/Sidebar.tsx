@@ -100,10 +100,6 @@ function Sidebar() {
     (org, index, self) => self.findIndex((o) => o.id === org.id) === index, // dedupe
   );
 
-  useEffect(() => {
-    console.log("hehe", user);
-  });
-
   return (
     <>
       <div className="w-full sm:w-64 p-4 flex flex-col gap-4 ml-3 min-h-full rounded-xl bg-gradient-to-br from-[#121213] to-[#1c1d1e]  ">

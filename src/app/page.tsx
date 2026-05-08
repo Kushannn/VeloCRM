@@ -4,7 +4,6 @@ import HomeSignedOut from "@/components/HomeSignedOut";
 import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// import { Router } from "next/router";
 
 export default function HomePage() {
   const router = useRouter();
