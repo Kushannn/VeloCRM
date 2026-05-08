@@ -2,35 +2,38 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import SingleProjectDetails from "@/components/project/ProjectDetails/SingleProjectDetails";
 import { currentUser } from "@clerk/nextjs/server";
+
 export default async function Page({
   params,
 }: {
-  params: { projectId: string; orgId: string };
+  params: Promise<{ projectSlug: string; orgSlug: string }>;
 }) {
-  const { projectId, orgId } = params;
+  const { projectSlug, orgSlug } = await params;
   const user = await currentUser();
 
+  const organization = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
+  });
+
+  if (!organization) return notFound();
+
   const project = await prisma.project.findUnique({
-    where: { id: projectId },
+    where: { slug: projectSlug },
     include: {
       projectUsers: {
-        include: {
-          user: true,
-        },
+        include: { user: true },
       },
       sprints: true,
     },
   });
 
-  if (!project) {
-    notFound();
-  }
+  if (!project) return notFound();
 
   return (
     <SingleProjectDetails
       project={project}
-      orgId={orgId}
-      projectId={params.projectId}
+      orgId={organization.id}
+      projectId={project.id}
       user={user}
     />
   );

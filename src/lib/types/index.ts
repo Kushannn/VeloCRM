@@ -81,7 +81,7 @@ export interface ProjectType {
   description: string | null;
   status: string;
   createdAt: Date;
-  updatedAt: Date;
+  // updatedAt: Date;
   organizationId: string;
   projectUsers: ProjectUserType[];
   sprints: SprintType[] | null;

@@ -1,33 +1,35 @@
-import { prisma } from "@/lib/prisma";
 import ProjectSummaryDashboard from "@/components/project/projectSummarDashboard/ProjectSummarDashboard";
+import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { useEffect } from "react";
+import { notFound } from "next/navigation";
 
-export default async function Page({ params }: { params: { orgId: string } }) {
-  const { orgId } = params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>;
+}) {
+  const { orgSlug } = await params;
 
   const user = await currentUser();
 
-  const projects = await prisma.project.findMany({
-    where: { organizationId: orgId },
+  const organization = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
   });
 
-  const organization = await prisma.organization.findUnique({
-    where: { id: orgId },
+  if (!organization) return notFound();
+
+  const projects = await prisma.project.findMany({
+    where: { organizationId: organization.id },
   });
 
   const members = await prisma.userOrganization.findMany({
-    where: {
-      organizationId: orgId,
-    },
-    include: {
-      user: true,
-    },
+    where: { organizationId: organization.id },
+    include: { user: true },
   });
 
   return (
     <ProjectSummaryDashboard
-      orgId={orgId}
+      orgId={organization.id}
       projects={projects}
       organization={organization}
       organizationMembers={members}

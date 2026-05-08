@@ -5,12 +5,11 @@ export default async function Page({
   params,
 }: {
   params: Promise<{
-    orgId: string;
     projectSlug: string;
     sprintSlug: string;
   }>;
 }) {
-  const { orgId, projectSlug, sprintSlug } = await params;
+  const { projectSlug, sprintSlug } = await params;
   const sprint = await prisma.sprint.findFirst({
     where: {
       slug: sprintSlug,
