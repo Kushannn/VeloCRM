@@ -27,7 +27,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("clerkId ", clerkId);
 
     const dbUser = await prisma.user.findUnique({
       where: { clerkId },
