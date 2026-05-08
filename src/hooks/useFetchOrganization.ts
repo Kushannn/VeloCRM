@@ -1,6 +1,3 @@
-// import { UserType } from "@/lib/types";
-// import { useAppSelector } from "@/redux/hooks";
-// import { useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/slices/authSlice";

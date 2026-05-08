@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // ✅ Generate slug
+    // Generate slug
     const baseSlug = generateSlug(name);
     const slug = `${baseSlug}-${Date.now()}`; // prevents duplicate errors
 

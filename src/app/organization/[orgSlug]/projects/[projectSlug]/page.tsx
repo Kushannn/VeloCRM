@@ -11,6 +11,7 @@ export default async function Page({
   const { projectSlug, orgSlug } = await params;
   const user = await currentUser();
 
+  // Get org by slug instead of using Redux
   const organization = await prisma.organization.findUnique({
     where: { slug: orgSlug },
   });

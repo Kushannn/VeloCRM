@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   try {
     const { title, description, startDate, endDate, userId } = await req.json();
@@ -18,14 +18,14 @@ export async function POST(
     if (!projectId) {
       return NextResponse.json(
         { error: "Project ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!title || !startDate || !endDate) {
       return NextResponse.json(
         { error: "Title, Start Date, and End Date are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,6 +47,7 @@ export async function POST(
         createdById: userId,
         organizationId: project.organizationId,
         projectId,
+        slug: `${title.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
       },
     });
 
@@ -55,7 +56,7 @@ export async function POST(
     console.error("[CREATE_SPRINT_ERROR]", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
