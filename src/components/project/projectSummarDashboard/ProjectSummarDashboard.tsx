@@ -10,10 +10,17 @@ import {
   Chip,
   Divider,
 } from "@heroui/react";
-import { CircleUser, Plus } from "lucide-react";
+import {
+  CircleCheck,
+  CirclePause,
+  CircleUser,
+  Pause,
+  Plus,
+  Zap,
+} from "lucide-react";
 import CreateProject from "../createProject/CreateProject";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
 
@@ -26,7 +33,7 @@ type Props = {
   user: any;
 };
 
-export default async function ProjectSummaryDashboard({
+export default function ProjectSummaryDashboard({
   orgId,
   orgSlug,
   projects: initialProjects,
@@ -39,6 +46,7 @@ export default async function ProjectSummaryDashboard({
   const [openOptions, setOpenOptions] = useState<string | null>(null);
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false);
   const [projectId, setProjectId] = useState("");
+  const [selectedProjectStatus, setSelectedProjectStatus] = useState("ACTIVE");
 
   const router = useRouter();
 
@@ -87,6 +95,39 @@ export default async function ProjectSummaryDashboard({
     debouncedStatusUpdate(id, status);
   };
 
+  const handleDeleteProject = async (projectId: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this project? This action cannot be undone.",
+      )
+    )
+      return;
+
+    try {
+      const res = await fetch(`/api/project/${projectId}/delete-project`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setProjects((prev) => prev.filter((p) => p.id !== projectId));
+        addToast({ title: "Project deleted successfully", color: "success" });
+      } else {
+        addToast({ title: data.error || "Failed to delete", color: "danger" });
+      }
+    } catch {
+      addToast({ title: "Failed to delete project", color: "danger" });
+    }
+  };
+
+  const filteredProjects = selectedProjectStatus
+    ? projects.filter((p) => p.status === selectedProjectStatus)
+    : projects;
+
+  console.log("user owned org ", user);
+  console.log("projects ", projects);
+
   return (
     <>
       <div className="px-4 space-y-6">
@@ -107,57 +148,71 @@ export default async function ProjectSummaryDashboard({
           {[
             {
               label: "Active",
-              color: "from-[#0d9488] via-[#0e7490] to-[#1e40af]",
-              text: "#dbeafe",
+              value: "ACTIVE",
+              cardClass:
+                "bg-white/5 backdrop-blur-sm border border-white/10 hover:border-violet-500/30 transition-colors border-t-2 border-t-emerald-500/60",
+              emoji: Zap,
+              activeColor: "text-emerald-400",
             },
             {
               label: "On Hold",
-              color: "from-[#f59e0b] via-[#ea580c] to-[#b91c1c]",
-              text: "#fef3c7",
+              value: "ON_HOLD",
+              cardClass:
+                "bg-white/5 backdrop-blur-sm border border-white/10 hover:border-violet-500/30 transition-colors border-t-2 border-t-amber-500/60",
+              emoji: CirclePause,
+              activeColor: "text-amber-400",
             },
             {
               label: "Completed",
-              color: "from-[#15803d] via-[#115e59] to-[#164e63]",
-              text: "#bbf7d0",
+              value: "COMPLETED",
+              cardClass:
+                "bg-white/5 backdrop-blur-sm border border-white/10 hover:border-violet-500/30 transition-colors border-t-2 border-t-violet-500/60",
+              emoji: CircleCheck,
+              activeColor: "text-violet-400",
             },
-          ].map((stat, idx) => (
-            <Card
-              key={idx}
-              className={`w-full bg-gradient-to-br ${stat.color} text-[${stat.text}] h-20`}
-            >
-              <CardBody className="flex flex-row justify-between items-center px-4 py-3">
-                <div className="flex flex-col">
-                  <p className="text-xl">{stat.label}</p>
-                  <p className="text-sm">{stat.label} Projects</p>
-                </div>
-                <div className="text-xl">12</div>
-              </CardBody>
-              <Divider />
-            </Card>
-          ))}
+          ].map((stat, idx) => {
+            const isSelected = selectedProjectStatus === stat.value;
+            return (
+              <Card
+                key={idx}
+                isPressable
+                onClick={() =>
+                  setSelectedProjectStatus(isSelected ? "" : stat.value)
+                }
+                className={`${stat.cardClass} ${isSelected ? "ring-1 ring-white/20" : ""}`}
+              >
+                <CardBody className="flex flex-row justify-between items-center px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <stat.emoji
+                      size={20}
+                      className={isSelected ? stat.activeColor : "text-white"}
+                    />
+                    <p className="text-base font-medium">{stat.label}</p>
+                  </div>
+                  <div
+                    className={`text-xl font-bold ${isSelected ? stat.activeColor : "text-white"}`}
+                  >
+                    {projects.filter((p) => p.status === stat.value).length}
+                  </div>
+                </CardBody>
+              </Card>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.length === 0 ? (
+          {filteredProjects.length === 0 ? (
             <p className="text-center text-gray-400 col-span-full">
               No projects found.
             </p>
           ) : (
-            projects.map((project: any, index: number) => (
+            filteredProjects.map((project: any, index: number) => (
               <Card
                 key={project.id || index}
-                className={`w-sm p-4 ${
-                  project.status === "ACTIVE"
-                    ? "bg-gradient-to-tr from-[#0d9488] via-[#0e7490] to-[#1e40af]"
-                    : project.status === "ON HOLD"
-                      ? "bg-gradient-to-br from-[#f59e0b] via-[#ea580c] to-[#b91c1c]"
-                      : project.status === "COMPLETED"
-                        ? "bg-gradient-to-tl from-[#15803d] via-[#115e59] to-[#164e63]"
-                        : "bg-gray-600  "
-                }`}
+                className={`w-sm p-4 bg-[#191919] `}
               >
                 <CardHeader className="flex justify-between items-center">
-                  {user.ownedOrganizations?.some(
+                  {user.ownedOrganizations?.map(
                     (org: any) =>
                       org.id === project.organizationId ||
                       org === project.organizationId,
@@ -232,7 +287,7 @@ export default async function ProjectSummaryDashboard({
                         <button
                           className="block w-full px-4 py-2 text-left"
                           onClick={() => {
-                            console.log("Delete clicked");
+                            handleDeleteProject(project.id);
                             setOpenOptions(null);
                           }}
                         >

@@ -49,7 +49,6 @@ export default function SprintDashboard({ sprint, project }: any) {
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
-
     const { active, over } = event;
 
     if (!over) return;

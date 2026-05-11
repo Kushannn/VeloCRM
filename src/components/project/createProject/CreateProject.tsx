@@ -23,8 +23,9 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const user = useAppSelector((state) => state.auth.user);
+  const currentOrg = useAppSelector((state) => state.organization.currentOrg);
 
-  async function handleSubmit() {
+  async function handleSubmit(close: () => void) {
     if (!projectName.trim()) {
       addToast({
         title: "Project name is required",
@@ -44,7 +45,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
         body: JSON.stringify({
           name: projectName,
           description,
-          organizationId: user?.ownedOrganizations?.[0]?.id || null,
+          organizationId: currentOrg?.id,
         }),
       });
 
@@ -56,9 +57,9 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
           variant: "solid",
           color: "success",
         });
-        onClose();
         setProjectName("");
         setDescription("");
+        close();
       } else {
         addToast({
           title: data.error || "Something went wrong.",
@@ -73,7 +74,9 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
         color: "danger",
       });
     } finally {
+      console.log("Are we even coming here ? ", loading);
       setLoading(false);
+      console.log("Are we even coming here2  ? ", loading);
     }
   }
 
@@ -142,7 +145,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
               </Button>
               <Button
                 color="primary"
-                onPress={handleSubmit}
+                onPress={() => handleSubmit(close)}
                 isLoading={loading}
               >
                 {loading ? "Creating..." : "Create"}
