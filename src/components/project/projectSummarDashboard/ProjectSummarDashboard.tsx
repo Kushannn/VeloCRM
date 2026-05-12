@@ -17,6 +17,8 @@ import {
   Pause,
   Plus,
   Zap,
+  ArrowRight,
+  NotebookText,
 } from "lucide-react";
 import CreateProject from "../createProject/CreateProject";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
@@ -125,9 +127,6 @@ export default function ProjectSummaryDashboard({
     ? projects.filter((p) => p.status === selectedProjectStatus)
     : projects;
 
-  console.log("user owned org ", user);
-  console.log("projects ", projects);
-
   return (
     <>
       <div className="px-4 space-y-6">
@@ -206,144 +205,190 @@ export default function ProjectSummaryDashboard({
               No projects found.
             </p>
           ) : (
-            filteredProjects.map((project: any, index: number) => (
-              <Card
-                key={project.id || index}
-                className={`w-sm p-4 bg-[#191919] `}
-              >
-                <CardHeader className="flex justify-between items-center">
-                  {user.ownedOrganizations?.map(
-                    (org: any) =>
-                      org.id === project.organizationId ||
-                      org === project.organizationId,
-                  ) ? (
-                    <select
-                      defaultValue={project.status || "ACTIVE"}
-                      onChange={(e) =>
-                        handleProjectStatusChange(project.id, e.target.value)
-                      }
-                      className="p-2 cursor-pointer   shadow-lg rounded-md z-10 bg-white/10 backdrop-blur-md border border-white/20 text-sm"
-                    >
-                      <option
-                        className="bg-black backdrop-blur-md  "
-                        value="ACTIVE"
-                      >
-                        Active
-                      </option>
-                      <option
-                        className="bg-black backdrop-blur-md  "
-                        value="ON_HOLD"
-                      >
-                        On Hold
-                      </option>
-                      <option
-                        className="bg-black backdrop-blur-md  "
-                        value="COMPLETED"
-                      >
-                        Completed
-                      </option>
-                    </select>
-                  ) : (
-                    <Chip
-                      classNames={{
-                        base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
-                        content: "drop-shadow shadow-black  ",
-                      }}
-                    >
-                      {STATUS_DISPLAY[project.status] || "Status"}
-                    </Chip>
-                  )}
+            filteredProjects.map((project: any, index: number) => {
+              const statusColor =
+                project.status === "ACTIVE"
+                  ? "text-emerald-400"
+                  : project.status === "ON_HOLD"
+                    ? "text-amber-400"
+                    : project.status === "COMPLETED"
+                      ? "text-violet-400"
+                      : "text-white/40";
 
-                  <span
-                    className="relative cursor-pointer text-2xl font-bold"
-                    onClick={() =>
-                      setOpenOptions(
-                        openOptions === project.id ? null : project.id,
-                      )
-                    }
-                  >
-                    ...
-                    {openOptions === project.id && (
-                      <div className="absolute right-0 mt-2 w-40   shadow-lg rounded-md z-10 bg-white/10 backdrop-blur-md border border-white/20 text-sm">
-                        <button
-                          className="block w-full px-4 py-2 text-left"
-                          onClick={() => {
-                            setOpenAddMemberModal(true);
-                            setOpenOptions(null);
-                            setProjectId(project.id);
-                          }}
+              return (
+                <Card
+                  key={project.id || index}
+                  className={`w-sm p-4 bg-[#191919] `}
+                >
+                  <CardHeader className="flex justify-between items-center">
+                    {user.ownedOrganizations?.map(
+                      (org: any) =>
+                        org.id === project.organizationId ||
+                        org === project.organizationId,
+                    ) ? (
+                      <select
+                        value={project.status || "ACTIVE"} // ← controlled value
+                        onChange={(e) =>
+                          handleProjectStatusChange(project.id, e.target.value)
+                        }
+                        defaultValue={project.status || "ACTIVE"}
+                        className={`p-2 cursor-pointer shadow-lg rounded-xl z-10 backdrop-blur-md border text-sm font-medium  ${
+                          project.status === "ACTIVE"
+                            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                            : project.status === "ON_HOLD"
+                              ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                              : project.status === "COMPLETED"
+                                ? "bg-violet-500/10 border-violet-500/30 text-violet-400"
+                                : "bg-white/10 border-white/20 text-white"
+                        }`}
+                      >
+                        <option
+                          className="bg-[#1a1a1a] text-emerald-400"
+                          value="ACTIVE"
                         >
-                          Add new member
-                        </button>
-                        <button
-                          className="block w-full px-4 py-2 text-left"
-                          onClick={() => {
-                            console.log("Edit clicked");
-                            setOpenOptions(null);
-                          }}
+                          Active
+                        </option>
+                        <option
+                          className="bg-[#1a1a1a] text-amber-400"
+                          value="ON_HOLD"
                         >
-                          Remove a member
-                        </button>
-                        <button
-                          className="block w-full px-4 py-2 text-left"
-                          onClick={() => {
-                            handleDeleteProject(project.id);
-                            setOpenOptions(null);
-                          }}
+                          On Hold
+                        </option>
+                        <option
+                          className="bg-[#1a1a1a] text-violet-400"
+                          value="COMPLETED"
                         >
-                          Delete
-                        </button>
-                      </div>
+                          Completed
+                        </option>
+                      </select>
+                    ) : (
+                      <Chip
+                        classNames={{
+                          base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
+                          content: "drop-shadow shadow-black  ",
+                        }}
+                      >
+                        {STATUS_DISPLAY[project.status] || "Status"}
+                      </Chip>
                     )}
-                  </span>
-                </CardHeader>
 
-                <CardBody>
-                  <h1 className="  text-xl font-bold">{project.name}</h1>
-                  <p className="text-sm text-gray-300 pt-2">
-                    {project.description}
-                  </p>
+                    <span
+                      className="relative cursor-pointer text-2xl font-bold"
+                      onClick={() =>
+                        setOpenOptions(
+                          openOptions === project.id ? null : project.id,
+                        )
+                      }
+                    >
+                      ...
+                      {openOptions === project.id && (
+                        <div className="absolute right-0 mt-2 w-40   shadow-lg rounded-md z-10 bg-white/10 backdrop-blur-md border border-white/20 text-sm">
+                          <button
+                            className="block w-full px-4 py-2 text-left"
+                            onClick={() => {
+                              setOpenAddMemberModal(true);
+                              setOpenOptions(null);
+                              setProjectId(project.id);
+                            }}
+                          >
+                            Add new member
+                          </button>
+                          <button
+                            className="block w-full px-4 py-2 text-left"
+                            onClick={() => {
+                              console.log("Edit clicked");
+                              setOpenOptions(null);
+                            }}
+                          >
+                            Remove a member
+                          </button>
+                          <button
+                            className="block w-full px-4 py-2 text-left"
+                            onClick={() => {
+                              handleDeleteProject(project.id);
+                              setOpenOptions(null);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </span>
+                  </CardHeader>
 
-                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    {/* <Card className="flex-1 bg-[#62A388]"> */}
-                    <Card className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl rounded-xl  ">
-                      <CardBody className="flex flex-col justify-between items-center">
-                        Sprints <span>{project.sprints || 0}</span>
-                      </CardBody>
-                    </Card>
-                    <Card className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl rounded-xl text-white">
-                      <CardBody className="flex flex-col justify-between items-center">
-                        Tasks <span>{project.tasks || 0}</span>
-                      </CardBody>
-                    </Card>
-                  </div>
-                </CardBody>
+                  <CardBody>
+                    <h1 className="text-[17px] font-semibold text-white tracking-tight mb-1.5">
+                      {project.name}
+                    </h1>
+                    <p className="text-[13px] text-white/40 leading-relaxed mb-2">
+                      {project.description}
+                    </p>
 
-                <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                  <div className="flex items-center">
-                    {[...Array(3)].map((_, i) => (
-                      <CircleUser
-                        key={i}
-                        width={32}
-                        height={32}
-                        className={`${i !== 0 ? "-ml-2" : ""}`}
-                      />
-                    ))}
-                  </div>
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                      <Card className="flex-1 bg-[#1D1D1D] shadow-xl rounded-xl text-white">
+                        <CardBody className="flex flex-row items-center gap-4 px-3 py-2.5">
+                          <Zap
+                            size={18}
+                            className={`${statusColor} shrink-0`}
+                          />
+                          <div>
+                            <p className="text-[13px] text-white/30 mb-0.5">
+                              Sprints
+                            </p>
+                            <p className="text-[16px] font-semibold text-white leading-none">
+                              {project.sprints || 0}
+                            </p>
+                          </div>
+                        </CardBody>
+                      </Card>
+                      <Card className="flex-1 bg-[#1D1D1D] shadow-xl rounded-xl text-white">
+                        <CardBody className="flex flex-row items-center gap-4 px-3 py-2.5">
+                          <NotebookText
+                            size={18}
+                            className={`${statusColor} shrink-0`}
+                          />
+                          <div>
+                            <p className="text-[13px] text-white/30 mb-0.5">
+                              Tasks
+                            </p>
+                            <p className="text-[16px] font-semibold text-white leading-none">
+                              {project.tasks || 0}
+                            </p>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </div>
+                  </CardBody>
 
-                  <div
-                    onClick={() =>
-                      router.push(
-                        `/organization/${orgSlug}/projects/${project.slug}`,
-                      )
-                    }
-                    className="cursor-pointer hover:bg-white/10 px-4 py-2 rounded-md text-white font-bold"
-                  >
-                    View Details
-                  </div>
-                </CardFooter>
-              </Card>
-            ))
+                  <div className="h-px bg-white/[0.05] mx-[18px]" />
+
+                  <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div className="flex items-center">
+                      {[...Array(3)].map((_, i) => (
+                        <CircleUser
+                          key={i}
+                          width={32}
+                          height={32}
+                          className={`${i !== 0 ? "-ml-2" : ""}`}
+                        />
+                      ))}
+                    </div>
+
+                    <div
+                      onClick={() =>
+                        router.push(
+                          `/organization/${orgSlug}/projects/${project.slug}`,
+                        )
+                      }
+                      className="cursor-pointer hover:text-purple-400 px-4 py-2 rounded-md text-white font-bold flex gap-2"
+                    >
+                      View Details
+                      <ArrowRight />
+                    </div>
+                  </CardFooter>
+                </Card>
+              );
+            })
           )}
         </div>
       </div>

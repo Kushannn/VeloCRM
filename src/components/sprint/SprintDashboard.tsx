@@ -129,7 +129,7 @@ export default function SprintDashboard({ sprint, project }: any) {
             {localSprint.description && (
               <p
                 onClick={() => setOpenDescModal(true)}
-                className="text-sm text-gray-400 line-clamp-2 cursor-pointer hover:text-white"
+                className="text-sm text-gray-400 line-clamp-2"
               >
                 {localSprint.description}
               </p>
@@ -157,7 +157,7 @@ export default function SprintDashboard({ sprint, project }: any) {
 
           <Button
             onClick={() => setOpenTaskModal(true)}
-            className="ml-auto bg-gradient-to-r from-[#893168] to-purple-700 text-white"
+            className="ml-auto bg-[#494949] text-white hover:text-purple-400"
           >
             + New Task
           </Button>

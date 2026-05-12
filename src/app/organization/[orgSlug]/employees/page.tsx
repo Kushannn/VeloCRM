@@ -1,78 +1,33 @@
-"use client";
-
 import { Card, CardBody } from "@heroui/react";
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 
 import { useAppSelector } from "@/redux/hooks";
-import useFetchOrganization from "@/hooks/useFetchOrganization";
-import useFetchOrgMembers from "@/hooks/useFetchOrgMembers";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { prisma } from "@/lib/prisma";
+import { EmployeeDetails } from "@/components/employeeDetails/EmployeeDetails";
 
-export default function DashboardPage() {
-  // const STATUS_DISPLAY: Record<string, string> = {
-  //   ACTIVE: "Active",
-  //   ON_HOLD: "On Hold",
-  //   COMPLETED: "Completed",
-  // };
+export default async function DashboardPage({
+  params,
+}: {
+  params: Promise<{ orgSlug: string }>;
+}) {
+  const { orgSlug } = await params;
 
-  const user = useAppSelector((state) => state.auth.user);
+  const organization = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
+  });
 
-  useFetchOrganization();
-  useFetchOrgMembers();
+  const members = await prisma.userOrganization.findMany({
+    where: { organizationId: organization?.id },
+    include: { user: true },
+  });
 
-  const organization = useAppSelector((state) => state.organization.currentOrg);
-  const orgMembers = useAppSelector((state) => state.organization.members);
-
-  const params = useParams() as { orgId: string };
-  const orgId = params.orgId;
-
-  const router = useRouter();
-
-  if (!user) return <p className="text-center mt-10">Loading...</p>;
+  if (!organization) return notFound();
 
   return (
     <>
-      <div>
-        {orgMembers.map((member) => {
-          return (
-            <Card className="bg-red-500 shadow-lg shadow-white/10">
-              <CardBody className="bg-[#6554AF]">
-                <div className="flex flex-row justify-between">
-                  <div>
-                    <img src={member?.user?.image!} />
-                  </div>
-
-                  <div>
-                    <div className="text-md text-black font-semibold">
-                      {member?.user.name}
-                    </div>
-                    <div className="text-sm  ">{member?.user.email}</div>
-                  </div>
-
-                  <div>
-                    <div className="text-sm  ">Birthday</div>
-                    <div className="text-md text-black font-semibold">
-                      13 Nov 2003
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-sm whiter">Age</div>
-                    <div className="text-md text-black font-semibold">21</div>
-                  </div>
-
-                  <div>
-                    <div className="text-sm white">Position</div>
-                    <div className="text-md text-black font-semibold">
-                      MERN STACK INTERN
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          );
-        })}
-      </div>
+      <EmployeeDetails members={members} organization={organization} />
     </>
   );
 }

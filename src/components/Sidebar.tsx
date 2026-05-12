@@ -131,7 +131,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
     {
       icon: <Users size={18} />,
       label: "Employees",
-      onClick: () => router.push(`/organization/${activeOrg?.id}/employees`),
+      onClick: () => router.push(`/organization/${activeOrg?.slug}/employees`),
     },
     {
       icon: <Home size={18} />,
