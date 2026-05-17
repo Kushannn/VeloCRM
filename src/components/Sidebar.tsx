@@ -17,18 +17,13 @@ import {
 import CreateOrganization from "./createOrganization/CreateOrganization";
 import CreateProject from "./project/createProject/CreateProject";
 import {
-  addToast,
+  toast,
   Button,
   Input,
   Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
+  Description,
+  Label,
 } from "@heroui/react";
 import { useAppSelector } from "@/redux/hooks";
 import { useParams, useRouter } from "next/navigation";
@@ -72,11 +67,12 @@ function Sidebar({ onExpandChange }: sidebarProps) {
 
   async function handleSendInvite() {
     if (!email) {
-      addToast({
-        title: "Email is required",
-        variant: "solid",
-        color: "danger",
-      });
+      // addToast({
+      //   title: "Email is required",
+      //   variant: "solid",
+      //   color: "danger",
+      // });
+      toast.danger("Email is required");
       return;
     }
     setSendInviteLoading(true);
@@ -92,30 +88,32 @@ function Sidebar({ onExpandChange }: sidebarProps) {
       const data = await res.json();
       if (data.success) {
         setSendInviteLoading(false);
-        addToast({
-          title: "User invited successfully",
-          variant: "solid",
-          color: "success",
-        });
+        // addToast({
+        //   title: "User invited successfully",
+        //   variant: "solid",
+        //   color: "success",
+        // });
+        toast.success("User invited successfully");
       }
     } catch {
-      addToast({
-        title: "Could not invite user",
-        variant: "solid",
-        color: "danger",
-      });
+      // addToast({
+      //   title: "Could not invite user",
+      //   variant: "solid",
+      //   color: "danger",
+      // });
+      toast.danger("Could not invite user");
     }
   }
 
-  const handleMouseEnter = () => {
-    setIsExpanded(true);
-    onExpandChange?.(true);
-  };
+  // const handleMouseEnter = () => {
+  //   setIsExpanded(true);
+  //   onExpandChange?.(true);
+  // };
 
-  const handleMouseLeave = () => {
-    setIsExpanded(false);
-    onExpandChange?.(false);
-  };
+  // const handleMouseLeave = () => {
+  //   setIsExpanded(false);
+  //   onExpandChange?.(false);
+  // };
 
   const navItems = [
     {
@@ -169,9 +167,10 @@ function Sidebar({ onExpandChange }: sidebarProps) {
           {/* Org Switcher */}
           <div className="px-3 mb-4">
             <Dropdown>
-              <DropdownTrigger>
+              {/* Trigger — first child */}
+              <Dropdown.Trigger>
                 <div className="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-[#1a1a1a] transition-colors group">
-                  <div className="w-8 h-8 rounded-md bg-violet-900/60 border border-violet-700/40 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-md bg-violet-900/60 border border-violet-700/40 flex items-center justify-center shrink-0">
                     <Building size={14} className="text-violet-300" />
                   </div>
                   <div
@@ -189,39 +188,38 @@ function Sidebar({ onExpandChange }: sidebarProps) {
                   {isExpanded && (
                     <ChevronRight
                       size={14}
-                      className="text-zinc-600 flex-shrink-0"
+                      className="text-zinc-600 shrink-0"
                     />
                   )}
                 </div>
-              </DropdownTrigger>
-              <DropdownMenu
-                aria-label="Organizations"
-                items={allOrgs}
-                classNames={{
-                  base: "bg-[#111111] border border-[#222222] rounded-xl shadow-xl",
-                }}
-              >
-                {(org) => (
-                  <DropdownItem
-                    key={org.id}
-                    onClick={() => {
-                      dispatch(setOrganization(org));
-                      router.push(`/organization/${org.slug}/projects`);
-                    }}
-                    classNames={{
-                      base: "data-[hover=true]:bg-[#1a1a1a] rounded-lg",
-                      title:
+              </Dropdown.Trigger>
+
+              {/* Popover */}
+              <Dropdown.Popover className="bg-[#111111] border border-[#222222] rounded-xl shadow-xl p-1">
+                <Dropdown.Menu className="outline-none">
+                  {allOrgs.map((org) => (
+                    <Dropdown.Item
+                      key={org.id}
+                      id={org.id}
+                      textValue={org.name}
+                      onAction={() => {
+                        dispatch(setOrganization(org));
+                        router.push(`/organization/${org.slug}/projects`);
+                      }}
+                      className={`px-3 py-2 rounded-lg cursor-pointer hover:bg-[#1a1a1a] ${
                         activeOrg?.id === org.id
-                          ? "text-violet-400 font-medium"
-                          : "text-zinc-200",
-                      description: "text-zinc-600",
-                    }}
-                    description={org.slug}
-                  >
-                    {org.name}
-                  </DropdownItem>
-                )}
-              </DropdownMenu>
+                          ? "text-violet-400"
+                          : "text-zinc-200"
+                      }`}
+                    >
+                      <Label>{org.name}</Label>
+                      <Description className="text-zinc-600 text-xs">
+                        {org.slug}
+                      </Description>
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown.Popover>
             </Dropdown>
           </div>
 
@@ -236,7 +234,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
                 onClick={item.onClick}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-left w-full group cursor-pointer"
               >
-                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-zinc-400 group-hover:text-violet-400 transition-colors">
+                <div className="w-8 h-8 flex items-center justify-center shrink-0 text-zinc-400 group-hover:text-violet-400 transition-colors">
                   {item.icon}
                 </div>
                 <span
@@ -263,7 +261,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
                 onClick={item.onClick}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] transition-colors text-left w-full group cursor-pointer"
               >
-                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-zinc-500 group-hover:text-violet-400 transition-colors">
+                <div className="w-8 h-8 flex items-center justify-center shrink-0 text-zinc-500 group-hover:text-violet-400 transition-colors">
                   {item.icon}
                 </div>
                 <span
@@ -283,44 +281,52 @@ function Sidebar({ onExpandChange }: sidebarProps) {
 
       {/* Invite Modal */}
       <Modal isOpen={inviteModal} onOpenChange={setInviteModal}>
-        <ModalContent className="bg-[#111111] border border-[#222222]">
-          <ModalHeader className="border-b border-[#1f1f1f] text-white">
-            Invite People to the Organization
-          </ModalHeader>
-          <ModalBody>
-            <p className="text-zinc-400 text-sm mb-2">
-              Enter the email of the person you want to invite
-            </p>
-            <Input
-              label="Email"
-              variant="bordered"
-              placeholder="Enter email..."
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              classNames={{
-                input: "placeholder-zinc-600 text-white",
-                label: "text-zinc-400",
-                inputWrapper: "bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg",
-              }}
-            />
-          </ModalBody>
-          <ModalFooter className="border-t border-[#1f1f1f]">
-            <Button
-              variant="ghost"
-              onClick={() => setInviteModal(false)}
-              className="text-zinc-400"
-            >
-              Cancel
-            </Button>
-            <Button
-              color="secondary"
-              onClick={handleSendInvite}
-              isLoading={sendInviteLoading}
-            >
-              Send Invite
-            </Button>
-          </ModalFooter>
-        </ModalContent>
+        <Modal.Backdrop className="bg-black/50 backdrop-blur-sm" />
+
+        <Modal.Container className="bg-[#111111] border border-[#222222] max-w-md">
+          <Modal.Dialog>
+            {({ close }) => (
+              <>
+                <Modal.Header className="border-b border-[#1f1f1f] text-white">
+                  <Modal.Heading>
+                    Invite People to the Organization
+                  </Modal.Heading>
+                </Modal.Header>
+
+                <Modal.Body className="space-y-4">
+                  <p className="text-zinc-400 text-sm">
+                    Enter the email of the person you want to invite
+                  </p>
+
+                  <Input
+                    placeholder="Enter email..."
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-zinc-600"
+                  />
+                </Modal.Body>
+
+                <Modal.Footer className="border-t border-[#1f1f1f]">
+                  <Button
+                    variant="ghost"
+                    onPress={close}
+                    className="text-zinc-400"
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    onPress={handleSendInvite}
+                    isPending={sendInviteLoading}
+                  >
+                    Send Invite
+                  </Button>
+                </Modal.Footer>
+              </>
+            )}
+          </Modal.Dialog>
+        </Modal.Container>
       </Modal>
 
       <CreateOrganization

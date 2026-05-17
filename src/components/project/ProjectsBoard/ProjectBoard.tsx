@@ -13,10 +13,9 @@ import {
   DragStartEvent,
 } from "@dnd-kit/core";
 import StatusColumn from "./ProjectStatusColumn";
-import ProjectCard from "./ProjectCard";
 import { ProjectType } from "@/lib/types";
 import debounce from "lodash/debounce";
-import { addToast } from "@heroui/react";
+import { toast } from "@heroui/react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { updateProject } from "@/redux/slices/projectSlice";
 import useFetchProjects from "@/hooks/useFetchProjects";
@@ -45,29 +44,30 @@ export default function ProjectBoard() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status: newStatus }),
-          }
+          },
         );
         if (!res.ok) throw new Error("Failed to update project status");
 
         const data = await res.json();
         if (data.success) {
-          addToast({
-            title: "Status updated successfully!",
-            variant: "solid",
-            color: "success",
-          });
+          // addToast({
+          //   title: "Status updated successfully!",
+          //   variant: "solid",
+          //   color: "success",
+          // });
+          toast.success("Status updated successfully!");
         } else {
           throw new Error("Backend update failed");
         }
       } catch (error) {
-        addToast({
-          title: "Failed to update status.",
-          variant: "solid",
-          color: "danger",
-        });
-        console.error("Failed to update project status:", error);
+        // addToast({
+        //   title: "Failed to update status.",
+        //   variant: "solid",
+        //   color: "danger",
+        // });
+        toast.danger("Failed to update status");
       }
-    }, 2000)
+    }, 2000),
   ).current;
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -86,17 +86,17 @@ export default function ProjectBoard() {
     const draggedProject = projects.find((p) => p.id === active.id);
     if (!draggedProject) return;
 
-    // ✅ Get the new status directly from columns array
+    // Getting the new status directly from columns array
     const column = columns.find((col) => col.id === over.id);
     if (!column) return;
 
     const newStatus = column.status;
     if (draggedProject.status === newStatus) return;
 
-    // ✅ Optimistically update Redux
+    // Optimistically update Redux
     dispatch(updateProject({ ...draggedProject, status: newStatus }));
 
-    // ✅ Trigger backend update
+    // Trigger backend update
     debouncedStatusUpdate(draggedProject.id, newStatus);
   };
 
@@ -108,7 +108,7 @@ export default function ProjectBoard() {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   return (

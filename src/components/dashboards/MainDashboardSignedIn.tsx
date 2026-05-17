@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "@heroui/react";
+import { Card, Modal, Button } from "@heroui/react";
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -63,23 +53,27 @@ export default function MainDasboardSignedIn({ firstName, todayShort }: Props) {
         <p className="text-gray-400">{todayShort}</p>
 
         <div className="flex gap-6">
-          <Card className="w-1/2 bg-[#242124] border border-gray-800">
-            <CardHeader>Recent Activity</CardHeader>
-            <CardBody>
-              <p>✅ You closed a deal</p>
-            </CardBody>
+          <Card className="w-1/2 bg-[#242124] border border-gray-800 rounded-lg h-50">
+            <Card.Header>
+              <Card.Title>Recent Activity</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              <p>You Closed a deal today</p>
+            </Card.Content>
           </Card>
 
-          <Card className="w-1/2 bg-[#242124] border border-gray-800">
-            <CardHeader>Recent Activity</CardHeader>
-            <CardBody>
-              <p>📞 Follow-up call done</p>
-            </CardBody>
+          <Card className="w-1/2 bg-[#242124] border border-gray-800 h-50">
+            <Card.Header>
+              <Card.Title>Recent Activity</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              <p>You Closed a deal today</p>
+            </Card.Content>
           </Card>
         </div>
       </div>
 
-      <Modal isOpen={showModal} onOpenChange={setShowModal}>
+      {/* <Modal isOpen={showModal} onOpenChange={setShowModal}>
         <ModalContent>
           <ModalHeader>You've been invited!</ModalHeader>
           <ModalBody>
@@ -90,6 +84,24 @@ export default function MainDasboardSignedIn({ firstName, todayShort }: Props) {
             <Button onClick={handleAcceptInvite}>Accept</Button>
           </ModalFooter>
         </ModalContent>
+      </Modal> */}
+
+      <Modal>
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog>
+              <Modal.CloseTrigger />
+              <Modal.Header>You've Been Invited !</Modal.Header>
+              <Modal.Body>
+                <p>Do you accept the invite ? </p>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button onClick={() => setShowModal(false)}>Cancel</Button>
+                <Button onClick={handleAcceptInvite}>Accept</Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );

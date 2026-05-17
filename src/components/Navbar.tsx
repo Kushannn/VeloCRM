@@ -12,7 +12,7 @@ import {
 import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function Navbar() {
   const reduxUser = useAppSelector((state) => state.auth.user);

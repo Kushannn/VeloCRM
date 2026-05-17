@@ -1,20 +1,10 @@
 "use client";
 
-import {
-  addToast,
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Chip,
-  Divider,
-} from "@heroui/react";
+import { toast, Button, Card, Chip } from "@heroui/react";
 import {
   CircleCheck,
   CirclePause,
   CircleUser,
-  Pause,
   Plus,
   Zap,
   ArrowRight,
@@ -22,7 +12,7 @@ import {
 } from "lucide-react";
 import CreateProject from "../createProject/CreateProject";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
 
@@ -79,16 +69,19 @@ export default function ProjectSummaryDashboard({
             ),
           );
 
-          addToast({
-            title: "Status updated!",
-            color: "success",
-          });
+          // addToast({
+          //   title: "Status updated!",
+          //   color: "success",
+          // });
+
+          toast.success("Status updated!");
         }
       } catch {
-        addToast({
-          title: "Failed to update",
-          color: "danger",
-        });
+        // addToast({
+        //   title: "Failed to update",
+        //   color: "danger",
+        // });
+        toast.danger("Failed to update");
       }
     }, 2000),
   ).current;
@@ -114,12 +107,15 @@ export default function ProjectSummaryDashboard({
 
       if (data.success) {
         setProjects((prev) => prev.filter((p) => p.id !== projectId));
-        addToast({ title: "Project deleted successfully", color: "success" });
+        // addToast({ title: "Project deleted successfully", color: "success" });
+        toast.success("Project deleted successfully");
       } else {
-        addToast({ title: data.error || "Failed to delete", color: "danger" });
+        // addToast({ title: data.error || "Failed to delete", color: "danger" });
+        toast.danger("Failed to delete");
       }
     } catch {
-      addToast({ title: "Failed to delete project", color: "danger" });
+      // addToast({ title: "Failed to delete project", color: "danger" });
+      toast.danger("Failed to delete project");
     }
   };
 
@@ -132,14 +128,14 @@ export default function ProjectSummaryDashboard({
       <div className="px-4 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl">Projects</h1>
+            <h1 className="text-3xl sm:text-4xl mb-4">Projects</h1>
             <p className="text-sm sm:text-base">Track all the projects here!</p>
           </div>
           <Button
-            className="h-8 bg-gradient-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800   shadow-md shadow-purple-500/20"
+            className="h-10 bg-linear-to-r from-[#893168] to-purple-700 hover:from-purple-600 hover:to-purple-800   shadow-md shadow-purple-500/20 flex rounded-lg w-30 p-2 text-sm gap-2 justify-between"
             onClick={() => setOpenProjectModal(true)}
           >
-            <Plus /> <span>Create New</span>
+            <Plus size={20} /> <span>Create New</span>
           </Button>
         </div>
 
@@ -174,13 +170,13 @@ export default function ProjectSummaryDashboard({
             return (
               <Card
                 key={idx}
-                isPressable
+                // isPressable
                 onClick={() =>
                   setSelectedProjectStatus(isSelected ? "" : stat.value)
                 }
-                className={`${stat.cardClass} ${isSelected ? "ring-1 ring-white/20" : ""}`}
+                className={`${stat.cardClass} ${isSelected ? "ring-1 ring-white/20" : ""} rounded-xl`}
               >
-                <CardBody className="flex flex-row justify-between items-center px-4 py-3">
+                <Card.Content className="flex flex-row justify-between items-center px-4 py-3">
                   <div className="flex items-center gap-3">
                     <stat.emoji
                       size={20}
@@ -193,7 +189,7 @@ export default function ProjectSummaryDashboard({
                   >
                     {projects.filter((p) => p.status === stat.value).length}
                   </div>
-                </CardBody>
+                </Card.Content>
               </Card>
             );
           })}
@@ -218,9 +214,9 @@ export default function ProjectSummaryDashboard({
               return (
                 <Card
                   key={project.id || index}
-                  className={`w-sm p-4 bg-[#191919] `}
+                  className={`w-sm p-4 bg-[#191919] rounded-xl border-gray-600 border-2`}
                 >
-                  <CardHeader className="flex justify-between items-center">
+                  <Card.Header className="flex justify-between items-center">
                     {user.ownedOrganizations?.map(
                       (org: any) =>
                         org.id === project.organizationId ||
@@ -232,7 +228,7 @@ export default function ProjectSummaryDashboard({
                           handleProjectStatusChange(project.id, e.target.value)
                         }
                         defaultValue={project.status || "ACTIVE"}
-                        className={`p-2 cursor-pointer shadow-lg rounded-xl z-10 backdrop-blur-md border text-sm font-medium  ${
+                        className={`pl-0.5 cursor-pointer shadow-lg rounded-xl z-10 backdrop-blur-md border text-xs font-medium flex  ${
                           project.status === "ACTIVE"
                             ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                             : project.status === "ON_HOLD"
@@ -240,7 +236,7 @@ export default function ProjectSummaryDashboard({
                               : project.status === "COMPLETED"
                                 ? "bg-violet-500/10 border-violet-500/30 text-violet-400"
                                 : "bg-white/10 border-white/20 text-white"
-                        }`}
+                        } h-8 w-16 justify-center align-middle `}
                       >
                         <option
                           className="bg-[#1a1a1a] text-emerald-400"
@@ -263,10 +259,11 @@ export default function ProjectSummaryDashboard({
                       </select>
                     ) : (
                       <Chip
-                        classNames={{
-                          base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
-                          content: "drop-shadow shadow-black  ",
-                        }}
+                        // classNames={{
+                        //   base: "bg-linear-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
+                        //   content: "drop-shadow shadow-black  ",
+                        // }}
+                        className="bg-linear-to-br from-indigo-500 to-pink-500 border border-white/50 shadow-pink-500/30 text-white drop-shadow"
                       >
                         {STATUS_DISPLAY[project.status] || "Status"}
                       </Chip>
@@ -314,55 +311,55 @@ export default function ProjectSummaryDashboard({
                         </div>
                       )}
                     </span>
-                  </CardHeader>
+                  </Card.Header>
 
-                  <CardBody>
-                    <h1 className="text-[17px] font-semibold text-white tracking-tight mb-1.5">
+                  <Card.Content>
+                    <h1 className="text-[22px] font-semibold text-white tracking-tight mb-1.5 mt-4">
                       {project.name}
                     </h1>
                     <p className="text-[13px] text-white/40 leading-relaxed mb-2">
                       {project.description}
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4 mb-4">
                       <Card className="flex-1 bg-[#1D1D1D] shadow-xl rounded-xl text-white">
-                        <CardBody className="flex flex-row items-center gap-4 px-3 py-2.5">
+                        <Card.Content className="flex flex-row items-center gap-4 px-3 py-2.5">
                           <Zap
                             size={18}
                             className={`${statusColor} shrink-0`}
                           />
                           <div>
-                            <p className="text-[13px] text-white/30 mb-0.5">
+                            <p className="text-[13px] text-white/40 mb-1">
                               Sprints
                             </p>
                             <p className="text-[16px] font-semibold text-white leading-none">
                               {project.sprints || 0}
                             </p>
                           </div>
-                        </CardBody>
+                        </Card.Content>
                       </Card>
                       <Card className="flex-1 bg-[#1D1D1D] shadow-xl rounded-xl text-white">
-                        <CardBody className="flex flex-row items-center gap-4 px-3 py-2.5">
+                        <Card.Content className="flex flex-row items-center gap-4 px-3 py-2.5">
                           <NotebookText
                             size={18}
                             className={`${statusColor} shrink-0`}
                           />
                           <div>
-                            <p className="text-[13px] text-white/30 mb-0.5">
+                            <p className="text-[13px] text-white/40 mb-1">
                               Tasks
                             </p>
                             <p className="text-[16px] font-semibold text-white leading-none">
                               {project.tasks || 0}
                             </p>
                           </div>
-                        </CardBody>
+                        </Card.Content>
                       </Card>
                     </div>
-                  </CardBody>
+                  </Card.Content>
 
-                  <div className="h-px bg-white/[0.05] mx-[18px]" />
+                  <div className="h-px bg-white/20 mx-4.5 mb-2" />
 
-                  <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                  <Card.Footer className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div className="flex items-center">
                       {[...Array(3)].map((_, i) => (
                         <CircleUser
@@ -380,12 +377,12 @@ export default function ProjectSummaryDashboard({
                           `/organization/${orgSlug}/projects/${project.slug}`,
                         )
                       }
-                      className="cursor-pointer hover:text-purple-400 px-4 py-2 rounded-md text-white font-bold flex gap-2"
+                      className="cursor-pointer hover:text-purple-400 px-4 py-2 rounded-md text-white font-medium flex gap-2"
                     >
                       View Details
                       <ArrowRight />
                     </div>
-                  </CardFooter>
+                  </Card.Footer>
                 </Card>
               );
             })

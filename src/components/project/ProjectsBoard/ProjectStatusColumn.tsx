@@ -26,17 +26,17 @@ export default function StatusColumn({
     <div
       ref={setNodeRef}
       className={`
-        flex flex-col w-full sm:w-[27rem] lg:w-[30rem]
-        min-h-[480px] sm:min-h-[600px]
+        flex flex-col w-full sm:w-100 lg:w-120
+        min-h-120 sm:min-h-150
         rounded-xl
-        bg-gradient-to-b from-[#121018] to-[#232124]
+        bg-linear-to-b from-[#121018] to-[#232124]
         p-6
         shadow-lg shadow-black/60
         border border-neutral-800
         text-neutral-100
         select-none
         overflow-visible
-        sm:flex-shrink-0
+        sm:shrink-0
         transition-colors
       `}
     >

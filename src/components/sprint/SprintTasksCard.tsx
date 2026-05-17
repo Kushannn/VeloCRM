@@ -45,11 +45,11 @@ export default function SprintTaskCard({ task }: SprintTaskCardProps) {
         className={`
         relative
         cursor-grab rounded-lg border border-[#28223e]/70
-        bg-gradient-to-br from-[#201d25] to-[#2a2335]
+        bg-linear-to-br from-[#201d25] to-[#2a2335]
         shadow-md transition-all duration-200
         px-4 py-4
         w-full
-        min-h-[68px] sm:min-h-[80px]
+        min-h-17 sm:min-h-20
         select-none
         group
         hover:shadow-xl hover:z-40
@@ -77,8 +77,8 @@ export default function SprintTaskCard({ task }: SprintTaskCardProps) {
               task.status === "PENDING"
                 ? "bg-yellow-100 text-yellow-800"
                 : task.status === "IN_PROGRESS"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-green-100 text-green-800"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-green-100 text-green-800"
             }
             `}
           >

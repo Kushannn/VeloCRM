@@ -15,7 +15,7 @@ import {
 import SprintColumns from "./SprintColumns";
 import { ProjectType, SprintType, TaskType } from "@/lib/types";
 import debounce from "lodash/debounce";
-import { addToast } from "@heroui/react";
+import { toast } from "@heroui/react";
 import SprintTaskCard from "./SprintTasksCard";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
@@ -60,24 +60,25 @@ export default function SprintBoard({
         });
         const data = await res.json();
         if (data.success) {
-          addToast({
-            title: "Task status updated!",
-            variant: "solid",
-            color: "success",
-          });
+          // addToast({
+          //   title: "Task status updated!",
+          //   variant: "solid",
+          //   color: "success",
+          // });
+          toast.success("Task status updated!");
           onSprintUpdated?.();
         } else {
           throw new Error("Update failed");
         }
       } catch (err) {
-        addToast({
-          title: "Failed to update task status",
-          variant: "solid",
-          color: "danger",
-        });
-        console.error("Error updating task status:", err);
+        // addToast({
+        //   title: "Failed to update task status",
+        //   variant: "solid",
+        //   color: "danger",
+        // });
+        toast.danger("Failed to update task status")
       }
-    }, 1000)
+    }, 1000),
   ).current;
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -98,7 +99,7 @@ export default function SprintBoard({
     if (!column || task.status === column.status) return;
 
     const updatedTasks = tasks.map((t) =>
-      t.id === task.id ? { ...t, status: column.status } : t
+      t.id === task.id ? { ...t, status: column.status } : t,
     );
     setTasks(updatedTasks);
 
@@ -113,7 +114,7 @@ export default function SprintBoard({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   return (

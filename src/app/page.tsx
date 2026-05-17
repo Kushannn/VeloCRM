@@ -2,7 +2,7 @@
 
 import HomeSignedOut from "@/components/HomeSignedOut";
 import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {

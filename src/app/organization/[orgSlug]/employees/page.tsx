@@ -1,9 +1,5 @@
-import { Card, CardBody } from "@heroui/react";
-import { notFound, useParams } from "next/navigation";
+import { notFound } from "next/navigation";
 
-import { useAppSelector } from "@/redux/hooks";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { prisma } from "@/lib/prisma";
 import { EmployeeDetails } from "@/components/employeeDetails/EmployeeDetails";
 

@@ -3,13 +3,12 @@
 import { useState } from "react";
 import {
   Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
+  toast,
   Button,
   Input,
-  addToast,
+  TextField,
+  Label,
+  FieldError,
 } from "@heroui/react";
 
 interface CreateOrganizationProps {
@@ -29,11 +28,7 @@ export default function CreateOrganization({
 
   async function handleSubmit() {
     if (!orgName.trim()) {
-      addToast({
-        title: "Organization name is required",
-        variant: "solid",
-        color: "danger",
-      });
+      toast.danger("Organization name is required");
       return;
     }
 
@@ -44,96 +39,79 @@ export default function CreateOrganization({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: orgName  }),
+        body: JSON.stringify({ name: orgName }),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        addToast({
-          title: "Organization created successfully!",
-          variant: "solid",
-          color: "success",
-        });
+        toast.success("Organization created successfully!");
         onClose();
         setOrgName("");
         setOrganizationName(data.organization.name);
       } else {
-        addToast({
-          title: data.error || "Something went wrong.",
-          variant: "solid",
-          color: "danger",
-        });
+        toast.danger("Something went wrong");
       }
     } catch (err) {
-      addToast({
-        title: "Failed to create organization.",
-        variant: "solid",
-        color: "danger",
-      });
+      toast.danger("Something went wrong");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      backdrop="blur"
-      size="lg"
-      classNames={{
-        body: "py-6",
-        backdrop: "bg-[#292f46]/50",
-        base: "border-[#292f46] bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3] w-full max-w-2xl",
-        header: "border-b-[1px] border-[#292f46]",
-        footer: "border-t-[1px] border-[#292f46]",
-        closeButton: "hover:bg-white/5 active:bg-white/10",
-      }}
-    >
-      <ModalContent>
-        {(close) => (
-          <>
-            <ModalHeader className="  text-2xl font-semibold">
-              Create Organization
-            </ModalHeader>
+    <Modal isOpen={isOpen}>
+      <Modal.Backdrop variant="blur" className={"bg-[#292f46]/50"}>
+        <Modal.Container
+          size="lg"
+          className="border border-[#292f46] bg-[#19172c] text-[#a8b0d3] w-full max-w-2xl"
+        >
+          <Modal.Dialog>
+            {({ close }) => (
+              <>
+                <Modal.CloseTrigger className="hover:bg-white/5 active:bg-white/10" />
+                <Modal.Header className="border-b border-[#292f46]">
+                  <Modal.Heading className="text-white text-2xl font-semibold">
+                    Create Organization
+                  </Modal.Heading>
+                </Modal.Header>
 
-            <ModalBody className="space-y-4">
-              <Input
-                label="Organization Name"
-                variant="bordered"
-                placeholder="Enter name..."
-                value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
-                classNames={{
-                  input: "  placeholder-gray-400",
-                  label: "text-gray-300",
-                  inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
-                }}
-              />
-            </ModalBody>
+                <Modal.Body className="py-6 space-y-4">
+                  <TextField name="name" className="flex-1">
+                    <Label className="text-gray-300 text-sm">
+                      Organization Name
+                    </Label>
+                    <Input
+                      placeholder="Enter lead name"
+                      value={orgName}
+                      onChange={(e) => setOrgName(e.target.value)}
+                      className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2"
+                    />
+                    <FieldError />
+                  </TextField>
+                </Modal.Body>
 
-            <ModalFooter>
-              <Button
-                variant="light"
-                onPress={close}
-                disabled={loading}
-                className=" "
-              >
-                Cancel
-              </Button>
-              <Button
-                color="primary"
-                onPress={handleSubmit}
-                isLoading={loading}
-              >
-                {loading ? "Creating..." : "Create"}
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
+                <Modal.Footer className="border-t border-[#292f46]">
+                  <Button
+                    variant="primary"
+                    onPress={onClose}
+                    isDisabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onPress={handleSubmit}
+                    isPending={loading}
+                  >
+                    {loading ? "Creating..." : "Create"}
+                  </Button>
+                </Modal.Footer>
+              </>
+            )}
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

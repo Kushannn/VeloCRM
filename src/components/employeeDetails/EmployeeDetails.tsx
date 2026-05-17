@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/react";
+import { Card } from "@heroui/react";
 import { CircleUser, Mail, Shield } from "lucide-react";
 
 interface Member {
@@ -31,42 +31,50 @@ export function EmployeeDetails({ members, organization }: Props) {
         <p className="text-sm text-zinc-400">Members of {organization.name}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div>
+        <div></div>
+        <div></div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {members.map((member) => (
           <Card
             key={member.id}
             className="bg-[#111111] border border-[#1f1f1f] hover:border-violet-500/30 transition-colors"
           >
-            <CardBody className="flex flex-row items-center gap-4 p-4">
+            <Card.Content className="flex flex-col items-center gap-4 p-6 text-center">
               {/* Avatar */}
               {member.user.image ? (
                 <img
                   src={member.user.image}
                   alt={member.user.name ?? "Unknown"}
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                  className="w-16 h-16 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-violet-900/40 border border-violet-700/30 flex items-center justify-center flex-shrink-0">
-                  <CircleUser size={24} className="text-violet-300" />
+                <div className="w-16 h-16 rounded-full bg-violet-900/40 border border-violet-700/30 flex items-center justify-center">
+                  <CircleUser size={32} className="text-violet-300" />
                 </div>
               )}
 
               {/* Info */}
-              <div className="flex-1 min-w-0">
+              <div className="w-full space-y-1">
                 <p className="text-white font-semibold truncate">
-                  {member.user.name}
+                  {member.user.name ?? "Unknown"}
                 </p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <Mail size={11} className="text-zinc-500" />
+                <div className="flex items-center justify-center gap-1">
+                  <Mail size={11} className="text-zinc-500 shrink-0" />
                   <p className="text-zinc-500 text-xs truncate">
                     {member.user.email}
                   </p>
                 </div>
               </div>
 
+              {/* Divider */}
+              <div className="w-full h-px bg-white/5" />
+
               {/* Role badge */}
               <div
-                className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium flex-shrink-0 ${
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
                   member.role === "ADMIN"
                     ? "bg-violet-500/10 border border-violet-500/30 text-violet-400"
                     : "bg-white/5 border border-white/10 text-zinc-400"
@@ -75,7 +83,7 @@ export function EmployeeDetails({ members, organization }: Props) {
                 <Shield size={10} />
                 {member.role}
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
         ))}
 

@@ -1,11 +1,10 @@
 import React from "react";
 
 import { Chip } from "@heroui/chip";
-import { Card, CardBody } from "@heroui/react";
+import { Card } from "@heroui/react";
 import { Clock } from "lucide-react";
 
 import baseImage from "../../public/baseImage1.jpg";
-import Navbar from "./Navbar";
 
 function HomeSignedOut() {
   return (
@@ -21,7 +20,7 @@ function HomeSignedOut() {
           </Chip>
 
           <div className="w-fit mx-auto text-center">
-            <div className="text-6xl bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B] leading-tight">
+            <div className="text-6xl bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B] leading-tight">
               Grow Faster, Work Smarter –<br />
               Your Ultimate CRM
             </div>
@@ -36,19 +35,18 @@ function HomeSignedOut() {
             </div>
           </div>
         </div>
-        <div className=" mt-4 pt-4 text-center h-[100vh]">
+        <div className=" mt-4 pt-4 text-center h-screen">
           <div className="flex flex-row">
             <Card
-              isBlurred
-              radius="lg"
-              className="w-[30%] mx-auto bg-[#141414]"
+              // isBlurred
+              className="w-[30%] mx-auto bg-[#141414] rounded-lg backdrop-blur-lg"
             >
-              <CardBody className="p-6">
+              <Card.Content className="p-6">
                 <span>
                   <Clock />
                 </span>
 
-                <span className="text-md bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
+                <span className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
                   Real-Time Analytics & Reporting
                 </span>
 
@@ -56,19 +54,15 @@ function HomeSignedOut() {
                   Get a comprehensive view of your business performance with
                   live mertrics , sales trends
                 </span>
-              </CardBody>
+              </Card.Content>
             </Card>
-            <Card
-              isBlurred
-              radius="lg"
-              className="w-[30%] mx-auto bg-[#141414]"
-            >
-              <CardBody className="p-6">
+            <Card className="w-[30%] mx-auto bg-[#141414] backdrop-blur-lg rounded-lg">
+              <Card.Content className="p-6">
                 <span>
                   <Clock />
                 </span>
 
-                <span className="text-md bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
+                <span className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
                   Real-Time Analytics & Reporting
                 </span>
 
@@ -76,19 +70,15 @@ function HomeSignedOut() {
                   Get a comprehensive view of your business performance with
                   live mertrics , sales trends
                 </span>
-              </CardBody>
+              </Card.Content>
             </Card>
-            <Card
-              isBlurred
-              radius="lg"
-              className="w-[30%] mx-auto bg-[#141414]"
-            >
-              <CardBody className="p-6">
+            <Card className="w-[30%] mx-auto bg-[#141414] rounded-lg backdrop-blur-lg">
+              <Card.Content className="p-6">
                 <span>
                   <Clock />
                 </span>
 
-                <span className="text-md bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
+                <span className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
                   Real-Time Analytics & Reporting
                 </span>
 
@@ -96,18 +86,14 @@ function HomeSignedOut() {
                   Get a comprehensive view of your business performance with
                   live mertrics , sales trends
                 </span>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Card
-            isBlurred
-            radius="lg"
-            className="mx-auto bg-[#141414] mt-8 w-[92vw]"
-          >
-            <CardBody className="p-6 flex flex-row justify-around">
+          <Card className="mx-auto bg-[#141414] mt-8 w-[92vw] backdrop-blur-lg rounded-lg">
+            <Card.Content className="p-6 flex flex-row justify-around">
               <div className="ml-14 mt-8 w-[40%]">
-                <div className="text-md bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-5 mb-3 text-4xl">
+                <div className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-5 mb-3 text-4xl">
                   Workflow with a <br /> Smart CRM
                 </div>
                 <span className="text-[#7B7B7B]">
@@ -118,10 +104,10 @@ function HomeSignedOut() {
                 <div>
                   <div className="mt-10 flex items-start gap-4">
                     {/* Vertical Gradient Line */}
-                    <span className="w-[2px] h-22 bg-gradient-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
+                    <span className="w-0.5 h-22 bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
 
                     <div>
-                      <div className="bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
+                      <div className="bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
                         Sales & Lead Tracking
                       </div>
                       <span className="text-[#7B7B7B]">
@@ -135,10 +121,10 @@ function HomeSignedOut() {
                 <div>
                   <div className="mt-10 flex items-start gap-4">
                     {/* Vertical Gradient Line */}
-                    <span className="w-[2px] h-7   bg-gradient-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
+                    <span className="w-0.5 h-7 bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
 
                     <div>
-                      <div className="bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
+                      <div className="bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
                         Task & Team Collaboration
                       </div>
                     </div>
@@ -148,10 +134,10 @@ function HomeSignedOut() {
                 <div>
                   <div className="mt-10 flex items-start gap-4">
                     {/* Vertical Gradient Line */}
-                    <span className="w-[2px] h-7 bg-gradient-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
+                    <span className="w-0.5 h-7 bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
 
                     <div>
-                      <div className="bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
+                      <div className="bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
                         360° Team Management
                       </div>
                     </div>
@@ -162,15 +148,15 @@ function HomeSignedOut() {
                 <img
                   src={baseImage.src}
                   alt="Base Image"
-                  className="w-full h-[400px] object-cover mt-8 rounded-lg"
+                  className="w-full h-100 object-cover mt-8 rounded-lg"
                 />
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
         </div>
-        <div className="border-t border-blue-800 mt-52 pt-4 h-[100vh]">
+        <div className="border-t border-blue-800 mt-52 pt-4 h-screen">
           <div className="mt-5 text-left ml-10">
-            <span className="text-4xl bg-clip-text text-transparent bg-gradient-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B] leading-tight">
+            <span className="text-4xl bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B] leading-tight">
               The Smart Workflow For <br /> Business Success
             </span>
             <div className="mt-4 text-[#7B7B7B]">

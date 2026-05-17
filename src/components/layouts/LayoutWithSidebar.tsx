@@ -37,7 +37,7 @@ export default function LayoutWithSidebar({
           <>
             {/* Desktop sidebar */}
             <div
-              className="hidden sm:block fixed top-[64px] left-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
+              className="hidden sm:block fixed top-16 left-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
               style={{ width: isSidebarExpanded ? "240px" : "64px" }}
             >
               <Sidebar onExpandChange={setIsSidebarExpanded} />

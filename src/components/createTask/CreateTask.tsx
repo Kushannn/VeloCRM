@@ -3,17 +3,16 @@
 import React, { useState } from "react";
 import {
   Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
+  TextField,
+  Label,
   Input,
-  Textarea,
+  FieldError,
   Select,
-  SelectItem,
-  addToast,
+  ListBox,
+  useOverlayState,
 } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 import { ProjectType, SprintType } from "@/lib/types";
 
 interface CreateTaskProps {
@@ -25,6 +24,40 @@ interface CreateTaskProps {
   project: ProjectType;
 }
 
+// Reusable styled select to avoid repeating compound structure
+function StyledSelect({
+  label,
+  value,
+  onChange,
+  children,
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1 flex-1">
+      <p className="text-gray-300 text-sm">{label}</p>
+
+      {/* Select has NO Label child at all */}
+      <Select
+        aria-label={label}
+        value={value}
+        onChange={(val) => onChange(String(val ?? ""))}
+      >
+        <Select.Trigger className="w-full h-10 bg-[#262626] border border-gray-700 rounded-lg px-3 text-white flex items-center justify-between">
+          <Select.Value className="text-white text-sm" />
+          <Select.Indicator className="text-gray-400" />
+        </Select.Trigger>
+        <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl">
+          <ListBox className="outline-none p-1 space-y-1">{children}</ListBox>
+        </Select.Popover>
+      </Select>
+    </div>
+  );
+}
+
 export default function CreateTask({
   isOpen,
   onClose,
@@ -33,20 +66,22 @@ export default function CreateTask({
   sprint,
   project,
 }: CreateTaskProps) {
+  const state = useOverlayState({
+    isOpen,
+    onOpenChange: (open) => {
+      if (!open) onClose();
+    },
+  });
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("Todo");
-  const [priority, setPriority] = useState("Low");
+  const [status, setStatus] = useState("PENDING");
+  const [priority, setPriority] = useState("LOW");
   const [loading, setLoading] = useState(false);
   const [assignedTo, setAssignedTo] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (close: () => void) => {
     if (!title.trim()) {
-      addToast({
-        title: "Title is required.",
-        variant: "solid",
-        color: "danger",
-      });
+      addToast({ title: "Title is required.", color: "danger" });
       return;
     }
 
@@ -70,158 +105,170 @@ export default function CreateTask({
       const data = await res.json();
 
       if (data.success) {
-        addToast({
-          title: "Task created successfully!",
-          variant: "solid",
-          color: "success",
-        });
+        addToast({ title: "Task created successfully!", color: "success" });
         setTitle("");
         setDescription("");
-        setStatus("Todo");
-        setPriority("Low");
-        onClose();
+        setStatus("PENDING");
+        setPriority("LOW");
+        setAssignedTo("");
         onTaskCreated?.();
+        close();
       } else {
         addToast({
           title: data.error || "Something went wrong.",
-          variant: "solid",
           color: "danger",
         });
       }
-    } catch (err) {
-      addToast({
-        title: "Failed to create task.",
-        variant: "solid",
-        color: "danger",
-      });
+    } catch {
+      addToast({ title: "Failed to create task.", color: "danger" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      backdrop="blur"
-      size="lg"
-      classNames={{
-        body: "py-6",
-        backdrop: "bg-[#292f46]/50",
-        base: "border-[#292f46] bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3] w-full max-w-2xl",
-        header: "border-b-[1px] border-[#292f46]",
-        footer: "border-t-[1px] border-[#292f46]",
-        closeButton: "hover:bg-white/5 active:bg-white/10",
-      }}
-    >
-      <ModalContent>
-        {(close) => (
-          <>
-            <ModalHeader className="  text-2xl font-semibold">
-              Create Task
-            </ModalHeader>
+    <Modal state={state}>
+      <Modal.Backdrop
+        variant="blur"
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      >
+        <Modal.Container className="max-w-2xl w-full">
+          <Modal.Dialog className="bg-[#19172c] border border-[#292f46] text-[#a8b0d3] rounded-xl">
+            {({ close }) => (
+              <>
+                <Modal.Header className="border-b border-[#292f46] px-6 py-6">
+                  <div className="flex items-center justify-between w-full">
+                    <Modal.Heading className="text-2xl font-semibold">
+                      Create Task
+                    </Modal.Heading>
+                    <Modal.CloseTrigger className="hover:bg-white/5 active:bg-white/10 p-2 rounded-xl" />
+                  </div>
+                </Modal.Header>
 
-            <ModalBody className="space-y-4">
-              <Input
-                label="Task Title"
-                placeholder="Enter title..."
-                value={title}
-                variant="bordered"
-                onChange={(e: any) => setTitle(e.target.value)}
-                classNames={{
-                  label: "text-gray-300",
-                  inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
-                }}
-              />
+                <Modal.Body className="py-6 px-6 space-y-4">
+                  {/* Title */}
+                  <TextField name="title" className="w-full">
+                    <Label className="text-gray-300 text-sm">Task Title</Label>
+                    <textarea
+                      placeholder="Enter title..."
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 px-3 py-2 resize-none focus:outline-none focus:border-violet-500/50 mt-1"
+                    />
+                    <FieldError />
+                  </TextField>
 
-              <Textarea
-                label="Description"
-                placeholder="Task description..."
-                variant="bordered"
-                value={description}
-                onChange={(e: any) => setDescription(e.target.value)}
-                classNames={{
-                  input: "  placeholder-gray-400",
-                  label: "text-gray-300",
-                  inputWrapper:
-                    "bg-[#262626] border border-gray-700 rounded-lg   focus-within:ring-0 focus-within:ring-offset-0",
-                }}
-              />
+                  {/* Description */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-gray-300 text-sm">Description</label>
+                    <textarea
+                      placeholder="Task description..."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={3}
+                      className="w-full bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 px-3 py-2 resize-none focus:outline-none focus:border-violet-500/50"
+                    />
+                  </div>
 
-              <div>
-                <Select
-                  label="Assign To"
-                  selectedKeys={[assignedTo]}
-                  onSelectionChange={(keys: any) =>
-                    setAssignedTo(Array.from(keys)[0] as string)
-                  }
-                  classNames={{
-                    base: "bg-[#262626] border border-gray-700   rounded-lg",
-                    label: "text-gray-300",
-                  }}
-                >
-                  {project?.projectUsers?.map((user) => (
-                    <SelectItem key={user.id}>{user.user?.name}</SelectItem>
-                  ))}
-                </Select>
-              </div>
+                  {/* Assign to */}
+                  <Select
+                    value={assignedTo}
+                    onChange={(val) => setAssignedTo(String(val ?? ""))}
+                    className="w-full"
+                  >
+                    <Label className="text-gray-300 text-sm">Assign To</Label>
+                    <Select.Trigger className="w-full bg-[#262626] border border-gray-700 rounded-lg px-3 py-2 text-white flex items-center justify-between">
+                      <Select.Value className="text-white" />
+                      <Select.Indicator className="text-gray-400" />
+                    </Select.Trigger>
+                    <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1">
+                      <ListBox>
+                        {project?.projectUsers?.map((u) => (
+                          <ListBox.Item
+                            key={u.id}
+                            id={u.id}
+                            textValue={u.user?.name ?? "Unknown"}
+                            className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                          >
+                            <Label>{u.user?.name ?? "Unknown"}</Label>
+                            <ListBox.ItemIndicator />
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
 
-              <div className="flex gap-4">
-                <Select
-                  label="Status"
-                  selectedKeys={[status]}
-                  onSelectionChange={(keys: any) =>
-                    setStatus(Array.from(keys)[0] as string)
-                  }
-                  classNames={{
-                    base: "bg-[#262626] border border-gray-700   rounded-lg",
-                    label: "text-gray-300",
-                  }}
-                >
-                  <SelectItem key="Todo">Todo</SelectItem>
-                  <SelectItem key="In Progress">In Progress</SelectItem>
-                  <SelectItem key="Done">Done</SelectItem>
-                </Select>
+                  {/* Status + Priority */}
+                  <div className="flex gap-4">
+                    <StyledSelect
+                      label="Status"
+                      value={status}
+                      onChange={setStatus}
+                    >
+                      {[
+                        { id: "PENDING", label: "Pending" },
+                        { id: "IN_PROGRESS", label: "In Progress" },
+                        { id: "COMPLETED", label: "Completed" },
+                      ].map((s) => (
+                        <ListBox.Item
+                          key={s.id}
+                          id={s.id}
+                          textValue={s.label}
+                          className="px-3 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                        >
+                          <Label>{s.label}</Label>
+                          {/* <ListBox.ItemIndicator /> */}
+                        </ListBox.Item>
+                      ))}
+                    </StyledSelect>
 
-                <Select
-                  label="Priority"
-                  selectedKeys={[priority]}
-                  onSelectionChange={(keys: any) =>
-                    setPriority(Array.from(keys)[0] as string)
-                  }
-                  classNames={{
-                    base: "bg-[#262626] border border-gray-700   rounded-lg",
-                    label: "text-gray-300",
-                  }}
-                >
-                  <SelectItem key="Low">Low</SelectItem>
-                  <SelectItem key="Medium">Medium</SelectItem>
-                  <SelectItem key="High">High</SelectItem>
-                </Select>
-              </div>
-            </ModalBody>
+                    <StyledSelect
+                      label="Priority"
+                      value={priority}
+                      onChange={setPriority}
+                    >
+                      {[
+                        { id: "LOW", label: "Low" },
+                        { id: "MEDIUM", label: "Medium" },
+                        { id: "HIGH", label: "High" },
+                      ].map((p) => (
+                        <ListBox.Item
+                          key={p.id}
+                          id={p.id}
+                          textValue={p.label}
+                          className="px-3 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                        >
+                          <Label>{p.label}</Label>
+                          {/* <ListBox.ItemIndicator /> */}
+                        </ListBox.Item>
+                      ))}
+                    </StyledSelect>
+                  </div>
+                </Modal.Body>
 
-            <ModalFooter>
-              <Button
-                variant="light"
-                onPress={close}
-                disabled={loading}
-                className=" "
-              >
-                Cancel
-              </Button>
-              <Button
-                color="primary"
-                onPress={handleSubmit}
-                isLoading={loading}
-              >
-                {loading ? "Creating..." : "Create Task"}
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
+                <Modal.Footer className="border-t border-[#292f46] px-6 py-4 flex justify-end gap-3">
+                  <Button
+                    variant="ghost"
+                    onPress={close}
+                    isDisabled={loading}
+                    className="text-white cursor-pointer"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onPress={() => handleSubmit(close)}
+                    isPending={loading}
+                    className="cursor-pointer hover:bg-gray-700 p-2 rounded-xl "
+                  >
+                    {loading ? "Creating..." : "Create Task"}
+                  </Button>
+                </Modal.Footer>
+              </>
+            )}
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }
