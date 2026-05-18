@@ -37,7 +37,7 @@ export default function GlobalError({
       <div className="flex justify-center gap-4">
         <Button
           color="danger"
-          variant="flat"
+          // variant=""
           onClick={() => reset()}
           className="flex items-center gap-2"
         >

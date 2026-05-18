@@ -170,33 +170,35 @@ export default function CreateTask({
                     />
                   </div>
 
-                  {/* Assign to */}
-                  <Select
-                    value={assignedTo}
-                    onChange={(val) => setAssignedTo(String(val ?? ""))}
-                    className="w-full"
-                  >
-                    <Label className="text-gray-300 text-sm">Assign To</Label>
-                    <Select.Trigger className="w-full bg-[#262626] border border-gray-700 rounded-lg px-3 py-2 text-white flex items-center justify-between">
-                      <Select.Value className="text-white" />
-                      <Select.Indicator className="text-gray-400" />
-                    </Select.Trigger>
-                    <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1">
-                      <ListBox>
-                        {project?.projectUsers?.map((u) => (
-                          <ListBox.Item
-                            key={u.id}
-                            id={u.id}
-                            textValue={u.user?.name ?? "Unknown"}
-                            className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
-                          >
-                            <Label>{u.user?.name ?? "Unknown"}</Label>
-                            <ListBox.ItemIndicator />
-                          </ListBox.Item>
-                        ))}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
+                  <div className="flex flex-col gap-1 w-full">
+                    <span className="text-gray-300 text-sm">Assign To</span>
+
+                    <Select
+                      aria-label="Assign To"
+                      value={assignedTo}
+                      onChange={(val) => setAssignedTo(String(val ?? ""))}
+                    >
+                      <Select.Trigger className="w-full h-10 bg-[#262626] border border-gray-700 rounded-lg px-3 text-white flex items-center justify-between cursor-pointer z-50">
+                        <Select.Value className="text-white text-sm" />
+                        <Select.Indicator className="text-gray-400" />
+                      </Select.Trigger>
+                      <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-[100]">
+                        <ListBox className="outline-none space-y-1">
+                          {project?.projectUsers?.map((u) => (
+                            <ListBox.Item
+                              key={u.id}
+                              id={u.id}
+                              textValue={u.user?.name ?? "Unknown"}
+                              className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                            >
+                              <Label>{u.user?.name ?? "Unknown"}</Label>
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                          ))}
+                        </ListBox>
+                      </Select.Popover>
+                    </Select>
+                  </div>
 
                   {/* Status + Priority */}
                   <div className="flex gap-4">

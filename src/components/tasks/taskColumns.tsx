@@ -42,7 +42,7 @@ export default function TaskColumns({ col }: { col: ColumnType }) {
       <div
         ref={setNodeRef}
         className={`bg-[#161617] border rounded-xl p-3 flex flex-col gap-3 min-h-75 transition
-        ${isOver ? "border-blue-500 bg-[#1d1f24]" : "border-gray-800"}`}
+        ${isOver ? "border-blue-500 bg-[#1d1f24]" : "border-gray-800"} h-full min-h-[150]`}
       >
         {col.tasks.length > 0 ? (
           col.tasks.map((task) => <TaskCard key={task.id} task={task} />)

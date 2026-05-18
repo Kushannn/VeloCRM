@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Chip, Modal } from "@heroui/react";
+import { Button, Chip, Modal, useOverlayState } from "@heroui/react";
 
 import { useState } from "react";
 import { Calendar, Circle, Clock, Dot } from "lucide-react";
@@ -10,6 +10,7 @@ import CreateTask from "@/components/createTask/CreateTask";
 import TaskColumns from "@/components/tasks/taskColumns";
 import { ColumnType } from "@/lib/types";
 import { useParams } from "next/navigation";
+import MagicBento from "../MagicBento";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 
@@ -22,6 +23,7 @@ export default function SprintDashboard({ sprint, project }: any) {
     projectId: string;
     sprintId: string;
   }>();
+  const descState = useOverlayState();
   const calculateDaysRemaining = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -124,7 +126,7 @@ export default function SprintDashboard({ sprint, project }: any) {
     <>
       <div className="px-4 pb-10 min-h-screen space-y-6">
         {/* Header */}
-        <div className="bg-linear-to-br from-[#1f1d24] to-[#17161b] border border-gray-800 rounded-xl p-4 flex flex-wrap gap-4 items-center">
+        <div className="bg-[#0f0f0f] border border-gray-800 rounded-xl p-4 flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-55">
             {isActive && (
               <p className="flex gap-3 items-center text-sm mb-2">
@@ -138,7 +140,7 @@ export default function SprintDashboard({ sprint, project }: any) {
 
             {localSprint.description && (
               <p
-                onClick={() => setOpenDescModal(true)}
+                onClick={() => descState.open()}
                 className="text-sm text-gray-400 line-clamp-2 mt-2"
               >
                 {localSprint.description}
@@ -186,11 +188,23 @@ export default function SprintDashboard({ sprint, project }: any) {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {columns.map((col) => (
+          {/* No outer grid div needed */}
+          <MagicBento
+            cards={columns.map((col) => (
               <TaskColumns key={col.key} col={col} />
             ))}
-          </div>
+            columns={3}
+            enableStars
+            enableSpotlight
+            enableBorderGlow={true}
+            enableTilt={false}
+            enableMagnetism={false}
+            clickEffect
+            spotlightRadius={400}
+            particleCount={12}
+            glowColor="132, 0, 255"
+            disableAnimations={false}
+          />
         </DndContext>
       </div>
 
@@ -224,29 +238,42 @@ export default function SprintDashboard({ sprint, project }: any) {
       </Modal> */}
 
       {/* Description Modal */}
-      <Modal isOpen={openDescModal} onOpenChange={setOpenDescModal}>
-        <Modal.Backdrop className="bg-black/50 backdrop-blur-sm" />
-
-        <Modal.Container
-          size="lg"
-          className="bg-[#2a2a2a] text-white border border-gray-700"
+      <Modal state={descState}>
+        <Modal.Backdrop
+          variant="blur"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
         >
-          <Modal.Dialog>
-            {() => (
-              <>
-                <Modal.Header className="border-b border-gray-700">
-                  <Modal.Heading>Sprint Description</Modal.Heading>
-                </Modal.Header>
-
-                <Modal.Body className="text-gray-300">
-                  <p className="whitespace-pre-line">
-                    {localSprint.description}
-                  </p>
-                </Modal.Body>
-              </>
-            )}
-          </Modal.Dialog>
-        </Modal.Container>
+          <Modal.Container className="max-w-lg w-full">
+            <Modal.Dialog className="bg-[#111111] border border-[#1f1f1f] rounded-2xl text-white">
+              {({ close }) => (
+                <>
+                  <Modal.Header className="border-b border-[#1f1f1f] px-6 py-4">
+                    <div className="flex items-center justify-between w-full">
+                      <Modal.Heading className="text-lg font-semibold">
+                        Sprint Description
+                      </Modal.Heading>
+                      <Modal.CloseTrigger className="hover:bg-white/5 rounded-lg p-1" />
+                    </div>
+                  </Modal.Header>
+                  <Modal.Body className="px-6 py-4">
+                    <p className="text-zinc-400 text-sm whitespace-pre-line leading-relaxed">
+                      {localSprint.description}
+                    </p>
+                  </Modal.Body>
+                  <Modal.Footer className="border-t border-[#1f1f1f] px-6 py-4 flex justify-end">
+                    <Button
+                      variant="ghost"
+                      onPress={close}
+                      className="text-zinc-400 hover:text-white"
+                    >
+                      Close
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );
