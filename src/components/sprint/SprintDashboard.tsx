@@ -10,7 +10,7 @@ import CreateTask from "@/components/createTask/CreateTask";
 import TaskColumns from "@/components/tasks/taskColumns";
 import { ColumnType } from "@/lib/types";
 import { useParams } from "next/navigation";
-import MagicBento from "../MagicBento";
+import MagicBento from "../ui/MagicBento";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 

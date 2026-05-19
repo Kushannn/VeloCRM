@@ -15,6 +15,13 @@ export default async function Page({
     where: {
       slug: projectSlug,
     },
+    include: {
+      projectUsers: {
+        include: {
+          user: true,
+        },
+      },
+    },
   });
 
   const sprint = await prisma.sprint.findFirst({

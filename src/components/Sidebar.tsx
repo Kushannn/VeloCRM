@@ -134,7 +134,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
     {
       icon: <Home size={18} />,
       label: "Leads",
-      onClick: () => {},
+      onClick: () => router.push(`/organization/${activeOrg?.slug}/leads`),
     },
   ];
 

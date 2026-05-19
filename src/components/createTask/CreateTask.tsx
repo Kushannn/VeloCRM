@@ -191,8 +191,28 @@ export default function CreateTask({
                               textValue={u.user?.name ?? "Unknown"}
                               className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
                             >
-                              <Label>{u.user?.name ?? "Unknown"}</Label>
-                              <ListBox.ItemIndicator />
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-semibold shrink-0 overflow-hidden">
+                                  {u.user?.image ? (
+                                    <img
+                                      src={u.user.image}
+                                      alt={u.user.name ?? ""}
+                                      className="w-full h-full object-cover rounded-full"
+                                    />
+                                  ) : (
+                                    (u.user?.name?.[0]?.toUpperCase() ?? "?")
+                                  )}
+                                </div>
+
+                                <div className="flex flex-col">
+                                  <span className="text-white text-sm font-medium leading-tight">
+                                    {u.user?.name ?? "Unknown"}
+                                  </span>
+                                  <span className="text-gray-400 text-xs leading-tight">
+                                    {u.user?.email ?? ""}
+                                  </span>
+                                </div>
+                              </div>
                             </ListBox.Item>
                           ))}
                         </ListBox>
