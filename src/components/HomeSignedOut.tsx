@@ -1,171 +1,227 @@
 import React from "react";
-
-import { Chip } from "@heroui/chip";
-import { Card } from "@heroui/react";
-import { Clock } from "lucide-react";
-
 import baseImage from "../../public/baseImage1.jpg";
+import taskImage from "../../public/task.webp";
+import LightPillar from "./LightPillar";
+
+import LogoLoop from "./LogoLoop";
+import { Card, Link, Separator } from "@heroui/react";
+import { Fan } from "lucide-react";
 
 function HomeSignedOut() {
   return (
     <>
-      <div className="flex flex-col">
-        <div className="flex items-center h-screen flex-col ">
-          <Chip
-            variant="dot"
-            color="warning"
-            className="border-2 border-gray-800 p-6 text-md mb-10"
-          >
-            From Leads To Loyalty - Manage it all in one place
-          </Chip>
+      <LightPillar
+        topColor="#111111"
+        bottomColor="#9333EA"
+        intensity={1}
+        rotationSpeed={0.3}
+        glowAmount={0.003}
+        pillarWidth={3}
+        pillarHeight={0.4}
+        noiseIntensity={0.5}
+        pillarRotation={25}
+        interactive={false}
+        mixBlendMode="screen"
+        quality="high"
+        className="fixed"
+      />
+      <div className="relative min-h-screen overflow-hidden text-white ">
+        {/* Main */}
+        <div className="max-w-7xl mx-auto px-6 min-h-screen flex flex-col items-center justify-center text-center">
+          <div className="space-y-6">
+            {/* <div className="inline-flex items-center rounded-full border border-white/10 px-4 py-2 text-sm text-zinc-300 backdrop-blur-sm">
+              Built for modern teams & growing businesses
+            </div> */}
 
-          <div className="w-fit mx-auto text-center">
-            <div className="text-6xl bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B] leading-tight">
-              Grow Faster, Work Smarter –<br />
-              Your Ultimate CRM
-            </div>
+            <h1 className="text-6xl md:text-7xl font-bold leading-tight tracking-tight">
+              Manage Projects,
+              <br />
+              Leads & Teams
+              <span className="bg-linear-to-r from-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
+                {" "}
+                Seamlessly
+              </span>
+            </h1>
 
-            <div className="mt-4 text-lg text-[#7B7B7B]">
-              <div className="">
-                Streamline customer relationships, automate workflows, and
-              </div>
-              <div className="text-center">
-                gain valuable insights to make smarter decisions
-              </div>
+            <p className="max-w-2xl mx-auto text-lg text-zinc-400 leading-relaxed">
+              A modern CRM workspace to manage clients, track leads, organize
+              sprints, and collaborate with your entire team in one powerful
+              platform.
+            </p>
+
+            <div className="flex items-center justify-center gap-4 pt-4">
+              <button className="px-6 py-3 rounded-xl border border-violet-500/30 backdrop-blur-sm hover:scale-105 transition-all duration-300 font-medium">
+                Get Started
+              </button>
+
+              <button className="px-6 py-3 rounded-xl border border-white/10 backdrop-blur-sm hover:scale-105 transition-all duration-300 font-medium">
+                Live Demo
+              </button>
             </div>
+          </div>
+
+          <div className="mt-16 relative">
+            <div className="absolute inset-0 blur-3xl rounded-full opacity-30 bg-violet-500/20" />
+
+            <img
+              src={baseImage.src}
+              alt="CRM Dashboard"
+              className="relative w-full max-w-5xl rounded-2xl border border-white/10 shadow-2xl shadow-violet-900/20"
+            />
           </div>
         </div>
-        <div className=" mt-4 pt-4 text-center h-screen">
-          <div className="flex flex-row">
-            <Card
-              // isBlurred
-              className="w-[30%] mx-auto bg-[#141414] rounded-lg backdrop-blur-lg"
-            >
-              <Card.Content className="p-6">
-                <span>
-                  <Clock />
-                </span>
 
-                <span className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
-                  Real-Time Analytics & Reporting
-                </span>
+        {/* Second - Logo Loops  */}
 
-                <span className="text-[#7B7B7B]">
-                  Get a comprehensive view of your business performance with
-                  live mertrics , sales trends
-                </span>
-              </Card.Content>
-            </Card>
-            <Card className="w-[30%] mx-auto bg-[#141414] backdrop-blur-lg rounded-lg">
-              <Card.Content className="p-6">
-                <span>
-                  <Clock />
-                </span>
+        <div
+          style={{ height: "200px", position: "relative", overflow: "hidden" }}
+        >
+          "For logo loops"
+        </div>
 
-                <span className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
-                  Real-Time Analytics & Reporting
-                </span>
+        {/* Third */}
+        <section className="flex flex-col gap-28 mb-14">
+          <div className="text-center">
+            <p className="text-violet-400 text-sm uppercase tracking-[0.3em] mb-4">
+              Smart Workflow
+            </p>
 
-                <span className="text-[#7B7B7B]">
-                  Get a comprehensive view of your business performance with
-                  live mertrics , sales trends
-                </span>
-              </Card.Content>
-            </Card>
-            <Card className="w-[30%] mx-auto bg-[#141414] rounded-lg backdrop-blur-lg">
-              <Card.Content className="p-6">
-                <span>
-                  <Clock />
-                </span>
+            <h2 className="text-6xl font-bold tracking-tight">
+              Project strategy made simple
+            </h2>
 
-                <span className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-8 mb-3">
-                  Real-Time Analytics & Reporting
-                </span>
-
-                <span className="text-[#7B7B7B]">
-                  Get a comprehensive view of your business performance with
-                  live mertrics , sales trends
-                </span>
-              </Card.Content>
-            </Card>
+            <p className="text-zinc-400 text-lg mt-6 max-w-3xl mx-auto leading-relaxed">
+              Align your projects around a clear pipeline. Plan sprints, assign
+              tasks, and track every milestone with real-time visibility.
+            </p>
           </div>
 
-          <Card className="mx-auto bg-[#141414] mt-8 w-[92vw] backdrop-blur-lg rounded-lg">
-            <Card.Content className="p-6 flex flex-row justify-around">
-              <div className="ml-14 mt-8 w-[40%]">
-                <div className="text-md bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mt-5 mb-3 text-4xl">
-                  Workflow with a <br /> Smart CRM
-                </div>
-                <span className="text-[#7B7B7B]">
-                  Streamline your operations with an intelligent <br /> CRM that
-                  automates tasks, tracks leads
-                </span>
-
-                <div>
-                  <div className="mt-10 flex items-start gap-4">
-                    {/* Vertical Gradient Line */}
-                    <span className="w-0.5 h-22 bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
-
-                    <div>
-                      <div className="bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
-                        Sales & Lead Tracking
-                      </div>
-                      <span className="text-[#7B7B7B]">
-                        Access all customer interactions, history and <br />
-                        preferences in one place for better relationships.
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mt-10 flex items-start gap-4">
-                    {/* Vertical Gradient Line */}
-                    <span className="w-0.5 h-7 bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
-
-                    <div>
-                      <div className="bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
-                        Task & Team Collaboration
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mt-10 flex items-start gap-4">
-                    {/* Vertical Gradient Line */}
-                    <span className="w-0.5 h-7 bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B]" />
-
-                    <div>
-                      <div className="bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC]  to-[#7B7B7B] leading-tight mb-3">
-                        360° Team Management
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {/* left  and right container*/}
+          <div className="flex justify-around">
+            <div className="flex flex-col gap-16">
               <div>
-                <img
-                  src={baseImage.src}
-                  alt="Base Image"
-                  className="w-full h-100 object-cover mt-8 rounded-lg"
-                />
+                <p className="font-bold text-lg  mb-1">Smart Workflow</p>
+
+                <p className="text-sm tracking-tight">
+                  Project strategy made simple
+                </p>
               </div>
-            </Card.Content>
-          </Card>
-        </div>
-        <div className="border-t border-blue-800 mt-52 pt-4 h-screen">
-          <div className="mt-5 text-left ml-10">
-            <span className="text-4xl bg-clip-text text-transparent bg-linear-to-b from-[#FCFCFC] via-[#B0B0B0] to-[#7B7B7B] leading-tight">
-              The Smart Workflow For <br /> Business Success
-            </span>
-            <div className="mt-4 text-[#7B7B7B]">
-              Achieve efficiency and growth with a smart workflow system <br />
-              that keeps your team organized and productive.
+
+              <img src={taskImage.src} alt="" className="h-72 w-72" />
+            </div>
+
+            <Separator orientation="vertical" className="bg-white/50" />
+
+            <div className="flex flex-col gap-16">
+              <div>
+                <p className="font-bold text-lg  mb-1">Smart Workflow</p>
+
+                <p className="text-sm tracking-tight">
+                  Project strategy made simple
+                </p>
+              </div>
+
+              <img src={taskImage.src} alt="" className="h-72 w-72" />
             </div>
           </div>
-        </div>
-        <div className="border-t border-violet-800 mt-4 pt-4 text-center h-[100h]"></div>
+        </section>
+
+        {/* Fourth */}
+        <section>
+          {/* feature cards */}
+          <div className="flex gap-4">
+            <Card className="w-95 bg-black/85 border border-white/10 rounded-3xl shadow-xl backdrop-blur-md p-2">
+              <Card.Header className="flex flex-col items-start gap-4 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-violet-500/15 border border-violet-500/20">
+                    <Fan size={20} className="text-violet-400" />
+                  </div>
+
+                  <Card.Title className="text-white text-xl font-semibold tracking-tight">
+                    Pipelines
+                  </Card.Title>
+                </div>
+
+                <Card.Description className="text-gray-400 text-sm leading-relaxed wrap-break-words">
+                  Organize deals by stages and track progress at a glance.
+                  Manage workflows efficiently and keep every milestone visible
+                  across your team.
+                </Card.Description>
+              </Card.Header>
+            </Card>
+
+            <Card className="w-95 bg-black/85 border border-white/10 rounded-3xl shadow-xl backdrop-blur-md p-2">
+              <Card.Header className="flex flex-col items-start gap-4 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-violet-500/15 border border-violet-500/20">
+                    <Fan size={20} className="text-violet-400" />
+                  </div>
+
+                  <Card.Title className="text-white text-xl font-semibold tracking-tight">
+                    Pipelines
+                  </Card.Title>
+                </div>
+
+                <Card.Description className="text-gray-400 text-sm leading-relaxed wrap-break-words">
+                  Organize deals by stages and track progress at a glance.
+                  Manage workflows efficiently and keep every milestone visible
+                  across your team.
+                </Card.Description>
+              </Card.Header>
+            </Card>
+
+            <Card className="w-95 bg-black/85 border border-white/10 rounded-3xl shadow-xl backdrop-blur-md p-2">
+              <Card.Header className="flex flex-col items-start gap-4 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-violet-500/15 border border-violet-500/20">
+                    <Fan size={20} className="text-violet-400" />
+                  </div>
+
+                  <Card.Title className="text-white text-xl font-semibold tracking-tight">
+                    Pipelines
+                  </Card.Title>
+                </div>
+
+                <Card.Description className="text-gray-400 text-sm leading-relaxed wrap-break-words">
+                  Organize deals by stages and track progress at a glance.
+                  Manage workflows efficiently and keep every milestone visible
+                  across your team.
+                </Card.Description>
+              </Card.Header>
+            </Card>
+
+            <Card className="w-95 bg-black/85 border border-white/10 rounded-3xl shadow-xl backdrop-blur-md p-2">
+              <Card.Header className="flex flex-col items-start gap-4 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-violet-500/15 border border-violet-500/20">
+                    <Fan size={20} className="text-violet-400" />
+                  </div>
+
+                  <Card.Title className="text-white text-xl font-semibold tracking-tight">
+                    Pipelines
+                  </Card.Title>
+                </div>
+
+                <Card.Description className="text-gray-400 text-sm leading-relaxed wrap-break-words">
+                  Organize deals by stages and track progress at a glance.
+                  Manage workflows efficiently and keep every milestone visible
+                  across your team.
+                </Card.Description>
+              </Card.Header>
+            </Card>
+          </div>
+        </section>
+
+        {/* Fifth */}
+
+        <section className="flex justify-center items-center min-h-screen">
+          <div>
+            <p className="text-2xl font-bold text-white leading-tight text-center">
+              Effortless client management <br />
+              all in one place
+            </p>
+          </div>
+        </section>
       </div>
     </>
   );

@@ -17,15 +17,25 @@ import { useAppSelector } from "@/redux/hooks";
 interface CreateProjectProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
-export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
+export default function CreateProject({
+  isOpen,
+  onClose,
+  onSuccess,
+}: CreateProjectProps) {
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const currentOrg = useAppSelector((state) => state.organization.currentOrg);
 
-  const state = useOverlayState();
+  const state = useOverlayState({
+    isOpen,
+    onOpenChange: (open) => {
+      if (!open) onClose();
+    },
+  });
 
   async function handleSubmit(close: () => void) {
     if (!projectName.trim()) {
@@ -51,6 +61,7 @@ export default function CreateProject({ isOpen, onClose }: CreateProjectProps) {
         toast.success("Project created successfully!");
         setProjectName("");
         setDescription("");
+        onSuccess;
         close(); // Close the modal on success
       } else {
         toast.danger(data.error || "Something went wrong");

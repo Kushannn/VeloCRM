@@ -87,3 +87,16 @@ export interface ProjectType {
   projectUsers: ProjectUserType[];
   sprints: SprintType[] | null;
 }
+
+export interface Leads {
+  id: string;
+  name: string;
+  // role: string;
+  status: string;
+  email: string | null;
+  source: string;
+  company: string | null;
+  phone: string | null;
+  notes: string | null;
+  expectedClose: Date | null;
+}

@@ -15,7 +15,6 @@ import { redirect } from "next/navigation";
 import { useState } from "react";
 
 export default function Navbar() {
-  const reduxUser = useAppSelector((state) => state.auth.user);
   const user = useUser();
   const { signOut } = useAuth();
   const dispatch = useAppDispatch();
@@ -50,9 +49,9 @@ export default function Navbar() {
               <Link href="/dashboard" className="hover:text-blue-500">
                 About
               </Link>
-              <Link href="/settings" className="hover:text-blue-500">
+              {/* <Link href="/settings" className="hover:text-blue-500">
                 Pricing
-              </Link>
+              </Link> */}
               <SignUpButton />
               <button onClick={() => redirect("/sign-in")}>Sign In</button>
             </SignedOut>

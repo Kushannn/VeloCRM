@@ -393,6 +393,7 @@ export default function ProjectSummaryDashboard({
       <CreateProject
         isOpen={openProjectModal}
         onClose={() => setOpenProjectModal(false)}
+        onSuccess={()=>router.refresh()}
       />
 
       <AddMemberModal

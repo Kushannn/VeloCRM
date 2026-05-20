@@ -182,7 +182,7 @@ export default function CreateTask({
                         <Select.Value className="text-white text-sm" />
                         <Select.Indicator className="text-gray-400" />
                       </Select.Trigger>
-                      <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-[100]">
+                      <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-100">
                         <ListBox className="outline-none space-y-1">
                           {project?.projectUsers?.map((u) => (
                             <ListBox.Item

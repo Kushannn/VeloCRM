@@ -14,8 +14,8 @@ export default async function page({
 
   const leads = await prisma.lead.findMany({
     where: { organizationId: org?.id },
-    include: { assignedTo: true },
+    include: { assignedTo: true, activities: true, tags: true },
   });
 
-  return <LeadsDashboard org={org} />;
+  return <LeadsDashboard org={org} leads={leads} />;
 }

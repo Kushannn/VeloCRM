@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   toast,
   Modal,
@@ -16,18 +16,22 @@ import {
   Select,
   ListBox,
 } from "@heroui/react";
+import { Leads } from "@/lib/types";
 
 interface AddLeadProps {
   isOpen: boolean;
   onClose: () => void;
   organizationId: string;
-  //   onSuccess?: () => void;
+  onSuccess?: () => void;
+  editingLead?: Leads | null;
 }
 
 export default function AddLead({
   isOpen,
   onClose,
   organizationId,
+  onSuccess,
+  editingLead,
 }: //   onSuccess,
 AddLeadProps) {
   const [formData, setFormData] = useState({
@@ -40,6 +44,34 @@ AddLeadProps) {
     expectedClose: "",
     status: "",
   });
+
+  useEffect(() => {
+    if (editingLead) {
+      setFormData({
+        name: editingLead.name || "",
+        email: editingLead.email || "",
+        phone: editingLead.phone || "",
+        company: editingLead.company || "",
+        source: editingLead.source || "",
+        notes: editingLead.notes || "",
+        expectedClose: editingLead.expectedClose
+          ? new Date(editingLead.expectedClose).toISOString()
+          : "",
+        status: editingLead.status || "",
+      });
+    } else {
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        source: "",
+        notes: "",
+        expectedClose: "",
+        status: "",
+      });
+    }
+  }, [editingLead, isOpen]);
 
   const state = useOverlayState({
     isOpen,
@@ -59,44 +91,41 @@ AddLeadProps) {
 
   async function handleSubmit() {
     if (!formData.name.trim()) {
-      // addToast({
-      //   title: "Lead name is required",
-      //   variant: "solid",
-      //   color: "danger",
-      // });
-
       toast.danger("Lead name is required");
-
       return;
     }
 
-    const finalData = { ...formData, organizationId };
-
     setLoading(true);
+
     try {
-      const res = await fetch(
-        `/api/organization/${organizationId}/leads/add-lead`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...finalData,
-          }),
+      const endpoint = editingLead
+        ? `/api/organization/${organizationId}/leads/${editingLead.id}`
+        : `/api/organization/${organizationId}/leads/add-lead`;
+
+      const method = editingLead ? "PUT" : "POST";
+
+      const res = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          ...formData,
+          organizationId,
+        }),
+      });
 
       const data = await res.json();
 
       if (data.success) {
-        // addToast({
-        //   title: "Lead created successfully!",
-        //   variant: "solid",
-        //   color: "success",
-        // });
-
-        toast.success("Lead created successfully!");
+        toast.success(
+          editingLead
+            ? "Lead updated successfully!"
+            : "Lead created successfully!",
+        );
 
         onClose();
+
         setFormData({
           name: "",
           email: "",
@@ -107,22 +136,15 @@ AddLeadProps) {
           expectedClose: "",
           status: "",
         });
-        // onSuccess?.();
+
+        onSuccess?.();
       } else {
-        // addToast({
-        //   title: data.error || "Something went wrong.",
-        //   variant: "solid",
-        //   color: "danger",
-        // });
-        toast.danger("Something went wrong");
+        toast.danger(data.message || "Something went wrong");
       }
     } catch (err) {
-      toast.danger("Failed to create lead.");
-      // addToast({
-      //   title: "Failed to create lead.",
-      //   variant: "solid",
-      //   color: "danger",
-      // });
+      toast.danger(
+        editingLead ? "Failed to update lead." : "Failed to create lead.",
+      );
     } finally {
       setLoading(false);
     }
@@ -134,14 +156,14 @@ AddLeadProps) {
         variant="blur"
         className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-10"
       >
-        <Modal.Container className="max-w-4xl w-full ">
-          <Modal.Dialog className="bg-[#19172c] border border-[#292f46] text-[#a8b0d3] rounded-xl w-full">
+        <Modal.Container className="max-w-6xl w-full ">
+          <Modal.Dialog className="bg-[#19172c] border border-[#292f46] text-[#a8b0d3] rounded-xl w-full max-w-3xl">
             {({ close }) => (
               <>
                 <Modal.Header className="border-b border-[#292f46] flex items-center">
                   <div className="flex items-center justify-between w-full">
                     <Modal.Heading className="text-2xl font-semibold text-white">
-                      Add lead
+                      {editingLead ? "Edit Lead" : "Add Lead"}
                     </Modal.Heading>
                     <Modal.CloseTrigger className="hover:bg-white/5 bg-mist-900 rounded-xl" />
                   </div>
@@ -223,6 +245,44 @@ AddLeadProps) {
                               { id: "COLD_CALL", label: "Cold Call" },
                               { id: "EXHIBITION", label: "Exhibition" },
                               { id: "OTHER", label: "Other" },
+                            ].map((s) => (
+                              <ListBox.Item
+                                key={s.id}
+                                id={s.id}
+                                textValue={s.label}
+                                className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                              >
+                                {s.label}
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
+                    </div>
+
+                    <div className="flex-1 flex flex-col gap-1">
+                      <label className="text-gray-300 text-sm">Status</label>
+
+                      <Select
+                        aria-label="Status"
+                        value={formData.status}
+                        onChange={(val) => handleChange("status", String(val))}
+                      >
+                        <Select.Trigger className="bg-[#262626] border border-gray-700 rounded-lg px-3 py-2 text-white w-full flex items-center justify-between">
+                          <Select.Value className="text-white text-sm" />
+                          <Select.Indicator className="text-gray-400" />
+                        </Select.Trigger>
+
+                        <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-100">
+                          <ListBox className="outline-none space-y-1">
+                            {[
+                              { id: "NEW", label: "New" },
+                              { id: "CONTACTED", label: "Contacted" },
+                              { id: "QUALIFIED", label: "Qualified" },
+                              { id: "PROPOSAL_SENT", label: "Proposal Sent" },
+                              { id: "NEGOTIATION", label: "Negotiation" },
+                              { id: "WON", label: "Won" },
+                              { id: "LOST", label: "Lost" },
                             ].map((s) => (
                               <ListBox.Item
                                 key={s.id}
@@ -337,12 +397,11 @@ AddLeadProps) {
                   </TextField>
                 </Modal.Body>
 
-                <Modal.Footer className="border-t border-[#292f46]">
+                <Modal.Footer className="border-t border-[#292f46] pt-4">
                   <Button
                     variant="primary"
                     onPress={close}
                     // disabled={loading}
-                    className="text-white"
                   >
                     Cancel
                   </Button>
@@ -351,7 +410,13 @@ AddLeadProps) {
                     onPress={handleSubmit}
                     // isLoading={loading}
                   >
-                    {loading ? "Creating..." : "Create"}
+                    {loading
+                      ? editingLead
+                        ? "Updating..."
+                        : "Creating..."
+                      : editingLead
+                        ? "Update Lead"
+                        : "Create Lead"}
                   </Button>
                 </Modal.Footer>
               </>
