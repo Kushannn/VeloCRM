@@ -11,7 +11,7 @@ import {
 } from "@clerk/nextjs";
 import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -19,6 +19,7 @@ export default function Navbar() {
   const { signOut } = useAuth();
   const dispatch = useAppDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   const handleLogout = async () => {
     await signOut();
@@ -26,7 +27,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-[#0a0a0a] ">
+    <header className="bg-transparent z-100">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="text-xl font-bold">
@@ -52,8 +53,16 @@ export default function Navbar() {
               {/* <Link href="/settings" className="hover:text-blue-500">
                 Pricing
               </Link> */}
-              <SignUpButton />
-              <button onClick={() => redirect("/sign-in")}>Sign In</button>
+              <SignUpButton>
+                <button className="cursor-pointer">Sign Up</button>
+              </SignUpButton>
+              <button
+                onClick={() => router.push("/sign-in")}
+                // onClick={() => console.log("Clicked")}
+                className="cursor-pointer"
+              >
+                Sign In
+              </button>
             </SignedOut>
 
             <SignedIn>
@@ -85,8 +94,15 @@ export default function Navbar() {
             <Link href="/settings" className="block hover:text-blue-500">
               Pricing
             </Link>
-            <SignUpButton />
-            <button onClick={() => redirect("/sign-in")}>Sign In</button>
+            <button className="cursor-pointer">
+              <SignUpButton />
+            </button>
+            <button
+              onClick={() => router.push("/sign-in")}
+              className="cursor-pointer"
+            >
+              Sign In
+            </button>
           </SignedOut>
 
           <SignedIn>
