@@ -337,6 +337,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
       <CreateProject
         isOpen={isProjectModalOpen}
         onClose={() => setIsProjectModalOpen(false)}
+        onSuccess={() => router.refresh()}
       />
     </>
   );
