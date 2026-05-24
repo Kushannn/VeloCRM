@@ -35,6 +35,7 @@ export async function POST(req: Request) {
         assignedToId:
           typeof body.assignedToId === "string" ? body.assignedToId : undefined,
         organizationId: body.organizationId,
+        createdById: body.user.id,
       },
     });
 
