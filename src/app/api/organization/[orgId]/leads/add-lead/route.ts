@@ -8,14 +8,14 @@ export async function POST(req: Request) {
     if (!body.name || typeof body.name !== "string") {
       return NextResponse.json(
         { success: false, error: "Name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!body.organizationId || typeof body.organizationId !== "string") {
       return NextResponse.json(
         { success: false, error: "Organization ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -24,11 +24,27 @@ export async function POST(req: Request) {
         name: body.name,
         email: typeof body.email === "string" ? body.email : undefined,
         phone: typeof body.phone === "string" ? body.phone : undefined,
+        company: typeof body.company === "string" ? body.company : undefined,
         source: typeof body.source === "string" ? body.source : undefined,
         notes: typeof body.notes === "string" ? body.notes : undefined,
+        value: typeof body.value === "number" ? body.value : undefined,
+        expectedClose: body.expectedClose
+          ? new Date(body.expectedClose)
+          : undefined,
+        status: body.status && body.status !== "" ? body.status : "NEW",
         assignedToId:
           typeof body.assignedToId === "string" ? body.assignedToId : undefined,
         organizationId: body.organizationId,
+        createdById: body.user.id,
+      },
+    });
+
+    await prisma.leadActivity.create({
+      data: {
+        type: "NOTE",
+        note: "Lead created",
+        leadId: newLead.id,
+        userId: body.user.id,
       },
     });
 
@@ -37,7 +53,7 @@ export async function POST(req: Request) {
     console.error("Error creating lead:", error);
     return NextResponse.json(
       { success: false, error: error.message || "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

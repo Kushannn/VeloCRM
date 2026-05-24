@@ -58,6 +58,37 @@ export async function POST(req: Request) {
       },
     });
 
+    // below steps are to add the admins to the project automatically upon creation of the project
+
+    const orgMembers = await prisma.userOrganization.findMany({
+      where: {
+        organizationId,
+        role: "ADMIN",
+      },
+    });
+
+    const projectUsers = [
+      { userId: dbUser.id, projectId: project.id }, // for owners
+      ...orgMembers
+        .filter((m) => m.userId !== dbUser.id) // avoid duplicate if owner is also admin
+        .map((m) => ({ userId: m.userId, projectId: project.id })),
+    ];
+
+    await Promise.all(
+      projectUsers.map((pu) =>
+        prisma.userProject.upsert({
+          where: {
+            userId_projectId: {
+              userId: pu.userId,
+              projectId: pu.projectId,
+            },
+          },
+          update: {},
+          create: pu,
+        }),
+      ),
+    );
+
     return NextResponse.json({ success: true, project }, { status: 201 });
   } catch (error) {
     console.error("Error creating project:", error);

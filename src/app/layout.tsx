@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import { Raleway, Manrope } from "next/font/google";
+import { Raleway, Manrope, Geist } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import Providers from "./providers";
 import LayoutWithSidebar from "@/components/layouts/LayoutWithSidebar";
 import UserLoader from "./UserLoader";
-import HomeSignedOut from "@/components/HomeSignedOut";
+import { cn } from "@/lib/utils";
 
-const raleway = Raleway({
-  subsets: ["latin"],
-  weight: ["300", "400", "700"],
-  variable: "--font-raleway",
-});
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
 const manrope = Manrope({
   subsets: ["latin"],
   weight: ["300", "400", "700"],
@@ -29,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body
         className={`${manrope.variable} antialiased min-h-screen`}
         style={{ fontFamily: "var(--font-manrope), sans-serif" }}

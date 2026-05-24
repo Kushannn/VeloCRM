@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ProjectType } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { setSelectedProject } from "@/redux/slices/projectSlice";
 
@@ -57,11 +57,10 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   // };
 
   const handleClick = () => {
-    console.log("Handle click called");
     if (!isDragging) {
       dispatch(setSelectedProject(project));
       router.push(
-        `/organization/${project.organizationId}/projects/${project.id}`
+        `/organization/${project.organizationId}/projects/${project.id}`,
       );
     }
   };
@@ -81,11 +80,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       className={`
         transform-gpu
         cursor-grab rounded-xl border border-[#181621]/80
-        bg-gradient-to-br from-[#171320] to-[#232124]
+        bg-linear-to-br from-[#171320] to-[#232124]
         shadow-md transition-all duration-300
         px-4 py-5 sm:p-6
         w-full
-        min-h-[104px] sm:min-h-[120px] md:min-h-[132px]
+        min-h-26 sm:min-h-30 md:min-h-33
         outline-none focus-visible:ring-2 focus-visible:ring-violet-900
         select-none hover:shadow-4xl hover:z-50
       `}

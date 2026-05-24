@@ -17,6 +17,8 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
 
+  leadActivities LeadActivity[] @relation("LeadActivityUser")
+  createdLeads Lead[] @relation("LeadCreatedBy")
   assignedTasks       Task[]             @relation("AssignedTasks")
   createdTasks        Task[]             @relation("CreatedTasks")
   sprints             Sprint[]           @relation("UserSprints")
@@ -56,8 +58,8 @@ enum MembershipRole {
 
 model UserOrganization {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String          
-  organizationId String
+  userId         String         @db.ObjectId
+  organizationId String         @db.ObjectId
   role           MembershipRole @default(MEMBER)
 
   user         User         @relation(fields: [userId], references: [id])
@@ -121,6 +123,7 @@ model Task {
   sprintId     String
   projectId    String?
   createdAt    DateTime     @default(now())
+  dueDate      DateTime?
 
   assignedTo   User?    @relation("AssignedTasks", fields: [assignedToId], references: [id])
   createdBy    User     @relation("CreatedTasks", fields: [createdById], references: [id])
@@ -159,24 +162,71 @@ model Lead {
   name           String
   email          String?
   phone          String?
+  company        String?
+  source         LeadSource @default(OTHER)
   status         LeadStatus @default(NEW)
-  source         String?
+  value          Float?
+  expectedClose  DateTime?
   notes          String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-  assignedToId   String?
-  organizationId String
+  assignedToId   String?    @db.ObjectId
+  organizationId String     @db.ObjectId
+ createdById String @db.ObjectId
 
   assignedTo   User?        @relation("LeadAssignee", fields: [assignedToId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
+  createdByUser User @relation("LeadCreatedBy", fields: [createdById], references: [id])
+  activities   LeadActivity[]
+  tags         LeadTag[]
+}
+
+model LeadActivity {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  type      LeadActivityType
+  note      String?
+  leadId    String           @db.ObjectId
+  userId    String           @db.ObjectId
+  createdAt DateTime         @default(now())
+
+  lead Lead @relation(fields: [leadId], references: [id])
+  user User @relation("LeadActivityUser", fields: [userId], references: [id])
+}
+
+model LeadTag {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  label  String
+  leadId String @db.ObjectId
+
+  lead Lead @relation(fields: [leadId], references: [id])
 }
 
 enum LeadStatus {
   NEW
   CONTACTED
   QUALIFIED
+  PROPOSAL_SENT
+  NEGOTIATION
+  WON
   LOST
-  CONVERTED
+}
+
+enum LeadSource {
+  WEBSITE
+  REFERRAL
+  SOCIAL_MEDIA
+  EMAIL_CAMPAIGN
+  COLD_CALL
+  EXHIBITION
+  OTHER
+}
+
+enum LeadActivityType {
+  NOTE
+  CALL
+  EMAIL
+  MEETING
+  FOLLOW_UP
 }
 
 

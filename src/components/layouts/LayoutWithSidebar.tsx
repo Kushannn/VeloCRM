@@ -12,44 +12,69 @@ export default function LayoutWithSidebar({
   children: ReactNode;
 }) {
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const pathname = usePathname();
 
   const noSidebarRoutes = ["/", "/sign-in", "/sign-up"];
   const isPublicRoute = noSidebarRoutes.includes(pathname);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212]  ">
+    <div className="min-h-screen flex flex-col bg-[#09080f]">
       <Navbar />
 
+      {/* Mobile menu toggle */}
       {!isPublicRoute && (
-        <div className="flex items-center justify-between sm:hidden px-4 py-3 bg-[#1f1f1f] border-b border-gray-800">
+        <div className="flex items-center justify-between sm:hidden px-4 py-3 bg-[#111111] border-b border-[#1f1f1f]">
           <h1 className="text-lg font-bold">VeloCRM</h1>
           <button onClick={() => setShowSidebar(!showSidebar)}>
-            <Menu className="w-6 h-6  " />
+            <Menu className="w-6 h-6" />
           </button>
         </div>
       )}
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         {!isPublicRoute && (
-          <div
-            className={`${
-              showSidebar ? "block" : "hidden"
-            } sm:block w-64 transition-all duration-300 z-50 sm:z-auto fixed sm:relative inset-y-0 left-0`}
-          >
-            <Sidebar />
-          </div>
+          <>
+            {/* Desktop sidebar */}
+            <div
+              className="hidden sm:block fixed top-16 left-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
+              style={{ width: isSidebarExpanded ? "240px" : "64px" }}
+            >
+              <Sidebar onExpandChange={setIsSidebarExpanded} />
+            </div>
+
+            {/* Mobile sidebar */}
+            <div
+              className={`${
+                showSidebar ? "translate-x-0" : "-translate-x-full"
+              } sm:hidden fixed inset-y-0 left-0 w-64 z-50 transition-transform duration-300`}
+            >
+              <Sidebar onExpandChange={setIsSidebarExpanded} />
+            </div>
+
+            {/* Mobile overlay */}
+            {showSidebar && (
+              <div
+                className="fixed inset-0 bg-black/50 sm:hidden z-40"
+                onClick={() => setShowSidebar(false)}
+              />
+            )}
+          </>
         )}
 
-        {!isPublicRoute && showSidebar && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 sm:hidden z-40"
-            onClick={() => setShowSidebar(false)}
-            style={{ marginLeft: "16rem" }}
-          />
-        )}
-
-        <main className="flex-1 p-4 sm:p-6 sm:ml-0">{children}</main>
+        {/* Main content  */}
+        <main
+          className="flex-1 p-2 sm:p-6 overflow-auto transition-all duration-300 ease-in-out"
+          style={{
+            marginLeft: isPublicRoute
+              ? 0
+              : isSidebarExpanded
+                ? "240px"
+                : "64px",
+          }}
+        >
+          {children}
+        </main>
       </div>
     </div>
   );

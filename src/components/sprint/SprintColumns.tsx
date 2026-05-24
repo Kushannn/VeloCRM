@@ -26,16 +26,16 @@ export default function SprintColumns({
     <div
       ref={setNodeRef}
       className={`
-        flex flex-col w-full sm:w-[26rem] lg:w-[30rem]
-        min-h-[300px] sm:min-h-[480px]
+        flex flex-col w-full sm:w-104 lg:w-120
+        min-h-75 sm:min-h-120
         rounded-xl
-        bg-gradient-to-b from-[#151519] to-[#1f1d22]
+        bg-linear-to-b from-[#151519] to-[#1f1d22]
         p-5
         shadow-lg border border-neutral-800
         text-neutral-100
         select-none
         overflow-visible
-        sm:flex-shrink-0
+        sm:shrink-0
       `}
     >
       <h2 className="mb-5 text-lg font-semibold tracking-wide text-neutral-200">

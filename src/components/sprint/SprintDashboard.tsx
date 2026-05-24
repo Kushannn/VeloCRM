@@ -1,21 +1,16 @@
 "use client";
 
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from "@heroui/react";
+import { Button, Chip, Modal, useOverlayState } from "@heroui/react";
 
 import { useState } from "react";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Circle, Clock, Dot } from "lucide-react";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 
 import CreateTask from "@/components/createTask/CreateTask";
 import TaskColumns from "@/components/tasks/taskColumns";
 import { ColumnType } from "@/lib/types";
 import { useParams } from "next/navigation";
+import MagicBento from "../ui/MagicBento";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 
@@ -28,6 +23,7 @@ export default function SprintDashboard({ sprint, project }: any) {
     projectId: string;
     sprintId: string;
   }>();
+  const descState = useOverlayState();
   const calculateDaysRemaining = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -49,7 +45,6 @@ export default function SprintDashboard({ sprint, project }: any) {
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
-
     const { active, over } = event;
 
     if (!over) return;
@@ -117,50 +112,74 @@ export default function SprintDashboard({ sprint, project }: any) {
     },
   ];
 
+  function getProgress(startDate: Date, endDate: Date) {
+    const now = new Date();
+    const total = new Date(endDate).getTime() - new Date(startDate).getTime();
+    const passed = now.getTime() - new Date(startDate).getTime();
+    return Math.min(100, Math.max(0, (passed / total) * 100));
+  }
+
+  const progress = getProgress(localSprint.startDate, localSprint.endDate);
+  const isActive = progress > 0 && progress < 100;
+
   return (
     <>
       <div className="px-4 pb-10 min-h-screen space-y-6">
         {/* Header */}
-        <div className="bg-[#161617] border border-gray-800 rounded-xl p-4 flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-[220px]">
-            <h1 className="text-xl font-semibold text-white">
+        <div className="bg-[#0f0f0f] border border-gray-800 rounded-xl p-4 flex flex-wrap gap-4 items-center">
+          <div className="flex-1 min-w-55">
+            {isActive && (
+              <p className="flex gap-3 items-center text-sm mb-2">
+                Active Sprint
+                <span className="w-2 h-2 bg-green-700 animate-pulse rounded-xl"></span>
+              </p>
+            )}
+            <h1 className="text-3xl font-medium text-white">
               {localSprint.title}
             </h1>
 
             {localSprint.description && (
               <p
-                onClick={() => setOpenDescModal(true)}
-                className="text-sm text-gray-400 line-clamp-2 cursor-pointer hover:text-white"
+                onClick={() => descState.open()}
+                className="text-sm text-gray-400 line-clamp-2 mt-2"
               >
                 {localSprint.description}
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <Calendar className="w-4 h-4" />
-            {new Date(localSprint.startDate).toLocaleDateString()}
-          </div>
+          <div className="items-center rounded-xl border border-zinc-800 flex gap-10 p-3 bg-[#16161c]">
+            <div className="flex items-center gap-2 text-sm text-gray-300">
+              <Calendar className="w-4 h-4" />
+              {new Date(localSprint.startDate).toLocaleDateString()}
+            </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <Calendar className="w-4 h-4" />
-            {new Date(localSprint.endDate).toLocaleDateString()}
-          </div>
+            <div className="h-5 w-px bg-zinc-500"></div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-300">
-            <Clock className="w-4 h-4" />
-            {calculateDaysRemaining(
-              localSprint.startDate,
-              localSprint.endDate,
-            )}{" "}
-            days
+            <div className="flex items-center gap-2 text-sm text-gray-300">
+              <Calendar className="w-4 h-4" />
+              {new Date(localSprint.endDate).toLocaleDateString()}
+            </div>
+
+            <div className="h-5 w-px bg-zinc-500"></div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-300">
+              <Clock className="w-4 h-4" />
+              {calculateDaysRemaining(
+                localSprint.startDate,
+                localSprint.endDate,
+              )}{" "}
+              days
+            </div>
           </div>
 
           <Button
             onClick={() => setOpenTaskModal(true)}
-            className="ml-auto bg-gradient-to-r from-[#893168] to-purple-700 text-white"
+            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600/10 border border-violet-500/20 text-violet-400 hover:bg-violet-600/20 hover:border-violet-500/40 hover:text-violet-300 transition-all duration-200 text-sm font-medium 
+    shadow-[0_10px_25px_rgba(196,167,255,0.25)]"
           >
-            + New Task
+            <span className="text-lg leading-none">+</span>
+            New Task
           </Button>
         </div>
 
@@ -169,11 +188,23 @@ export default function SprintDashboard({ sprint, project }: any) {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {columns.map((col) => (
+          {/* No outer grid div needed */}
+          <MagicBento
+            cards={columns.map((col) => (
               <TaskColumns key={col.key} col={col} />
             ))}
-          </div>
+            columns={3}
+            enableStars
+            enableSpotlight
+            enableBorderGlow={true}
+            enableTilt={false}
+            enableMagnetism={false}
+            clickEffect
+            spotlightRadius={400}
+            particleCount={12}
+            glowColor="132, 0, 255"
+            disableAnimations={false}
+          />
         </DndContext>
       </div>
 
@@ -188,7 +219,7 @@ export default function SprintDashboard({ sprint, project }: any) {
       />
 
       {/* Description Modal */}
-      <Modal
+      {/* <Modal
         isOpen={openDescModal}
         onOpenChange={setOpenDescModal}
         size="2xl"
@@ -204,6 +235,45 @@ export default function SprintDashboard({ sprint, project }: any) {
             <p className="whitespace-pre-line">{localSprint.description}</p>
           </ModalBody>
         </ModalContent>
+      </Modal> */}
+
+      {/* Description Modal */}
+      <Modal state={descState}>
+        <Modal.Backdrop
+          variant="blur"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+        >
+          <Modal.Container className="max-w-lg w-full">
+            <Modal.Dialog className="bg-[#111111] border border-[#1f1f1f] rounded-2xl text-white">
+              {({ close }) => (
+                <>
+                  <Modal.Header className="border-b border-[#1f1f1f] px-6 py-4">
+                    <div className="flex items-center justify-between w-full">
+                      <Modal.Heading className="text-lg font-semibold">
+                        Sprint Description
+                      </Modal.Heading>
+                      <Modal.CloseTrigger className="hover:bg-white/5 rounded-lg p-1" />
+                    </div>
+                  </Modal.Header>
+                  <Modal.Body className="px-6 py-4">
+                    <p className="text-zinc-400 text-sm whitespace-pre-line leading-relaxed">
+                      {localSprint.description}
+                    </p>
+                  </Modal.Body>
+                  <Modal.Footer className="border-t border-[#1f1f1f] px-6 py-4 flex justify-end">
+                    <Button
+                      variant="ghost"
+                      onPress={close}
+                      className="text-zinc-400 hover:text-white"
+                    >
+                      Close
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );

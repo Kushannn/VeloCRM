@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
       assignedTo,
       projectId,
       sprintId,
+      dueDate,
     }: {
       title: string;
       description?: string;
@@ -31,12 +32,13 @@ export async function POST(req: NextRequest) {
       assignedTo?: string;
       projectId: string;
       sprintId: string;
+      dueDate: Date;
     } = await req.json();
 
     if (!title || !projectId || !sprintId) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
     if (!projectExists) {
       return NextResponse.json(
         { success: false, error: "Project not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest) {
     if (!sprintExists) {
       return NextResponse.json(
         { success: false, error: "Sprint not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -88,6 +90,7 @@ export async function POST(req: NextRequest) {
         projectId,
         createdById: user.id,
         assignedToId: assignedTo || undefined,
+        dueDate: dueDate,
       },
     });
 
@@ -96,7 +99,7 @@ export async function POST(req: NextRequest) {
     console.error("Create Task Error:", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

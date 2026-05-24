@@ -25,14 +25,14 @@ export default function TaskColumns({ col }: { col: ColumnType }) {
       {/* Header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${col.dot} animate-pulse`} />
-          <span className="text-sm font-semibold text-gray-200">
+          <span className={`w-3 h-3 rounded-full ${col.dot} animate-pulse`} />
+          <span className="text-md font-semibold text-gray-200">
             {col.label}
           </span>
         </div>
 
         <span
-          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${col.badge}`}
+          className={`text-sm font-semibold px-2 py-0.5 rounded-full ${col.badge}`}
         >
           {col.tasks.length}
         </span>
@@ -41,8 +41,8 @@ export default function TaskColumns({ col }: { col: ColumnType }) {
       {/* Drop Zone */}
       <div
         ref={setNodeRef}
-        className={`bg-[#161617] border rounded-xl p-3 flex flex-col gap-3 min-h-[300px] transition
-        ${isOver ? "border-blue-500 bg-[#1d1f24]" : "border-gray-800"}`}
+        className={`bg-[#161617] border rounded-xl p-3 flex flex-col gap-3 min-h-75 transition
+        ${isOver ? "border-blue-500 bg-[#1d1f24]" : "border-gray-800"} h-full min-h-[150]`}
       >
         {col.tasks.length > 0 ? (
           col.tasks.map((task) => <TaskCard key={task.id} task={task} />)

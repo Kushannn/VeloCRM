@@ -36,8 +36,8 @@ export default function GlobalError({
 
       <div className="flex justify-center gap-4">
         <Button
-          color="danger"
-          variant="flat"
+          variant="danger"
+          // variant=""
           onClick={() => reset()}
           className="flex items-center gap-2"
         >
@@ -45,7 +45,7 @@ export default function GlobalError({
           Try Again
         </Button>
 
-        <Button variant="bordered" onClick={() => window.location.reload()}>
+        <Button variant="outline" onClick={() => window.location.reload()}>
           Refresh Page
         </Button>
       </div>

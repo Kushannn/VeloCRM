@@ -10,21 +10,27 @@ export default async function Page({
   }>;
 }) {
   const { projectSlug, sprintSlug } = await params;
-  const sprint = await prisma.sprint.findFirst({
-    where: {
-      slug: sprintSlug,
-      project: {
-        slug: projectSlug,
-      },
-    },
-    include: {
-      tasks: true,
-    },
-  });
 
   const project = await prisma.project.findUnique({
     where: {
       slug: projectSlug,
+    },
+    include: {
+      projectUsers: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+
+  const sprint = await prisma.sprint.findFirst({
+    where: {
+      slug: sprintSlug,
+      projectId: project?.id,
+    },
+    include: {
+      tasks: true,
     },
   });
 
@@ -36,7 +42,6 @@ export default async function Page({
     <SprintDashboard
       sprint={JSON.parse(JSON.stringify(sprint))}
       project={JSON.parse(JSON.stringify(project))}
-      params={params}
     />
   );
 }
