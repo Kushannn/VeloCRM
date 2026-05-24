@@ -1,108 +1,129 @@
 "use client";
 
-import { Card, Modal, Button } from "@heroui/react";
+import { Card } from "@heroui/react";
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { MembershipRole, projectStatus } from "@prisma/client";
+import {
+  FeedItem,
+  SprintsCompactDetailsForDashboard,
+  TaskStats,
+} from "@/lib/types";
+import { LeadPipelineChart } from "../LeadsPipelineChart";
+import MetricCards from "../cards/dashboardCards/MetricCards";
+import { InviteModal } from "../InviteUserModal";
+import RecentActivityCard from "../cards/dashboardCards/RecentActivityCArd";
+import SprintDetailsCard from "../cards/dashboardCards/SprintDetailsCard";
+import TasksDueSoonCard from "../cards/dashboardCards/TasksDueSoonCard";
+
+interface userType {
+  clerkId: string;
+  createdAt: Date;
+  email: string;
+  id: string;
+  image: string | null;
+  name: string | null;
+  role: string;
+  membership: {
+    id: string;
+    role: MembershipRole;
+    userId: string;
+    organizationId: string;
+    organization: {
+      id: string;
+      name: string;
+      createdAt: Date;
+      slug: string;
+      ownerId: string;
+    };
+  }[];
+  userProjects: {
+    id: string;
+    userId: string;
+    projectId: string;
+    project: {
+      id: string;
+      name: string;
+      description: string | null;
+      createdAt: Date;
+      organizationId: string;
+      slug: string;
+      status: projectStatus;
+    };
+  }[];
+}
+
+type PipelineItem = {
+  status: string;
+  count: number;
+};
 
 type Props = {
   firstName: string;
   todayShort: string;
+  user: userType;
+  activeTasks: number;
+  totalLeads: number;
+  feed: FeedItem[];
+  sprintsDetails: SprintsCompactDetailsForDashboard[];
+  dueTasks: TaskStats;
+  pipelineData: PipelineItem[];
 };
 
-export default function MainDasboardSignedIn({ firstName, todayShort }: Props) {
-  const [showModal, setShowModal] = useState(false);
-  const [inviteToken, setInviteToken] = useState<string | null>(null);
-
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  useEffect(() => {
-    const token = searchParams.get("token");
-    if (token) {
-      setInviteToken(token);
-      setShowModal(true);
-    }
-  }, [searchParams]);
-
-  const handleAcceptInvite = async () => {
-    if (!inviteToken) return;
-
-    const res = await fetch("/api/invites/verify-invite", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: inviteToken }),
-    });
-
-    const result = await res.json();
-
-    if (result.success) {
-      alert("Successfully joined the organization!");
-      setShowModal(false);
-      router.replace("/dashboard");
-    } else {
-      alert(result.error || "Failed to join.");
-    }
-  };
+export default function MainDasboardSignedIn({
+  firstName,
+  todayShort,
+  user,
+  activeTasks,
+  totalLeads,
+  feed,
+  sprintsDetails,
+  dueTasks,
+  pipelineData,
+}: Props) {
+  const noOfProjects = user?.userProjects?.length ?? 0;
 
   return (
     <>
-      <div className="p-4 space-y-6">
+      <div className="px-4 space-y-6 bg-[#09080f]">
         <h1 className="text-3xl font-bold">Welcome back, {firstName}</h1>
 
-        <p className="text-gray-400">{todayShort}</p>
-
+        {/* Cards */}
         <div className="flex gap-6">
-          <Card className="w-1/2 bg-[#242124] border border-gray-800 rounded-lg h-50">
-            <Card.Header>
-              <Card.Title>Recent Activity</Card.Title>
-            </Card.Header>
-            <Card.Content>
-              <p>You Closed a deal today</p>
-            </Card.Content>
-          </Card>
+          <MetricCards
+            noOfProjects={noOfProjects}
+            activeTasks={activeTasks}
+            totalLeads={totalLeads}
+          />
+        </div>
 
-          <Card className="w-1/2 bg-[#242124] border border-gray-800 h-50">
-            <Card.Header>
-              <Card.Title>Recent Activity</Card.Title>
-            </Card.Header>
-            <Card.Content>
-              <p>You Closed a deal today</p>
-            </Card.Content>
-          </Card>
+        {/* card row 1  */}
+        <div className="flex gap-4 items-stretch">
+          <div className="w-1/2 flex flex-col">
+            <RecentActivityCard feed={feed} />
+          </div>
+
+          <div className="w-1/2 flex flex-col">
+            <SprintDetailsCard sprintsDetails={sprintsDetails} />
+          </div>
+        </div>
+
+        {/* card row 2  */}
+        <div className="flex gap-4 items-stretch">
+          <div className="w-1/2 flex flex-col">
+            <TasksDueSoonCard dueTasks={dueTasks} />
+          </div>
+
+          <div className="w-1/2 flex flex-col">
+            <Card className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-5 w-full h-full">
+              <Card.Content>
+                <LeadPipelineChart pipeline={pipelineData} />
+              </Card.Content>
+            </Card>
+          </div>
         </div>
       </div>
 
-      {/* <Modal isOpen={showModal} onOpenChange={setShowModal}>
-        <ModalContent>
-          <ModalHeader>You've been invited!</ModalHeader>
-          <ModalBody>
-            <p>Do you want to accept the invite?</p>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button onClick={handleAcceptInvite}>Accept</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal> */}
-
-      <Modal>
-        <Modal.Backdrop>
-          <Modal.Container>
-            <Modal.Dialog>
-              <Modal.CloseTrigger />
-              <Modal.Header>You've Been Invited !</Modal.Header>
-              <Modal.Body>
-                <p>Do you accept the invite ? </p>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={() => setShowModal(false)}>Cancel</Button>
-                <Button onClick={handleAcceptInvite}>Accept</Button>
-              </Modal.Footer>
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+      <InviteModal />
     </>
   );
 }

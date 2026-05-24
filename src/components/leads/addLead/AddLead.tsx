@@ -16,7 +16,7 @@ import {
   Select,
   ListBox,
 } from "@heroui/react";
-import { Leads } from "@/lib/types";
+import { Leads, UserType } from "@/lib/types";
 
 interface AddLeadProps {
   isOpen: boolean;
@@ -24,6 +24,7 @@ interface AddLeadProps {
   organizationId: string;
   onSuccess?: () => void;
   editingLead?: Leads | null;
+  user: UserType;
 }
 
 export default function AddLead({
@@ -32,6 +33,7 @@ export default function AddLead({
   organizationId,
   onSuccess,
   editingLead,
+  user,
 }: //   onSuccess,
 AddLeadProps) {
   const [formData, setFormData] = useState({
@@ -112,6 +114,7 @@ AddLeadProps) {
         body: JSON.stringify({
           ...formData,
           organizationId,
+          user,
         }),
       });
 

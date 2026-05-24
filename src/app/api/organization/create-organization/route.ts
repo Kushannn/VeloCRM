@@ -36,9 +36,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Generate slug
     const baseSlug = generateSlug(name);
-    const slug = `${baseSlug}-${Date.now()}`; // prevents duplicate errors
+    const slug = `${baseSlug}-${Date.now()}`; 
 
     const organization = await prisma.organization.create({
       data: {

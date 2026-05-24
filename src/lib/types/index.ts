@@ -1,3 +1,5 @@
+import { LeadActivityType } from "@prisma/client";
+
 export interface OrganizationType {
   id: string;
   name: string;
@@ -100,3 +102,69 @@ export interface Leads {
   notes: string | null;
   expectedClose: Date | null;
 }
+
+type BaseActivity = {
+  createdAt: Date;
+};
+
+type LeadActivityFeed = BaseActivity & {
+  kind: "lead_activity";
+  type: LeadActivityType;
+  note: string | null;
+  user: { name: string | null; image: string | null };
+  lead: { name: string };
+};
+
+type LeadCreatedFeed = BaseActivity & {
+  kind: "lead_created";
+  name: string;
+  status: string;
+  assignedTo: { name: string | null } | null;
+  user: { name: string | null; image: string | null };
+};
+
+type TaskFeed = BaseActivity & {
+  kind: "task";
+  title: string;
+  status: TaskStatus;
+  user: { name: string | null; image: string | null };
+  sprint: { title: string };
+};
+
+export type FeedItem = LeadActivityFeed | LeadCreatedFeed | TaskFeed;
+
+export type TaskStats = {
+  total: number;
+  // overdueTask: {
+  //
+  // }[];
+  dueTodayTasks: {
+    id: string;
+    title: string;
+    status: string;
+    priority: string;
+    dueDate: Date | null;
+    sprint: { title: string };
+    project: { name: string } | null;
+  }[];
+  dueSoonTasks: {
+    id: string;
+    title: string;
+    status: string;
+    priority: string;
+    dueDate: Date | null;
+    sprint: { title: string };
+    project: { name: string } | null;
+  }[];
+  // noDueDateTasks: typeof overdueTask;
+};
+
+export type SprintsCompactDetailsForDashboard = {
+  id: string;
+  title: string;
+  project: string;
+  total: number;
+  completed: number;
+  percent: number;
+  daysLeft: number;
+};

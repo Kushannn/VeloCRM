@@ -19,7 +19,7 @@ export default function LayoutWithSidebar({
   const isPublicRoute = noSidebarRoutes.includes(pathname);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0a]">
+    <div className="min-h-screen flex flex-col bg-[#09080f]">
       <Navbar />
 
       {/* Mobile menu toggle */}
@@ -64,7 +64,7 @@ export default function LayoutWithSidebar({
 
         {/* Main content  */}
         <main
-          className="flex-1 p-4 sm:p-6 overflow-auto transition-all duration-300 ease-in-out"
+          className="flex-1 p-2 sm:p-6 overflow-auto transition-all duration-300 ease-in-out"
           style={{
             marginLeft: isPublicRoute
               ? 0

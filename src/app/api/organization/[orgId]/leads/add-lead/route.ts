@@ -38,6 +38,15 @@ export async function POST(req: Request) {
       },
     });
 
+    await prisma.leadActivity.create({
+      data: {
+        type: "NOTE",
+        note: "Lead created",
+        leadId: newLead.id,
+        userId: body.user.id,
+      },
+    });
+
     return NextResponse.json({ success: true, lead: newLead }, { status: 201 });
   } catch (error: any) {
     console.error("Error creating lead:", error);

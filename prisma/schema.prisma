@@ -18,6 +18,7 @@ model User {
   createdAt DateTime @default(now())
 
   leadActivities LeadActivity[] @relation("LeadActivityUser")
+  createdLeads Lead[] @relation("LeadCreatedBy")
   assignedTasks       Task[]             @relation("AssignedTasks")
   createdTasks        Task[]             @relation("CreatedTasks")
   sprints             Sprint[]           @relation("UserSprints")
@@ -122,6 +123,7 @@ model Task {
   sprintId     String
   projectId    String?
   createdAt    DateTime     @default(now())
+  dueDate      DateTime?
 
   assignedTo   User?    @relation("AssignedTasks", fields: [assignedToId], references: [id])
   createdBy    User     @relation("CreatedTasks", fields: [createdById], references: [id])
@@ -170,9 +172,11 @@ model Lead {
   updatedAt      DateTime   @updatedAt
   assignedToId   String?    @db.ObjectId
   organizationId String     @db.ObjectId
+ createdById String @db.ObjectId
 
   assignedTo   User?        @relation("LeadAssignee", fields: [assignedToId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
+  createdByUser User @relation("LeadCreatedBy", fields: [createdById], references: [id])
   activities   LeadActivity[]
   tags         LeadTag[]
 }

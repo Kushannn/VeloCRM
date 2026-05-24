@@ -11,6 +11,9 @@ import {
   Select,
   ListBox,
   useOverlayState,
+  DatePicker,
+  DateField,
+  Calendar,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { ProjectType, SprintType } from "@/lib/types";
@@ -78,6 +81,7 @@ export default function CreateTask({
   const [priority, setPriority] = useState("LOW");
   const [loading, setLoading] = useState(false);
   const [assignedTo, setAssignedTo] = useState("");
+  const [dueDate, setDueDate] = useState();
 
   const handleSubmit = async (close: () => void) => {
     if (!title.trim()) {
@@ -98,6 +102,7 @@ export default function CreateTask({
             status,
             priority,
             assignedTo,
+            dueDate,
           }),
         },
       );
@@ -187,7 +192,7 @@ export default function CreateTask({
                           {project?.projectUsers?.map((u) => (
                             <ListBox.Item
                               key={u.id}
-                              id={u.id}
+                              id={u.userId}
                               textValue={u.user?.name ?? "Unknown"}
                               className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
                             >
@@ -265,6 +270,51 @@ export default function CreateTask({
                         </ListBox.Item>
                       ))}
                     </StyledSelect>
+                  </div>
+
+                  <div>
+                    <DatePicker className="w-64" name="date">
+                      <Label>Due Date</Label>
+                      <DateField.Group fullWidth>
+                        <DateField.Input>
+                          {(segment) => <DateField.Segment segment={segment} />}
+                        </DateField.Input>
+                        <DateField.Suffix>
+                          <DatePicker.Trigger>
+                            <DatePicker.TriggerIndicator />
+                          </DatePicker.Trigger>
+                        </DateField.Suffix>
+                      </DateField.Group>
+                      <DatePicker.Popover>
+                        <Calendar aria-label="Event date">
+                          <Calendar.Header>
+                            <Calendar.YearPickerTrigger>
+                              <Calendar.YearPickerTriggerHeading />
+                              <Calendar.YearPickerTriggerIndicator />
+                            </Calendar.YearPickerTrigger>
+                            <Calendar.NavButton slot="previous" />
+                            <Calendar.NavButton slot="next" />
+                          </Calendar.Header>
+                          <Calendar.Grid>
+                            <Calendar.GridHeader>
+                              {(day) => (
+                                <Calendar.HeaderCell>{day}</Calendar.HeaderCell>
+                              )}
+                            </Calendar.GridHeader>
+                            <Calendar.GridBody>
+                              {(date) => <Calendar.Cell date={date} />}
+                            </Calendar.GridBody>
+                          </Calendar.Grid>
+                          <Calendar.YearPickerGrid>
+                            <Calendar.YearPickerGridBody>
+                              {({ year }) => (
+                                <Calendar.YearPickerCell year={year} />
+                              )}
+                            </Calendar.YearPickerGridBody>
+                          </Calendar.YearPickerGrid>
+                        </Calendar>
+                      </DatePicker.Popover>
+                    </DatePicker>
                   </div>
                 </Modal.Body>
 

@@ -25,7 +25,15 @@ const columns = [
 
 const ROWS_PER_PAGE = 4;
 
-export function LeadsDashboard({ org, leads }: { org: any; leads: Leads[] }) {
+export function LeadsDashboard({
+  org,
+  leads,
+  user,
+}: {
+  org: any;
+  leads: Leads[];
+  user: any;
+}) {
   const router = useRouter();
 
   const [openAddLead, setOpenAddLead] = useState(false);
@@ -357,6 +365,7 @@ export function LeadsDashboard({ org, leads }: { org: any; leads: Leads[] }) {
         organizationId={org.id}
         editingLead={editingLead}
         onSuccess={() => router.refresh()}
+        user={user}
       />
     </>
   );

@@ -160,7 +160,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
         onMouseLeave={() => setIsExpanded(false)}
       >
         {/* Background */}
-        <div className="absolute inset-0 bg-[#0a0a0a] border-r border-[#1f1f1f]" />
+        <div className="absolute inset-0 bg-[#09080f] border-r border-[#1f1f1f]" />
 
         {/* Content */}
         <div className="relative flex flex-col h-full py-4 overflow-hidden">
