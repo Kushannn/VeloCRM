@@ -19,7 +19,7 @@ import {
 
 import { Box, ChartNoAxesColumn, Crosshair, Fan } from "lucide-react";
 import ScrollFloat from "./ui/ScrollFloat";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 
 const testimonials = [
@@ -474,18 +474,18 @@ function HomeSignedOut() {
               <p className="text-violet-400 text-xs uppercase tracking-[0.2em] mb-4">
                 Testimonials
               </p>
-              <h2 className="text-4xl font-bold text-white tracking-tight">
-                <ScrollFloat
-                  animationDuration={1}
-                  ease="back.inOut(2)"
-                  scrollStart="center bottom+=50%"
-                  scrollEnd="bottom bottom-=40%"
-                  stagger={0.04}
-                  textClassName="text-5xl font-bold"
-                >
-                  Loved by teams worldwide
-                </ScrollFloat>
-              </h2>
+              {/* <h2 className="text-4xl font-bold text-white tracking-tight"> */}
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.04}
+                textClassName="text-5xl font-bold"
+              >
+                Loved by teams worldwide
+              </ScrollFloat>
+              {/* </h2> */}
               <p className="text-zinc-400 text-base mt-4 max-w-xl mx-auto">
                 See what our customers say about managing their work with us.
               </p>
