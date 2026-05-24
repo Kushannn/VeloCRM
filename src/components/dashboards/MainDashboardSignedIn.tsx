@@ -11,7 +11,7 @@ import {
 import { LeadPipelineChart } from "../LeadsPipelineChart";
 import MetricCards from "../cards/dashboardCards/MetricCards";
 import { InviteModal } from "../InviteUserModal";
-import RecentActivityCard from "../cards/dashboardCards/RecentActivityCArd";
+import RecentActivityCard from "../cards/dashboardCards/RecentActivityCard";
 import SprintDetailsCard from "../cards/dashboardCards/SprintDetailsCard";
 import TasksDueSoonCard from "../cards/dashboardCards/TasksDueSoonCard";
 
