@@ -1,31 +1,15 @@
-"use client";
-
-import HomeSignedOut from "@/components/HomeSignedOut";
-import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
+import HomeSignedOutWrapper from "@/components/HomeSignedOutWrapper";
 
 export default function HomePage() {
-  const router = useRouter();
-  const { isLoaded, isSignedIn } = useAuth();
-
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      router.replace("/dashboard");
-    }
-  }, [isLoaded, isSignedIn]);
-
   return (
-    <>
-      <main className="p-6">
-        <SignedIn>
-          <p className="text-gray-500">Redirecting to dashboard...</p>
-        </SignedIn>
-
-        <SignedOut>
-          <HomeSignedOut />
-        </SignedOut>
-      </main>
-    </>
+    <main className="p-6">
+      <SignedIn>
+        <p className="text-gray-500">Redirecting to dashboard...</p>
+      </SignedIn>
+      <SignedOut>
+        <HomeSignedOutWrapper />
+      </SignedOut>
+    </main>
   );
 }

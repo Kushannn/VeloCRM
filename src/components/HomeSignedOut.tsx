@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import baseImage from "../../public/baseImage1.jpg";
 // import taskImage from "../../public/task.webp";
 import trackerImage from "../../public/tracking.jpg";
@@ -17,6 +19,8 @@ import {
 
 import { Box, ChartNoAxesColumn, Crosshair, Fan } from "lucide-react";
 import ScrollFloat from "./ui/ScrollFloat";
+import { useRouter } from "next/router";
+import { useAuth } from "@clerk/nextjs";
 
 const testimonials = [
   {
@@ -84,6 +88,14 @@ const techLogos = [
 
 function HomeSignedOut() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace("/dashboard");
+    }
+  }, [isLoaded, isSignedIn]);
   return (
     <>
       <LightPillar
@@ -207,7 +219,7 @@ function HomeSignedOut() {
                 <p className="font-semibold text-base text-white mb-1">
                   Manage pipelines end to end
                 </p>
-                <p className="text-sm text-zinc-400 break-words">
+                <p className="text-sm text-zinc-400 wrap-break-words">
                   Track leads, deals and follow-ups — all in one centralized,
                   customized pipeline view.
                 </p>
@@ -227,7 +239,7 @@ function HomeSignedOut() {
                 <p className="font-semibold text-base text-white mb-1">
                   Details at a glance
                 </p>
-                <p className="text-sm text-zinc-400 break-words">
+                <p className="text-sm text-zinc-400 wrap-break-words">
                   Always know the status of any company, deal or contract.
                 </p>
               </div>
