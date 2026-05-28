@@ -7,8 +7,6 @@ export async function GET(
 ) {
   const { orgId } = await params;
 
-  console.log("This the organizaiton id ", orgId);
-
   try {
     if (!orgId) {
       return NextResponse.json(

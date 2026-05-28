@@ -1,27 +1,33 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { SprintType } from "@/lib/types";
+import { SprintType, TaskType } from "@/lib/types";
 import TaskCard from "./taskCard";
 
-type TaskType = NonNullable<SprintType["tasks"]>[number];
+type TaskTypeLocal = NonNullable<SprintType["tasks"]>[number];
 
 type ColumnType = {
   key: "IN_PROGRESS" | "PENDING" | "COMPLETED";
   label: string;
-  tasks: TaskType[];
+  tasks: TaskTypeLocal[];
   dot: string;
   badge: string;
   empty: string;
 };
 
-export default function TaskColumns({ col }: { col: ColumnType }) {
+export default function TaskColumns({
+  col,
+  onTaskClick,
+}: {
+  col: ColumnType;
+  onTaskClick: (task: TaskType) => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({
-    id: col.key, // MUST match status
+    id: col.key,
   });
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 h-full min-h-0">
       {/* Header */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
@@ -41,11 +47,28 @@ export default function TaskColumns({ col }: { col: ColumnType }) {
       {/* Drop Zone */}
       <div
         ref={setNodeRef}
-        className={`bg-[#161617] border rounded-xl p-3 flex flex-col gap-3 min-h-75 transition
-        ${isOver ? "border-blue-500 bg-[#1d1f24]" : "border-gray-800"} h-full min-h-[150]`}
+        className={`
+          flex-1
+          min-h-0
+          overflow-y-auto
+        bg-[#0e0c17]
+          border
+          rounded-xl
+          p-3
+          flex
+          flex-col
+          gap-3
+          transition
+          ${isOver ? "border-[#3d2d6b] bg-[#1a1232]" : "border-gray-800"}`}
       >
         {col.tasks.length > 0 ? (
-          col.tasks.map((task) => <TaskCard key={task.id} task={task} />)
+          col.tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onClick={() => onTaskClick(task)}
+            />
+          ))
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <p className="text-gray-600 text-xs italic text-center">

@@ -72,12 +72,12 @@ export default function SingleProjectDetails({
   const statusConfig = getStatusConfig(project?.status);
 
   return (
-    <div className="w-full px-4 py-6 space-y-6 max-w-7xl mx-auto">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-bold text-[#e8e4f0] tracking-tight">
               {project?.name}
             </h1>
             <span
@@ -91,13 +91,13 @@ export default function SingleProjectDetails({
           </div>
 
           {project?.description && (
-            <p className="text-zinc-400 text-sm max-w-xl">
+            <p className="text-[#b8aed4] text-sm max-w-xl">
               {project.description}
             </p>
           )}
 
-          <div className="flex items-center gap-2 text-zinc-500 text-xs">
-            <Calendar size={12} />
+          <div className="flex items-center gap-2 text-[#7c6fa0] text-sm">
+            <Calendar size={20} />
             <span>
               Created{" "}
               {project?.createdAt
@@ -130,201 +130,197 @@ export default function SingleProjectDetails({
 
       {/* Main content */}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
         {/* Members Card */}
-        <BorderGlow
+        {/* <BorderGlow
           edgeSensitivity={30}
           glowColor="40 80 80"
           // backgroundColor="#0f0f0f"
-          className="bg-[#0f0f0f]"
+          className="bg-[#0f0f0f] w-full"
           borderRadius={28}
           glowRadius={40}
           glowIntensity={1}
           coneSpread={25}
           animated={true}
           colors={["#c084fc", "#f472b6", "#38bdf8"]}
-        >
-          <div className="bg-[#0f0f0f] border border-[#1f1f1f] rounded-2xl w-full h-full">
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1f1f1f]">
-              <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-                <Users size={15} className="text-violet-400" />
-              </div>
-              <h2 className="text-base font-semibold text-white">Members</h2>
-              <span className="ml-auto text-xs text-zinc-400 font-bold bg-[#1a1a1a] px-2 py-0.5 rounded-full">
-                {project?.projectUsers?.length ?? 0}
-              </span>
+        > */}
+        <div className="bg-[#0f0f0f] border border-[#1f1f1f] rounded-2xl w-full h-full">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1f1f1f]">
+            <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+              <Users size={15} className="text-violet-400" />
             </div>
-
-            <div className="p-4 space-y-2 max-h-100 overflow-y-auto">
-              {project?.projectUsers?.length === 0 ? (
-                <div className="text-center py-10 text-zinc-600 text-sm">
-                  No members yet
-                </div>
-              ) : (
-                project?.projectUsers?.map((projectUser) => (
-                  <div
-                    key={projectUser?.id}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-[#141414] hover:bg-[#1a1a1a] border border-transparent hover:border-[#2a2a2a] transition-all"
-                  >
-                    {projectUser?.user?.image ? (
-                      <img
-                        src={projectUser.user.image}
-                        alt={projectUser.user.name ?? "User"}
-                        className="w-9 h-9 rounded-full object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-violet-900/40 border border-violet-700/30 flex items-center justify-center shrink-0 text-sm font-semibold text-violet-300">
-                        {projectUser?.user?.name?.charAt(0).toUpperCase() ??
-                          "U"}
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <p className="text-white text-sm font-medium truncate">
-                        {projectUser?.user?.name}
-                      </p>
-                      <p className="text-zinc-500 text-xs truncate">
-                        {projectUser?.user?.email}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+            <h2 className="text-base font-semibold text-white">Members</h2>
+            <span className="ml-auto text-xs text-zinc-400 font-bold bg-[#1a1a1a] px-2 py-0.5 rounded-full">
+              {project?.projectUsers?.length ?? 0}
+            </span>
           </div>
-        </BorderGlow>
+
+          <div className="p-4 space-y-2 max-h-100 overflow-y-auto">
+            {project?.projectUsers?.length === 0 ? (
+              <div className="text-center py-10 text-zinc-600 text-sm">
+                No members yet
+              </div>
+            ) : (
+              project?.projectUsers?.map((projectUser) => (
+                <div
+                  key={projectUser?.id}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-[#141414] hover:bg-[#1a1a1a] border border-transparent hover:border-[#2a2a2a] transition-all"
+                >
+                  {projectUser?.user?.image ? (
+                    <img
+                      src={projectUser.user.image}
+                      alt={projectUser.user.name ?? "User"}
+                      className="w-9 h-9 rounded-full object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-violet-900/40 border border-violet-700/30 flex items-center justify-center shrink-0 text-sm font-semibold text-violet-300">
+                      {projectUser?.user?.name?.charAt(0).toUpperCase() ?? "U"}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-medium truncate">
+                      {projectUser?.user?.name}
+                    </p>
+                    <p className="text-zinc-500 text-xs truncate">
+                      {projectUser?.user?.email}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+        {/* </BorderGlow> */}
         {/* Sprints Card */}
-        <BorderGlow
+        {/* <BorderGlow
           edgeSensitivity={30}
           glowColor="40 80 80"
-          className="bg-[#0f0f0f]"
+          className="bg-[#0f0f0f] w-full"
           borderRadius={28}
           glowRadius={40}
           glowIntensity={1}
           coneSpread={25}
           animated={true}
           colors={["#7c3aed", "#a855f7", "#6d28d9"]}
-        >
-          <div className="bg-[#0f0f0f] rounded-2xl ">
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1f1f1f]">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <Zap size={15} className="text-emerald-400" />
-              </div>
-              <h2 className="text-base font-semibold text-white">Sprints</h2>
-              <span className="ml-auto text-xs text-zinc-400 bg-[#1a1a1a] px-2 py-0.5 rounded-full font-bold">
-                {project?.sprints?.length ?? 0}
-              </span>
-
-              {/* CreateSprint trigger */}
-              <CreateSprint
-                projectId={project?.id ?? ""}
-                userId={user?.id ?? ""}
-              />
+        > */}
+        <div className="bg-[#0f0f0f] rounded-2xl w-full">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1f1f1f]">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+              <Zap size={15} className="text-emerald-400" />
             </div>
+            <h2 className="text-base font-semibold text-white">Sprints</h2>
+            <span className="ml-auto text-xs text-zinc-400 bg-[#1a1a1a] px-2 py-0.5 rounded-full font-bold">
+              {project?.sprints?.length ?? 0}
+            </span>
 
-            <div className="p-4 space-y-3 max-h-100 overflow-y-auto ">
-              {project?.sprints?.length === 0 ? (
-                <div className="text-center py-10 text-zinc-600 text-sm">
-                  No sprints yet
-                </div>
-              ) : (
-                project?.sprints?.map((sprint) => {
-                  const progress = getProgress(
-                    sprint?.startDate,
-                    sprint?.endDate,
-                  );
-                  const isActive = progress > 0 && progress < 100;
-                  const isCompleted = progress >= 100;
+            {/* CreateSprint trigger */}
+            <CreateSprint
+              projectId={project?.id ?? ""}
+              userId={user?.id ?? ""}
+            />
+          </div>
 
-                  return (
-                    <div
-                      key={sprint?.id}
-                      className="group p-4 rounded-xl bg-[#141414] hover:bg-[#1a1a1a] border border-transparent hover:border-[#2a2a2a] transition-all cursor-pointer"
-                      onClick={() =>
-                        router.push(
-                          `/organization/${orgSlug}/projects/${projectSlug}/sprint/${sprint?.slug}`,
-                        )
-                      }
-                    >
-                      {/* Sprint header */}
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div className="min-w-0">
-                          <p className="text-white font-semibold text-lg truncate py-2">
-                            {sprint?.title}
+          <div className="p-4 space-y-3 max-h-100 overflow-y-auto ">
+            {project?.sprints?.length === 0 ? (
+              <div className="text-center py-10 text-zinc-600 text-sm">
+                No sprints yet
+              </div>
+            ) : (
+              project?.sprints?.map((sprint) => {
+                const progress = getProgress(
+                  sprint?.startDate,
+                  sprint?.endDate,
+                );
+                const isActive = progress > 0 && progress < 100;
+                const isCompleted = progress >= 100;
+
+                return (
+                  <div
+                    key={sprint?.id}
+                    className="group p-4 rounded-xl bg-[#141414] hover:bg-[#1a1a1a] border border-transparent hover:border-[#2a2a2a] transition-all cursor-pointer"
+                    onClick={() =>
+                      router.push(
+                        `/organization/${orgSlug}/projects/${projectSlug}/sprint/${sprint?.slug}`,
+                      )
+                    }
+                  >
+                    {/* Sprint header */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="min-w-0">
+                        <p className="text-white font-semibold text-lg truncate py-2">
+                          {sprint?.title}
+                        </p>
+                        {sprint?.description && (
+                          <p className="text-zinc-500 text-md mt-0.5 truncate">
+                            {sprint.description}
                           </p>
-                          {sprint?.description && (
-                            <p className="text-zinc-500 text-md mt-0.5 truncate">
-                              {sprint.description}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span
-                            className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                              isCompleted
-                                ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
-                                : isActive
-                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                  : "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
-                            }`}
-                          >
-                            {isCompleted
-                              ? "Done"
-                              : isActive
-                                ? "Active"
-                                : "Upcoming"}
-                          </span>
-                          <ChevronRight
-                            size={14}
-                            className="text-zinc-600 group-hover:text-zinc-400 transition-colors"
-                          />
-                        </div>
+                        )}
                       </div>
-
-                      {/* Progress bar */}
-                      <div className="space-y-1.5">
-                        <ProgressBar
-                          value={progress}
-                          aria-label="sprint-details"
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            isCompleted
+                              ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                              : isActive
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                : "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
+                          }`}
                         >
-                          <ProgressBar.Output />
-                          <ProgressBar.Track>
-                            <ProgressBar.Fill />
-                          </ProgressBar.Track>
-                        </ProgressBar>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1 text-zinc-400 text-xs font-medium">
-                            <CalendarRange size={10} />
-                            <span>
-                              {new Date(sprint?.startDate).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                },
-                              )}
-                              {" → "}
-                              {new Date(sprint?.endDate).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                },
-                              )}
-                            </span>
-                          </div>
-                          <span className="text-sm font-medium text-zinc-400">
-                            {Math.round(progress)}%
-                          </span>
-                        </div>
+                          {isCompleted
+                            ? "Done"
+                            : isActive
+                              ? "Active"
+                              : "Upcoming"}
+                        </span>
+                        <ChevronRight
+                          size={14}
+                          className="text-zinc-600 group-hover:text-zinc-400 transition-colors"
+                        />
                       </div>
                     </div>
-                  );
-                })
-              )}
-            </div>
+
+                    {/* Progress bar */}
+                    <div className="space-y-1.5">
+                      <ProgressBar value={progress} aria-label="sprint-details">
+                        <ProgressBar.Output />
+                        <ProgressBar.Track>
+                          <ProgressBar.Fill />
+                        </ProgressBar.Track>
+                      </ProgressBar>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-zinc-400 text-xs font-medium">
+                          <CalendarRange size={10} />
+                          <span>
+                            {new Date(sprint?.startDate).toLocaleDateString(
+                              "en-GB",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                              },
+                            )}
+                            {" → "}
+                            {new Date(sprint?.endDate).toLocaleDateString(
+                              "en-GB",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )}
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium text-zinc-400">
+                          {Math.round(progress)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
-        </BorderGlow>
+        </div>
+        {/* </BorderGlow> */}
       </div>
     </div>
   );

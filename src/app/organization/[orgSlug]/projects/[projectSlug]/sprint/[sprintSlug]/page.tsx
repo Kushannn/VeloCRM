@@ -1,5 +1,6 @@
 import SprintDashboard from "@/components/sprint/SprintDashboard";
 import { prisma } from "@/lib/prisma";
+import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Page({
   params,
@@ -10,6 +11,8 @@ export default async function Page({
   }>;
 }) {
   const { projectSlug, sprintSlug } = await params;
+
+  const user = await currentUser();
 
   const project = await prisma.project.findUnique({
     where: {
@@ -30,7 +33,12 @@ export default async function Page({
       projectId: project?.id,
     },
     include: {
-      tasks: true,
+      tasks: {
+        include: {
+          assignedTo: true,
+          createdBy: true,
+        },
+      },
     },
   });
 

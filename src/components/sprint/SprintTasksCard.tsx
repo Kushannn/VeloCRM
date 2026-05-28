@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskType } from "@/lib/types";
 import React, { useState } from "react";
-import TaskDetailsCard from "../taskDetails/TaskDetailsCard";
+import TaskDetailsCard from "../tasks/taskDetails/TaskDetailsCard";
 
 interface SprintTaskCardProps {
   task: TaskType;

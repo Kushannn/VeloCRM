@@ -19,10 +19,8 @@ export default function LayoutWithSidebar({
   const isPublicRoute = noSidebarRoutes.includes(pathname);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09080f]">
+    <div className="h-screen flex flex-col bg-[#09080f]">
       <Navbar />
-
-      {/* Mobile menu toggle */}
       {!isPublicRoute && (
         <div className="flex items-center justify-between sm:hidden px-4 py-3 bg-[#111111] border-b border-[#1f1f1f]">
           <h1 className="text-lg font-bold">VeloCRM</h1>
@@ -35,24 +33,17 @@ export default function LayoutWithSidebar({
       <div className="flex flex-1 overflow-hidden">
         {!isPublicRoute && (
           <>
-            {/* Desktop sidebar */}
             <div
               className="hidden sm:block fixed top-16 left-0 bottom-0 z-30 transition-all duration-300 ease-in-out"
               style={{ width: isSidebarExpanded ? "240px" : "64px" }}
             >
               <Sidebar onExpandChange={setIsSidebarExpanded} />
             </div>
-
-            {/* Mobile sidebar */}
             <div
-              className={`${
-                showSidebar ? "translate-x-0" : "-translate-x-full"
-              } sm:hidden fixed inset-y-0 left-0 w-64 z-50 transition-transform duration-300`}
+              className={`${showSidebar ? "translate-x-0" : "-translate-x-full"} sm:hidden fixed inset-y-0 left-0 w-64 z-50 transition-transform duration-300`}
             >
               <Sidebar onExpandChange={setIsSidebarExpanded} />
             </div>
-
-            {/* Mobile overlay */}
             {showSidebar && (
               <div
                 className="fixed inset-0 bg-black/50 sm:hidden z-40"
@@ -61,8 +52,6 @@ export default function LayoutWithSidebar({
             )}
           </>
         )}
-
-        {/* Main content  */}
         <main
           className="flex-1 p-2 sm:p-6 overflow-auto transition-all duration-300 ease-in-out"
           style={{

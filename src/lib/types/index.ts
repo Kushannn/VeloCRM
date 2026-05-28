@@ -50,6 +50,7 @@ export interface TaskType {
   projectId?: string;
   assignedToId?: string;
   createdById: string;
+  dueDate: Date;
 }
 
 export interface SprintType {

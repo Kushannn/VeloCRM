@@ -7,7 +7,7 @@ import trackerImage from "../../public/tracking.jpg";
 import temp1 from "../../public/temp1.jpg";
 import temp2 from "../../public/temp2.jpg";
 import dashboardView from "../../public/dashboardview.jpg";
-import LightPillar from "./LightPillar";
+import LightPillar from "./ui/LightPillar";
 import TestimonialCard from "./testimonials/TestimonialCards";
 
 import {

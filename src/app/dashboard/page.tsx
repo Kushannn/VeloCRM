@@ -23,6 +23,12 @@ export default async function DashboardPage() {
     },
   });
 
+  if (!dbUser) redirect("/sign-in");
+
+  if (!dbUser.membership || dbUser.membership.length == 0) {
+    redirect("/onboarding");
+  }
+
   const userProjectIds = dbUser?.userProjects.map((up) => up.projectId);
 
   const activeSprints = await prisma.sprint.findMany({
@@ -220,7 +226,7 @@ export default async function DashboardPage() {
       feed={feed}
       sprintsDetails={sprintProgress}
       dueTasks={taskStats}
-      pipelineData = {pipeline}
+      pipelineData={pipeline}
     />
   );
 }

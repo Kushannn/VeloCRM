@@ -11,15 +11,7 @@ export default async function Page({
   const { orgSlug } = await params;
 
   const clerkUser = await currentUser();
-  // const user = clerkUser
-  //   ? {
-  //       id: clerkUser.id,
-  //       firstName: clerkUser.firstName,
-  //       lastName: clerkUser.lastName,
-  //       imageUrl: clerkUser.imageUrl,
-  //       email: clerkUser.emailAddresses[0]?.emailAddress || "",
-  //     }
-  //   : null;
+
   const user = await prisma.user.findUnique({
     where: { clerkId: clerkUser?.id ?? "" },
     include: { ownedOrganizations: true },
