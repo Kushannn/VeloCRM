@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Raleway, Manrope, Geist } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import Providers from "./providers";
 import LayoutWithSidebar from "@/components/layouts/LayoutWithSidebar";
 import UserLoader from "./UserLoader";
@@ -36,10 +36,18 @@ export default function RootLayout({
         <ClerkProvider
           publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
         >
-          <Providers>
-            <UserLoader />
-            <LayoutWithSidebar>{children}</LayoutWithSidebar>
-          </Providers>
+          <ClerkLoading>
+            <div className="min-h-screen bg-[#09080f] flex items-center justify-center">
+              <div className="w-6 h-6 rounded-full border-2 border-[#8b5cf6] border-t-transparent animate-spin" />
+            </div>
+          </ClerkLoading>
+
+          <ClerkLoaded>
+            <Providers>
+              <UserLoader />
+              <LayoutWithSidebar>{children}</LayoutWithSidebar>
+            </Providers>
+          </ClerkLoaded>
         </ClerkProvider>
       </body>
     </html>

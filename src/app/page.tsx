@@ -6,7 +6,9 @@ import HomeSignedOutWrapper from "@/components/HomeSignedOutWrapper";
 export default async function HomePage() {
   const { userId } = await auth();
 
-  if (userId) redirect("/dashboard");
+  if (userId) {
+    redirect("/dashboard");
+  }
 
   return (
     <main>

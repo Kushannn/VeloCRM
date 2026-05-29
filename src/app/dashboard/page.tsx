@@ -4,8 +4,14 @@ import { FeedItem } from "@/lib/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
+async function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export default async function DashboardPage() {
   const clerkUser = await currentUser();
+
+  await wait(10000);
 
   if (!clerkUser) redirect("/sign-in");
 
