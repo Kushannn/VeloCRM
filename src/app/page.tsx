@@ -1,7 +1,7 @@
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignedOut } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import HomeSignedOutWrapper from "@/components/HomeSignedOutWrapper";
+import HomeSignedOut from "@/components/HomeSignedOut";
 
 export default async function HomePage() {
   const { userId } = await auth();
@@ -13,7 +13,7 @@ export default async function HomePage() {
   return (
     <main>
       <SignedOut>
-        <HomeSignedOutWrapper />
+        <HomeSignedOut />
       </SignedOut>
     </main>
   );

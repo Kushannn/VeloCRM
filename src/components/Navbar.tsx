@@ -3,6 +3,7 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { logout } from "@/redux/slices/authSlice";
 import {
+  SignInButton,
   SignUpButton,
   SignedIn,
   SignedOut,
@@ -56,13 +57,11 @@ export default function Navbar() {
               <SignUpButton>
                 <button className="cursor-pointer">Sign Up</button>
               </SignUpButton>
-              <button
-                onClick={() => router.push("/sign-in")}
-                // onClick={() => console.log("Clicked")}
-                className="cursor-pointer"
-              >
-                Sign In
-              </button>
+              <SignInButton>
+                <button className="cursor-pointer hover:text-blue-500">
+                  Sign In
+                </button>
+              </SignInButton>
             </SignedOut>
 
             <SignedIn>

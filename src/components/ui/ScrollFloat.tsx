@@ -16,6 +16,18 @@ interface ScrollFloatProps {
   stagger?: number;
 }
 
+const getScrollParent = (node: HTMLElement | null): HTMLElement | Window => {
+  if (!node || node === document.body || node === document.documentElement) {
+    return window;
+  }
+  const overflowY = window.getComputedStyle(node).overflowY;
+  const isScrollable = overflowY === "auto" || overflowY === "scroll";
+  if (isScrollable) {
+    return node;
+  }
+  return getScrollParent(node.parentElement);
+};
+
 const ScrollFloat: React.FC<ScrollFloatProps> = ({
   children,
   scrollContainerRef,
@@ -45,11 +57,11 @@ const ScrollFloat: React.FC<ScrollFloatProps> = ({
     const scroller =
       scrollContainerRef && scrollContainerRef.current
         ? scrollContainerRef.current
-        : window;
+        : getScrollParent(el);
 
     const charElements = el.querySelectorAll(".inline-block");
 
-    gsap.fromTo(
+    const anim = gsap.fromTo(
       charElements,
       {
         willChange: "opacity, transform",
@@ -76,6 +88,13 @@ const ScrollFloat: React.FC<ScrollFloatProps> = ({
         },
       },
     );
+
+    return () => {
+      anim.kill();
+      if (anim.scrollTrigger) {
+        anim.scrollTrigger.kill();
+      }
+    };
   }, [
     scrollContainerRef,
     animationDuration,

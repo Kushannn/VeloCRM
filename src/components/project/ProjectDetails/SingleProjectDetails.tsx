@@ -13,6 +13,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ProjectDetailsMetricCards from "./ProjectDetailMetricCards";
 
 type Props = {
   project: ProjectType | null;
@@ -28,6 +29,8 @@ export default function SingleProjectDetails({
   user,
 }: Props) {
   const router = useRouter();
+
+  // console.log("project ", project);
 
   function getProgress(startDate: Date, endDate: Date) {
     const now = new Date();
@@ -128,22 +131,14 @@ export default function SingleProjectDetails({
         </div>
       </div>
 
+      {/* Metric cards */}
+      <div>
+        <ProjectDetailsMetricCards project={project} />
+      </div>
+
       {/* Main content */}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-        {/* Members Card */}
-        {/* <BorderGlow
-          edgeSensitivity={30}
-          glowColor="40 80 80"
-          // backgroundColor="#0f0f0f"
-          className="bg-[#0f0f0f] w-full"
-          borderRadius={28}
-          glowRadius={40}
-          glowIntensity={1}
-          coneSpread={25}
-          animated={true}
-          colors={["#c084fc", "#f472b6", "#38bdf8"]}
-        > */}
         <div className="bg-[#0f0f0f] border border-[#1f1f1f] rounded-2xl w-full h-full">
           <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1f1f1f]">
             <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
@@ -190,19 +185,7 @@ export default function SingleProjectDetails({
             )}
           </div>
         </div>
-        {/* </BorderGlow> */}
-        {/* Sprints Card */}
-        {/* <BorderGlow
-          edgeSensitivity={30}
-          glowColor="40 80 80"
-          className="bg-[#0f0f0f] w-full"
-          borderRadius={28}
-          glowRadius={40}
-          glowIntensity={1}
-          coneSpread={25}
-          animated={true}
-          colors={["#7c3aed", "#a855f7", "#6d28d9"]}
-        > */}
+
         <div className="bg-[#0f0f0f] rounded-2xl w-full">
           <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1f1f1f]">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
@@ -320,7 +303,6 @@ export default function SingleProjectDetails({
             )}
           </div>
         </div>
-        {/* </BorderGlow> */}
       </div>
     </div>
   );

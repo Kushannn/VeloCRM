@@ -118,10 +118,10 @@ model Task {
   description  String?
   status       TaskStatus   @default(PENDING)
   priority     TaskPriority @default(MEDIUM)
-  assignedToId String?
-  createdById  String
-  sprintId     String
-  projectId    String?
+  assignedToId String?      @db.ObjectId  // ✅
+  createdById  String       @db.ObjectId  // ✅
+  sprintId     String       @db.ObjectId  // ✅
+  projectId    String?      @db.ObjectId  // ✅
   createdAt    DateTime     @default(now())
   dueDate      DateTime?
 

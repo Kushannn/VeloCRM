@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useRef, useEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -8,7 +8,7 @@ interface AnimatedContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   container?: Element | string | null;
   distance?: number;
-  direction?: 'vertical' | 'horizontal';
+  direction?: "vertical" | "horizontal";
   reverse?: boolean;
   duration?: number;
   ease?: string;
@@ -24,14 +24,26 @@ interface AnimatedContentProps extends React.HTMLAttributes<HTMLDivElement> {
   onDisappearanceComplete?: () => void;
 }
 
+const getScrollParent = (node: HTMLElement | null): HTMLElement | Window => {
+  if (!node || node === document.body || node === document.documentElement) {
+    return window;
+  }
+  const overflowY = window.getComputedStyle(node).overflowY;
+  const isScrollable = overflowY === "auto" || overflowY === "scroll";
+  if (isScrollable) {
+    return node;
+  }
+  return getScrollParent(node.parentElement);
+};
+
 const AnimatedContent: React.FC<AnimatedContentProps> = ({
   children,
   container,
   distance = 100,
-  direction = 'vertical',
+  direction = "vertical",
   reverse = false,
   duration = 0.8,
-  ease = 'power3.out',
+  ease = "power3.out",
   initialOpacity = 0,
   animateOpacity = true,
   scale = 1,
@@ -39,10 +51,10 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
   delay = 0,
   disappearAfter = 0,
   disappearDuration = 0.5,
-  disappearEase = 'power3.in',
+  disappearEase = "power3.in",
   onComplete,
   onDisappearanceComplete,
-  className = '',
+  className = "",
   ...props
 }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -51,13 +63,19 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
     const el = ref.current;
     if (!el) return;
 
-    let scrollerTarget: Element | string | null = container || document.getElementById('snap-main-container') || null;
-
-    if (typeof scrollerTarget === 'string') {
-      scrollerTarget = document.querySelector(scrollerTarget);
+    let scrollerTarget: Element | Window | null = null;
+    if (container) {
+      if (typeof container === "string") {
+        scrollerTarget = document.querySelector(container);
+      } else {
+        scrollerTarget = container;
+      }
+    } else {
+      scrollerTarget =
+        document.getElementById("snap-main-container") || getScrollParent(el);
     }
 
-    const axis = direction === 'horizontal' ? 'x' : 'y';
+    const axis = direction === "horizontal" ? "x" : "y";
     const offset = reverse ? -distance : distance;
     const startPct = (1 - threshold) * 100;
 
@@ -65,7 +83,7 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       [axis]: offset,
       scale,
       opacity: animateOpacity ? initialOpacity : 1,
-      visibility: 'visible'
+      visibility: "visible",
     });
 
     const tl = gsap.timeline({
@@ -81,10 +99,10 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
             delay: disappearAfter,
             duration: disappearDuration,
             ease: disappearEase,
-            onComplete: () => onDisappearanceComplete?.()
+            onComplete: () => onDisappearanceComplete?.(),
           });
         }
-      }
+      },
     });
 
     tl.to(el, {
@@ -92,7 +110,7 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       scale: 1,
       opacity: 1,
       duration,
-      ease
+      ease,
     });
 
     const st = ScrollTrigger.create({
@@ -100,8 +118,10 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
       scroller: scrollerTarget || window,
       start: `top ${startPct}%`,
       once: true,
-      onEnter: () => tl.play()
+      onEnter: () => tl.play(),
     });
+
+    ScrollTrigger.refresh();
 
     return () => {
       st.kill();
@@ -123,11 +143,11 @@ const AnimatedContent: React.FC<AnimatedContentProps> = ({
     disappearDuration,
     disappearEase,
     onComplete,
-    onDisappearanceComplete
+    onDisappearanceComplete,
   ]);
 
   return (
-    <div ref={ref} className={`invisible ${className}`} {...props}>
+    <div ref={ref} className={`${className}`} {...props}>
       {children}
     </div>
   );

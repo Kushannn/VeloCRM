@@ -34,6 +34,12 @@ export default async function Page({
         include: { user: true },
       },
       sprints: true,
+      tasks: true,
+      _count: {
+        select: {
+          tasks: true,
+        },
+      },
     },
   });
 

@@ -20,7 +20,9 @@ export default function LayoutWithSidebar({
 
   return (
     <div className="h-screen flex flex-col bg-[#09080f]">
+      {/* <div className="relative" style={{ zIndex: 2 }}> */}
       <Navbar />
+      {/* </div> */}
       {!isPublicRoute && (
         <div className="flex items-center justify-between sm:hidden px-4 py-3 bg-[#111111] border-b border-[#1f1f1f]">
           <h1 className="text-lg font-bold">VeloCRM</h1>
@@ -30,7 +32,7 @@ export default function LayoutWithSidebar({
         </div>
       )}
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-y-auto">
         {!isPublicRoute && (
           <>
             <div
@@ -53,7 +55,7 @@ export default function LayoutWithSidebar({
           </>
         )}
         <main
-          className="flex-1 p-2 sm:p-6 overflow-auto transition-all duration-300 ease-in-out"
+          className="flex-1 p-2 sm:p-6 transition-all duration-300 ease-in-out"
           style={{
             marginLeft: isPublicRoute
               ? 0
