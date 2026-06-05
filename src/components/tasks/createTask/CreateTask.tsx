@@ -92,7 +92,7 @@ export default function CreateTask({
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/project/${project.id}/sprint/${sprint.id}/create-task`,
+        `/api/task/create-task`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -103,6 +103,8 @@ export default function CreateTask({
             priority,
             assignedTo,
             dueDate,
+            projectId: project.id,
+            sprintId: sprint.id,
           }),
         },
       );

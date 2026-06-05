@@ -42,15 +42,15 @@ export interface ColumnType {
 export interface TaskType {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
   priority: "LOW" | "MEDIUM" | "HIGH";
-  createdAt: string;
+  createdAt: Date;
   sprintId: string;
-  projectId?: string;
-  assignedToId?: string;
+  projectId?: string | null;
+  assignedToId?: string | null;
   createdById: string;
-  dueDate: Date;
+  dueDate: Date | null;
 }
 
 export interface SprintType {

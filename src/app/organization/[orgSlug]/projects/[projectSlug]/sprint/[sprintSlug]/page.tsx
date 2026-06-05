@@ -14,6 +14,12 @@ export default async function Page({
 
   const user = await currentUser();
 
+  const dbUser = await prisma.user.findUnique({
+    where: {
+      clerkId: user?.id,
+    },
+  });
+
   const project = await prisma.project.findUnique({
     where: {
       slug: projectSlug,
@@ -50,6 +56,7 @@ export default async function Page({
     <SprintDashboard
       sprint={JSON.parse(JSON.stringify(sprint))}
       project={JSON.parse(JSON.stringify(project))}
+      dbUser={dbUser}
     />
   );
 }

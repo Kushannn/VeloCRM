@@ -389,7 +389,7 @@ export default function ProjectSummaryDashboard({
       <AddMemberModal
         isOpen={openAddMemberModal}
         onClose={() => setOpenAddMemberModal(false)}
-        organization={organization}
+        organization={organization} 
         organizationMembers={organizationMembers}
         projectId={projectId}
       />

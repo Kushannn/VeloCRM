@@ -34,6 +34,8 @@ export default function CreateSprint({
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(close: () => void) {
+    console.log("userid in frontend", userId);
+
     if (!title.trim() || !dateValue) {
       addToast({
         title: "All required fields must be filled.",

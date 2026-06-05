@@ -10,6 +10,8 @@ import {
   Label,
   FieldError,
 } from "@heroui/react";
+import { useAppDispatch } from "@/redux/hooks";
+import { setOrganization } from "@/redux/slices/orgSlice";
 
 interface CreateOrganizationProps {
   isOpen: boolean;
@@ -25,6 +27,8 @@ export default function CreateOrganization({
 }: CreateOrganizationProps) {
   const [orgName, setOrgName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const dispatch = useAppDispatch();
 
   async function handleSubmit() {
     if (!orgName.trim()) {
@@ -46,6 +50,7 @@ export default function CreateOrganization({
 
       if (data.success) {
         toast.success("Organization created successfully!");
+        dispatch(setOrganization(data.organization));
         onClose();
         setOrgName("");
         setOrganizationName(data.organization.name);

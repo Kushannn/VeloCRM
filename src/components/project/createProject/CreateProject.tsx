@@ -61,8 +61,8 @@ export default function CreateProject({
         toast.success("Project created successfully!");
         setProjectName("");
         setDescription("");
-        onSuccess;
-        close(); // Close the modal on success
+        onSuccess();
+        close();
       } else {
         toast.danger(data.error || "Something went wrong");
       }
@@ -75,59 +75,60 @@ export default function CreateProject({
 
   return (
     <Modal state={state}>
-      <Modal.Backdrop variant="blur" className="bg-[#292f46]/50" />
-      <Modal.Container
-        size="lg"
-        className="border-[#292f46] bg-[#19172c] dark:bg-[#19172c] text-[#a8b0d3] w-full max-w-2xl"
-      >
-        <Modal.Dialog>
-          <Modal.CloseTrigger className="hover:bg-white/5 active:bg-white/10" />
+      <Modal.Backdrop variant="blur" className="bg-[#292f46]/50">
+        <Modal.Container
+          size="lg"
+          className="border-[#292f46] dark:bg-[#19172c] text-[#a8b0d3] w-full"
+        >
+          <Modal.Dialog className="bg-[#1d1a2c] ">
+            <Modal.CloseTrigger className="hover:bg-white/5 active:bg-white/10 bg-[#6c3fc4]" />
 
-          <Modal.Header className="border-b border-[#292f46]">
-            <Modal.Heading className="text-white text-2xl font-semibold">
-              Create Project
-            </Modal.Heading>
-          </Modal.Header>
+            <Modal.Header className="border-b border-[#292f46]">
+              <Modal.Heading className="text-white text-2xl font-semibold">
+                Create Project
+              </Modal.Heading>
+            </Modal.Header>
 
-          <Modal.Body className="py-6 space-y-4">
-            <TextField name="name" isRequired className="w-full">
-              <Label className="text-gray-300 text-sm">Project Name</Label>
-              <Input
-                placeholder="Enter project name"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                className="bg-[#262626] border border-gray-700 rounded-lg text-white"
-              />
-              <FieldError />
-            </TextField>
+            <Modal.Body className="py-6 space-y-4 px-2">
+              <TextField name="name" isRequired className="w-full">
+                <Label className="text-gray-300 text-sm">Project Name</Label>
+                <Input
+                  placeholder="Enter project name"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="bg-[#262626] border border-gray-700 rounded-lg text-white"
+                />
+                <FieldError />
+              </TextField>
 
-            <TextField name="description" className="w-full">
-              <Label className="text-gray-300 text-sm">Description</Label>
-              <textarea
-                placeholder="Description.."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2 resize-none"
-              />
-              <FieldError />
-            </TextField>
-          </Modal.Body>
+              <TextField name="description" className="w-full">
+                <Label className="text-gray-300 text-sm">Description</Label>
+                <textarea
+                  placeholder="Description.."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2 resize-none"
+                />
+                <FieldError />
+              </TextField>
+            </Modal.Body>
 
-          <Modal.Footer className="border-t border-[#292f46]">
-            <Button variant="ghost" onPress={close} className="text-white">
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              isPending={loading}
-              onPress={() => handleSubmit(close)}
-            >
-              Create
-            </Button>
-          </Modal.Footer>
-        </Modal.Dialog>
-      </Modal.Container>
+            <Modal.Footer className="border-t border-[#292f46] py-2">
+              <Button variant="ghost" onPress={close} className="text-white">
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                isPending={loading}
+                onPress={() => handleSubmit(close)}
+              >
+                {loading ? "Creating" : "Create"}
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

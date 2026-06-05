@@ -2,6 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { logout } from "@/redux/slices/authSlice";
+import { clearOrganization } from "@/redux/slices/orgSlice";
 import {
   SignInButton,
   SignUpButton,
@@ -25,10 +26,11 @@ export default function Navbar() {
   const handleLogout = async () => {
     await signOut();
     dispatch(logout());
+    dispatch(clearOrganization());
   };
 
   return (
-    <header className="bg-transparent">
+    <header className="bg-transparent z-101">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="text-xl font-bold">

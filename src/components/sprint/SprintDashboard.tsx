@@ -1,8 +1,8 @@
 "use client";
 
-import { Button, Modal, useOverlayState } from "@heroui/react";
+import { Button, Modal, toast, useOverlayState } from "@heroui/react";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Calendar, Clock } from "lucide-react";
 import {
   DndContext,
@@ -16,15 +16,24 @@ import {
 
 import CreateTask from "@/components/tasks/createTask/CreateTask";
 import TaskColumns from "@/components/tasks/taskColumns";
-import { ColumnType, TaskType } from "@/lib/types";
+import { ColumnType, TaskType, UserType } from "@/lib/types";
 import { useParams } from "next/navigation";
 import TaskCard from "../tasks/taskCard";
 import TaskDrawer from "../tasks/TaskDrawer";
 import { createPortal } from "react-dom";
+import { debounce } from "lodash";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 
-export default function SprintDashboard({ sprint, project }: any) {
+export default function SprintDashboard({
+  sprint,
+  project,
+  dbUser,
+}: {
+  sprint: any;
+  project: any;
+  dbUser: UserType | null;
+}) {
   const [localSprint, setLocalSprint] = useState(sprint);
   const [openTaskModal, setOpenTaskModal] = useState(false);
   // const [openDescModal, setOpenDescModal] = useState(false);
@@ -33,7 +42,7 @@ export default function SprintDashboard({ sprint, project }: any) {
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
   //This determines which task has been selected to drag
-  const [activeTask, setSelectedActiveTask] = useState<TaskType | null>(null);
+  const [activeTask, setActiveTask] = useState<TaskType | null>(null);
 
   const params = useParams<{
     orgId: string;
@@ -70,6 +79,26 @@ export default function SprintDashboard({ sprint, project }: any) {
     return Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   };
 
+  const debouncedUpdate = useRef(
+    debounce(async (taskId: string, status: string) => {
+      try {
+        const res = await fetch(`/api/task/${taskId}/update-task-status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status, userId: dbUser?.id }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Task status updated!");
+        } else {
+          throw new Error("Update failed");
+        }
+      } catch (err) {
+        toast.danger("Failed to update task status");
+      }
+    }, 1000),
+  ).current;
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -90,23 +119,7 @@ export default function SprintDashboard({ sprint, project }: any) {
       ),
     }));
 
-    try {
-      await fetch(
-        `/api/project/${params.projectId}/sprint/${params.sprintId}/task/${taskId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            taskId,
-            status: newStatus,
-          }),
-        },
-      );
-    } catch (error) {
-      console.log("Update failed");
-    }
+    debouncedUpdate(taskId, newStatus);
   };
 
   const columns: ColumnType[] = [
@@ -183,6 +196,7 @@ export default function SprintDashboard({ sprint, project }: any) {
         priority: task.priority,
         dueDate: task.dueDate,
         assignedToId: task.assignedToId,
+        userId: dbUser?.id,
       };
 
       const response = await fetch(`/api/task/${task.id}/update-task-details`, {
@@ -281,13 +295,13 @@ export default function SprintDashboard({ sprint, project }: any) {
               columns
                 .flatMap((col) => col.tasks)
                 .find((t) => t.id === active.id) ?? null;
-            setSelectedActiveTask(task);
+            setActiveTask(task);
           }}
           onDragEnd={(e) => {
-            setSelectedActiveTask(null);
+            setActiveTask(null);
             handleDragEnd(e);
           }}
-          onDragCancel={() => setSelectedActiveTask(null)}
+          onDragCancel={() => setActiveTask(null)}
           sensors={sensors}
         >
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 overflow-hidden">

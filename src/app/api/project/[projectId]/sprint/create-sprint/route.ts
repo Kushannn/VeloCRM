@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(
@@ -8,6 +7,8 @@ export async function POST(
 ) {
   try {
     const { title, description, startDate, endDate, userId } = await req.json();
+
+    console.log("userId ", userId);
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -38,17 +39,28 @@ export async function POST(
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    const sprint = await prisma.sprint.create({
-      data: {
-        title,
-        description,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        createdById: userId,
-        organizationId: project.organizationId,
-        projectId,
-        slug: `${title.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
-      },
+    const sprint = await prisma.$transaction(async (tx) => {
+      const createdSprint = await tx.sprint.create({
+        data: {
+          title,
+          description,
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          createdById: userId,
+          organizationId: project.organizationId,
+          projectId,
+          slug: `${title.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
+        },
+      });
+
+      await tx.activityLog.create({
+        data: {
+          type: "SPRINT_CREATED",
+          projectId,
+          sprintId: createdSprint.id,
+          userId,
+        },
+      });
     });
 
     return NextResponse.json({ success: true, sprint }, { status: 201 });

@@ -3,6 +3,15 @@ import { prisma } from "@/lib/prisma";
 import SingleProjectDetails from "@/components/project/ProjectDetails/SingleProjectDetails";
 import { currentUser } from "@clerk/nextjs/server";
 
+type ActivityItem = {
+  id: string;
+  type: "SPRINT_CREATED" | "TASK_CREATED" | "TASK_COMPLETED" | "TASK_UPDATED";
+  title: string;
+  subtitle?: string;
+  date: Date;
+  user?: { name: string | null; image: string | null } | null;
+};
+
 export default async function Page({
   params,
 }: {
@@ -10,15 +19,9 @@ export default async function Page({
 }) {
   const { projectSlug, orgSlug } = await params;
   const clerkUser = await currentUser();
-  const user = clerkUser
-    ? {
-        id: clerkUser.id,
-        firstName: clerkUser.firstName,
-        lastName: clerkUser.lastName,
-        imageUrl: clerkUser.imageUrl,
-        email: clerkUser.emailAddresses[0]?.emailAddress || "",
-      }
-    : null;
+  const dbUser = await prisma.user.findUnique({
+    where: { clerkId: clerkUser?.id },
+  });
 
   // Get org by slug instead of using Redux
   const organization = await prisma.organization.findUnique({
@@ -33,7 +36,11 @@ export default async function Page({
       projectUsers: {
         include: { user: true },
       },
-      sprints: true,
+      sprints: {
+        include: {
+          tasks: true,
+        },
+      },
       tasks: true,
       _count: {
         select: {
@@ -50,7 +57,7 @@ export default async function Page({
       project={project}
       orgSlug={orgSlug}
       projectSlug={projectSlug}
-      user={user}
+      user={dbUser}
     />
   );
 }

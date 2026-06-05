@@ -8,7 +8,9 @@ export async function PATCH(
   const { taskId } = await params;
 
   try {
-    const { status } = await req.json();
+    const { status, userId } = await req.json();
+
+    console.log("userid", userId);
 
     if (!taskId || !status) {
       return NextResponse.json(
@@ -17,10 +19,45 @@ export async function PATCH(
       );
     }
 
-    const updatedTask = await prisma.task.update({
+    // 1. Fetch current status BEFORE updating
+    const existingTask = await prisma.task.findUnique({
       where: { id: taskId },
-      data: { status },
+      select: { status: true, projectId: true, title: true },
     });
+
+    if (!existingTask) {
+      return NextResponse.json(
+        { success: false, error: "Task not found" },
+        { status: 404 },
+      );
+    }
+
+    if (!existingTask.projectId) {
+      return NextResponse.json(
+        { success: false, error: "Task is not associated with a project" },
+        { status: 400 },
+      );
+    }
+    // 2. Run update + activity log in one transaction
+    const [updatedTask] = await prisma.$transaction([
+      prisma.task.update({
+        where: { id: taskId },
+        data: { status },
+      }),
+      prisma.activityLog.create({
+        data: {
+          type: status === "COMPLETED" ? "TASK_COMPLETED" : "TASK_UPDATED",
+          projectId: existingTask.projectId,
+          taskId,
+          userId: userId ?? null,
+          metadata: {
+            from: existingTask.status,
+            to: status,
+            taskTitle: existingTask.title,
+          },
+        },
+      }),
+    ]);
 
     return NextResponse.json(
       { success: true, task: updatedTask },

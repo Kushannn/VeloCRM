@@ -67,11 +67,6 @@ function Sidebar({ onExpandChange }: sidebarProps) {
 
   async function handleSendInvite() {
     if (!email) {
-      // addToast({
-      //   title: "Email is required",
-      //   variant: "solid",
-      //   color: "danger",
-      // });
       toast.danger("Email is required");
       return;
     }
@@ -88,32 +83,13 @@ function Sidebar({ onExpandChange }: sidebarProps) {
       const data = await res.json();
       if (data.success) {
         setSendInviteLoading(false);
-        // addToast({
-        //   title: "User invited successfully",
-        //   variant: "solid",
-        //   color: "success",
-        // });
+
         toast.success("User invited successfully");
       }
     } catch {
-      // addToast({
-      //   title: "Could not invite user",
-      //   variant: "solid",
-      //   color: "danger",
-      // });
       toast.danger("Could not invite user");
     }
   }
-
-  // const handleMouseEnter = () => {
-  //   setIsExpanded(true);
-  //   onExpandChange?.(true);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   setIsExpanded(false);
-  //   onExpandChange?.(false);
-  // };
 
   const navItems = [
     {
