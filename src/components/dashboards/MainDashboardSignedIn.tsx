@@ -84,7 +84,7 @@ export default function MainDasboardSignedIn({
 
   return (
     <>
-      <div className="px-4 space-y-6 bg-[#09080f]">
+      <div className="px-4 space-y-6 pb-42 bg-[#09080f]">
         <h1 className="text-3xl font-bold">Welcome back, {firstName}</h1>
 
         {/* Cards */}
@@ -99,7 +99,7 @@ export default function MainDasboardSignedIn({
         {/* card row 1  */}
         <div className="flex gap-4 items-stretch">
           <div className="w-1/2 flex flex-col">
-            <RecentActivityCard feed={feed} />
+            <RecentActivityCard feed={[]} />
           </div>
 
           <div className="w-1/2 flex flex-col">
@@ -108,13 +108,18 @@ export default function MainDasboardSignedIn({
         </div>
 
         {/* card row 2  */}
-        <div className="flex gap-4 items-stretch">
+        <div className="flex gap-4 items-stretch mb-4">
           <div className="w-1/2 flex flex-col">
             <TasksDueSoonCard dueTasks={dueTasks} />
           </div>
 
           <div className="w-1/2 flex flex-col">
             <Card className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-5 w-full h-full">
+              <Card.Header className="w-full border-b border-[#4d3d7a] pb-3">
+                <Card.Title className="text-[#7c6fa0] text-md font-semibold uppercase tracking-wide">
+                  Leads Pipeline
+                </Card.Title>
+              </Card.Header>
               <Card.Content>
                 <LeadPipelineChart pipeline={pipelineData} />
               </Card.Content>

@@ -2,7 +2,7 @@
 
 import { Button, Modal, toast, useOverlayState } from "@heroui/react";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar, Clock } from "lucide-react";
 import {
   DndContext,
@@ -22,6 +22,7 @@ import TaskCard from "../tasks/taskCard";
 import TaskDrawer from "../tasks/TaskDrawer";
 import { createPortal } from "react-dom";
 import { debounce } from "lodash";
+import { TaskBoardSkeleton } from "@/app/organization/[orgSlug]/projects/[projectSlug]/sprint/[sprintSlug]/loading";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 

@@ -55,7 +55,7 @@ export default function LayoutWithSidebar({
           </>
         )}
         <main
-          className="flex-1 p-2 sm:p-6 transition-all duration-300 ease-in-out"
+          className="flex-1 min-w-0 overflow-x-hidden p-2 sm:p-6 transition-all duration-300 ease-in-out"
           style={{
             marginLeft: isPublicRoute
               ? 0

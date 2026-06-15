@@ -1,6 +1,13 @@
 "use client";
 
-import { toast, Button, Card, Chip } from "@heroui/react";
+import {
+  toast,
+  Select,
+  Label,
+  Description,
+  ListBox,
+  Header,
+} from "@heroui/react";
 import {
   CircleCheck,
   CirclePause,
@@ -26,7 +33,6 @@ type Props = {
 };
 
 export default function ProjectSummaryDashboard({
-  orgId,
   orgSlug,
   projects: initialProjects,
   organization,
@@ -39,7 +45,6 @@ export default function ProjectSummaryDashboard({
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false);
   const [projectId, setProjectId] = useState("");
   const [selectedProjectStatus, setSelectedProjectStatus] = useState("ACTIVE");
-
   const router = useRouter();
 
   const STATUS_DISPLAY: Record<string, string> = {
@@ -105,6 +110,8 @@ export default function ProjectSummaryDashboard({
     ? projects.filter((p) => p.status === selectedProjectStatus)
     : projects;
 
+  console.log("filtered", filteredProjects);
+
   return (
     <>
       <div className="px-4 space-y-6 bg-[#09080f] min-h-screen">
@@ -120,7 +127,7 @@ export default function ProjectSummaryDashboard({
           </div>
           <button
             onClick={() => setOpenProjectModal(true)}
-            className="flex items-center gap-2 bg-[#6c3fc4] hover:bg-[#8b5cf6] text-[#ede8fb] text-sm font-medium px-4 py-2.5 rounded-xl transition-colors duration-200 w-fit"
+            className=" flex items-center gap-2 bg-[#6c3fc4] hover:scale-105 hover:bg-[#8b5cf6] text-[#ede8fb] text-sm font-medium px-4 py-2.5 rounded-xl transition-colors duration-300 w-fit cursor-pointer"
           >
             <Plus size={16} />
             Create New
@@ -238,33 +245,56 @@ export default function ProjectSummaryDashboard({
                   {/* Card header */}
                   <div className="flex items-center justify-between">
                     {isOwner ? (
-                      <select
+                      <Select
                         value={project.status || "ACTIVE"}
-                        onChange={(e) =>
-                          handleProjectStatusChange(project.id, e.target.value)
+                        onChange={(key) =>
+                          handleProjectStatusChange(project.id, key as string)
                         }
-                        className={`text-xs font-medium px-2.5 py-1 rounded-full border cursor-pointer outline-none
-                          ${statusConfig.bg} ${statusConfig.border} ${statusConfig.color}`}
                       >
-                        <option
-                          className="bg-[#0e0c17] text-[#4ade80]"
-                          value="ACTIVE"
+                        <Select.Trigger
+                          className={`text-xs font-medium px-2.5 py-1 rounded-xl border cursor-pointer outline-none min-h-0 h-fit
+      ${statusConfig.bg} ${statusConfig.border} ${statusConfig.color}`}
                         >
-                          Active
-                        </option>
-                        <option
-                          className="bg-[#0e0c17] text-[#fb923c]"
-                          value="ON_HOLD"
-                        >
-                          On Hold
-                        </option>
-                        <option
-                          className="bg-[#0e0c17] text-[#8b5cf6]"
-                          value="COMPLETED"
-                        >
-                          Completed
-                        </option>
-                      </select>
+                          <Select.Value
+                            className={`text-xs font-medium ${statusConfig.color} mr-4`}
+                          />
+                          <Select.Indicator className="text-white/50" />
+                        </Select.Trigger>
+                        <Select.Popover className="bg-[#0e0c17] rounded-xl border border-white/10">
+                          <ListBox>
+                            <ListBox.Item
+                              className=" w-full px-4 py-2.5 text-left hover:bg-[#1a1232] hover:text-[#e8e4f0] transition-colors"
+                              id="ACTIVE"
+                              textValue="Active"
+                            >
+                              <Label className="text-xs text-[#4ade80]">
+                                Active
+                              </Label>
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                            <ListBox.Item
+                              id="ON_HOLD"
+                              textValue="On Hold"
+                              className="w-full px-4 py-2.5 text-left hover:bg-[#1a1232] hover:text-[#e8e4f0] transition-colors"
+                            >
+                              <Label className="text-xs text-[#fb923c] ">
+                                On Hold
+                              </Label>
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                            <ListBox.Item
+                              className="w-full px-4 py-2.5 text-left hover:bg-[#1a1232] hover:text-[#e8e4f0] transition-colors"
+                              id="COMPLETED"
+                              textValue="Completed"
+                            >
+                              <Label className="text-xs text-[#8b5cf6] ">
+                                Completed
+                              </Label>
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
                     ) : (
                       <span
                         className={`text-xs font-medium px-2.5 py-1 rounded-full border ${statusConfig.bg} ${statusConfig.border} ${statusConfig.color}`}
@@ -334,7 +364,7 @@ export default function ProjectSummaryDashboard({
                       <div>
                         <p className="text-[11px] text-[#7c6fa0]">Sprints</p>
                         <p className="text-base font-semibold text-[#e8e4f0]">
-                          {project.sprints || 0}
+                          {project._count.sprints || 0}
                         </p>
                       </div>
                     </div>
@@ -343,7 +373,7 @@ export default function ProjectSummaryDashboard({
                       <div>
                         <p className="text-[11px] text-[#7c6fa0]">Tasks</p>
                         <p className="text-base font-semibold text-[#e8e4f0]">
-                          {project.tasks || 0}
+                          {project._count.tasks || 0}
                         </p>
                       </div>
                     </div>
@@ -389,7 +419,7 @@ export default function ProjectSummaryDashboard({
       <AddMemberModal
         isOpen={openAddMemberModal}
         onClose={() => setOpenAddMemberModal(false)}
-        organization={organization} 
+        organization={organization}
         organizationMembers={organizationMembers}
         projectId={projectId}
       />

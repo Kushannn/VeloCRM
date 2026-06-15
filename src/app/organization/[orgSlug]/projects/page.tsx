@@ -23,7 +23,18 @@ export default async function Page({
   if (!organization) return notFound();
 
   const projects = await prisma.project.findMany({
-    where: { organizationId: organization.id },
+    where: {
+      organizationId: organization.id,
+    },
+    include: {
+      // sprints: true,
+      _count: {
+        select: {
+          sprints: true,
+          tasks: true,
+        },
+      },
+    },
   });
 
   const members = await prisma.userOrganization.findMany({

@@ -3,7 +3,7 @@
 import CreateSprint from "@/components/createSprint/CreateSprint";
 import { ProjectType, TaskType, UserType } from "@/lib/types";
 import { Chip } from "@heroui/react";
-import { Calendar, ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Plus, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProjectDetailsMetricCards from "./ProjectDetailMetricCards";
 import ProjectSprintCarousel from "../ProjectSprintCarousel/ProjectSprintCarousel";
@@ -43,6 +43,8 @@ export default function SingleProjectDetails({
     page * PAGE_SIZE,
     page * PAGE_SIZE + PAGE_SIZE,
   );
+
+  const [openSprintModal, setOpenSprintModal] = useState(false);
 
   //Function for the nextpage animation of sprints
   function goNext() {
@@ -143,7 +145,7 @@ export default function SingleProjectDetails({
       </div>
 
       {/* Metric cards */}
-      <div>
+      <div className="min-w-0 w-full">
         <ProjectDetailsMetricCards project={project} />
       </div>
 
@@ -158,8 +160,17 @@ export default function SingleProjectDetails({
           </div>
 
           <div className="flex items-center gap-2">
-            {/* <Button className="...">+ Create Sprint</Button> */}
+            <button
+              onClick={() => setOpenSprintModal(true)}
+              className=" flex items-center gap-2 bg-[#6c3fc4] hover:scale-105 hover:bg-[#8b5cf6] text-[#ede8fb] text-sm font-medium px-4 py-2.5 rounded-xl transition-colors duration-300 w-fit cursor-pointer"
+            >
+              <Plus size={16} />
+              Create New
+            </button>
             <CreateSprint
+              isOpen={openSprintModal}
+              onClose={() => setOpenSprintModal(false)}
+              onSuccess={() => router.refresh()}
               projectId={project?.id ?? ""}
               userId={user?.id ?? ""}
             />
