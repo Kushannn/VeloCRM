@@ -35,6 +35,8 @@ export async function POST(req: NextRequest) {
       dueDate: Date;
     } = await req.json();
 
+    console.log("dueDate", dueDate);
+
     if (!title || !projectId || !sprintId) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },

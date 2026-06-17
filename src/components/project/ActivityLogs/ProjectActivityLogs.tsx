@@ -76,7 +76,7 @@ export function ProjectActivityLogs({ projectId }: { projectId?: string }) {
     useFetchProjectActivity(projectId);
 
   return (
-    <div className="rounded-xl border border-white/8 bg-[#110f1a] overflow-hidden">
+    <div className="h-180 rounded-xl border border-white/8 bg-[#110f1a] overflow-y-auto">
       <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1f1f1f]">
         <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
           <Activity size={15} className="text-violet-400" />

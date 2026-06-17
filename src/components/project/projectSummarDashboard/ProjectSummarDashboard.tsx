@@ -110,8 +110,6 @@ export default function ProjectSummaryDashboard({
     ? projects.filter((p) => p.status === selectedProjectStatus)
     : projects;
 
-  console.log("filtered", filteredProjects);
-
   return (
     <>
       <div className="px-4 space-y-6 bg-[#09080f] min-h-screen">
@@ -127,7 +125,7 @@ export default function ProjectSummaryDashboard({
           </div>
           <button
             onClick={() => setOpenProjectModal(true)}
-            className=" flex items-center gap-2 bg-[#6c3fc4] hover:scale-105 hover:bg-[#8b5cf6] text-[#ede8fb] text-sm font-medium px-4 py-2.5 rounded-xl transition-colors duration-300 w-fit cursor-pointer"
+            className="  w-full sm:w-fit flex items-center justify-center gap-2 bg-[#6c3fc4] hover:bg-[#8b5cf6]hover:scale-105 text-[#ede8fb] text-sm font-medium px-4 py-2.5 rounded-xl transition-colors duration-300 cursor-pointer"
           >
             <Plus size={16} />
             Create New
@@ -135,7 +133,7 @@ export default function ProjectSummaryDashboard({
         </div>
 
         {/* Status filter cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
           {[
             {
               label: "Active",
@@ -173,7 +171,7 @@ export default function ProjectSummaryDashboard({
                 onClick={() =>
                   setSelectedProjectStatus(isSelected ? "" : stat.value)
                 }
-                className={`cursor-pointer rounded-xl px-5 py-4 border transition-all duration-200 flex items-center justify-between
+                className={`cursor-pointer rounded-xl px-4 sm:px-5 py-4 border transition-all duration-200 flex items-center justify-between
                   ${
                     isSelected
                       ? `${stat.bg} ${stat.activeBorder}`
@@ -186,7 +184,9 @@ export default function ProjectSummaryDashboard({
                     className={isSelected ? stat.color : "text-[#7c6fa0]"}
                   />
                   <p
-                    className={`text-sm font-medium ${isSelected ? stat.color : "text-[#b8aed4]"}`}
+                    className={`text-lg sm:text-xl font-medium ${
+                      isSelected ? stat.color : "text-[#e8e4f0]"
+                    }`}
                   >
                     {stat.label}
                   </p>
@@ -243,7 +243,7 @@ export default function ProjectSummaryDashboard({
                   className="bg-[#110f1a] border border-[#2a2040] hover:border-[#3d2d6b] rounded-xl p-5 flex flex-col gap-4 transition-colors duration-200"
                 >
                   {/* Card header */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     {isOwner ? (
                       <Select
                         value={project.status || "ACTIVE"}
@@ -349,10 +349,10 @@ export default function ProjectSummaryDashboard({
 
                   {/* Project name + description */}
                   <div>
-                    <h2 className="text-lg font-semibold text-[#e8e4f0] mb-1">
+                    <h2 className="text-base sm:text-lg font-semibold text-[#e8e4f0] mb-1 wrap-break-word">
                       {project.name}
                     </h2>
-                    <p className="text-sm text-[#7c6fa0] leading-relaxed line-clamp-2">
+                    <p className="text-sm text-[#7c6fa0] leading-relaxed line-clamp-3 wrap-break-word">
                       {project.description}
                     </p>
                   </div>
@@ -380,14 +380,17 @@ export default function ProjectSummaryDashboard({
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between pt-2 border-t border-[#2a2040]">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center sm:justify-between pt-2 border-t border-[#2a2040]">
                     <div className="flex items-center">
                       {[...Array(3)].map((_, i) => (
                         <div
                           key={i}
-                          className={`w-7 h-7 rounded-full bg-[#2d1d5e] border-2 border-[#09080f] flex items-center justify-center ${i !== 0 ? "-ml-2" : ""}`}
+                          className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#2d1d5e] border-2 border-[#09080f] flex items-center justify-center ${i !== 0 ? "-ml-2" : ""}`}
                         >
-                          <CircleUser size={14} className="text-[#c4a8f5]" />
+                          <CircleUser
+                            size={14}
+                            className="sm:w-3.5 sm:h-3.5 text-[#c4a8f5]"
+                          />
                         </div>
                       ))}
                     </div>
@@ -397,7 +400,7 @@ export default function ProjectSummaryDashboard({
                           `/organization/${orgSlug}/projects/${project.slug}`,
                         )
                       }
-                      className="flex items-center gap-1.5 text-sm text-[#8b5cf6] hover:text-[#c4a8f5] transition-colors font-medium cursor-pointer "
+                      className="flex items-center gap-1.5 text-sm text-[#8b5cf6] hover:text-[#c4a8f5] transition-colors font-medium cursor-pointer"
                     >
                       View Details
                       <ArrowRight size={14} />

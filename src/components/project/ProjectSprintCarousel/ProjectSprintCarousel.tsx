@@ -44,7 +44,7 @@ export default function ProjectSprintCarousel({
             key={sprint.id}
             onClick={() => router.push(`${currentUrl}/sprint/${sprint.slug}`)}
             className="
-              bg-[#110f1a] border border-[#2a2040] w-86.25
+              bg-[#110f1a] border border-[#2a2040] min-w-45 sm:min-w-75 lg:min-w-80
               hover:border-purple-500/40 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10
               transition-all duration-300 ease-out
               animate-fadein

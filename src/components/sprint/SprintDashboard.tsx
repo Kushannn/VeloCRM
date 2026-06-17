@@ -236,40 +236,53 @@ export default function SprintDashboard({
     <>
       <div className="h-full space-y-6 flex flex-col">
         {/* Header */}
-        <div className="bg-[#110f1a] border border-[#2a2040] hover:border-[#3d2d6b] rounded-xl p-4 flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-55">
-            {isActive && (
-              <p className="flex gap-3 text-[#7c6fa0] items-center text-sm mb-2">
-                Active Sprint
-                <span className="w-2 h-2 bg-green-700 animate-pulse rounded-xl"></span>
-              </p>
-            )}
-            <h1 className="text-3xl font-medium text-[#e8e4f0]">
-              {localSprint.title}
-            </h1>
-            {localSprint.description && (
-              <p
-                onClick={() => descState.open()}
-                className="text-sm text-[#b8aed4] line-clamp-2 mt-2"
-              >
-                {localSprint.description}
-              </p>
-            )}
+        {/* ---- HEADER ---- */}
+        <div className="bg-[#110f1a] border border-[#2a2040] hover:border-[#3d2d6b] rounded-xl p-3 sm:p-4 flex flex-col gap-3">
+          {/* Row 1: title + button */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              {isActive && (
+                <p className="flex gap-2 text-[#7c6fa0] items-center text-xs mb-1">
+                  Active Sprint
+                  <span className="w-2 h-2 bg-green-700 animate-pulse rounded-xl" />
+                </p>
+              )}
+              <h1 className="text-xl sm:text-2xl font-medium text-[#e8e4f0] truncate">
+                {localSprint.title}
+              </h1>
+              {localSprint.description && (
+                <p
+                  onClick={() => descState.open()}
+                  className="text-xs text-[#b8aed4] line-clamp-1 mt-1 cursor-pointer"
+                >
+                  {localSprint.description}
+                </p>
+              )}
+            </div>
+
+            <Button
+              onClick={() => setOpenTaskModal(true)}
+              className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6c3fc4] border border-[#2a2040] text-[#ede8fb] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] hover:text-white active:bg-[#4c2d9e] transition-all text-sm font-medium hover:scale-105 duration-300"
+            >
+              <span className="text-base leading-none">+</span>
+              New Task
+            </Button>
           </div>
 
-          <div className="items-center rounded-xl border border-zinc-800 flex gap-10 p-3 bg-[#1a1232]">
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <Calendar className="w-4 h-4" />
+          {/* Row 2: date strip */}
+          <div className="flex items-center rounded-lg border border-zinc-800 bg-[#1a1232] px-3 py-2 gap-2 sm:gap-4 w-full sm:w-fit">
+            <div className="flex items-center gap-1.5 text-xs text-gray-300">
+              <Calendar className="w-3.5 h-3.5 shrink-0" />
               {new Date(localSprint.startDate).toLocaleDateString()}
             </div>
-            <div className="h-5 w-px bg-zinc-500"></div>
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <Calendar className="w-4 h-4" />
+            <div className="h-4 w-px bg-zinc-600" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-300">
+              <Calendar className="w-3.5 h-3.5 shrink-0" />
               {new Date(localSprint.endDate).toLocaleDateString()}
             </div>
-            <div className="h-5 w-px bg-zinc-500"></div>
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <Clock className="w-4 h-4" />
+            <div className="h-4 w-px bg-zinc-600" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-300">
+              <Clock className="w-3.5 h-3.5 shrink-0" />
               {calculateDaysRemaining(
                 localSprint.startDate,
                 localSprint.endDate,
@@ -277,17 +290,9 @@ export default function SprintDashboard({
               days
             </div>
           </div>
-
-          <Button
-            onClick={() => setOpenTaskModal(true)}
-            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-[#6c3fc4] border border-[#2a2040] text-[#ede8fb] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] hover:text-white active:bg-[#4c2d9e] transition-all text-sm font-medium hover:scale-105 duration-300"
-          >
-            <span className="text-lg leading-none">+</span>
-            New Task
-          </Button>
         </div>
 
-        {/* Board */}
+        {/* ---- BOARD ---- */}
         <DndContext
           collisionDetection={closestCenter}
           onDragStart={({ active }) => {
