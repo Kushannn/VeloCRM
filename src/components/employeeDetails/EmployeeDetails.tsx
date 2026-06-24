@@ -5,6 +5,7 @@ import { CircleUser, Mail, Shield } from "lucide-react";
 
 interface Member {
   id: string;
+  designation: string;
   role: string;
   user: {
     id: string;
@@ -75,13 +76,13 @@ export function EmployeeDetails({ members, organization }: Props) {
               {/* Role badge */}
               <div
                 className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                  member.role === "ADMIN"
+                  member.designation === "ADMIN"
                     ? "bg-violet-500/10 border border-violet-500/30 text-violet-400"
                     : "bg-white/5 border border-white/10 text-zinc-400"
                 }`}
               >
                 <Shield size={10} />
-                {member.role}
+                {member.designation}
               </div>
             </Card.Content>
           </Card>

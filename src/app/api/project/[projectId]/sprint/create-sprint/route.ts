@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
 
 export async function POST(
   req: Request,
@@ -7,14 +8,20 @@ export async function POST(
 ) {
   try {
     const { title, description, startDate, endDate, userId } = await req.json();
+    const { projectId } = await params;
 
-    console.log("userId ", userId);
+    const access = await getProjectAccessById(projectId);
+
+    if (!access) {
+      return NextResponse.json(
+        { error: "Could not perform the action " },
+        { status: 403 },
+      );
+    }
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { projectId } = await params;
 
     if (!projectId) {
       return NextResponse.json(
@@ -30,15 +37,6 @@ export async function POST(
       );
     }
 
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: { organization: true },
-    });
-
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
-
     const sprint = await prisma.$transaction(async (tx) => {
       const createdSprint = await tx.sprint.create({
         data: {
@@ -47,7 +45,7 @@ export async function POST(
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           createdById: userId,
-          organizationId: project.organizationId,
+          organizationId: access.project.organizationId,
           projectId,
           slug: `${title.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
         },

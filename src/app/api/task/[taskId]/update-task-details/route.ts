@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
 
 export async function PATCH(
   req: Request,
@@ -9,6 +10,15 @@ export async function PATCH(
 
   try {
     const body = await req.json();
+
+    const access = await getProjectAccessById(body.projectId);
+
+    if (!access) {
+      return NextResponse.json(
+        { success: false, error: "Error getting membership with project" },
+        { status: 403 },
+      );
+    }
 
     const {
       title,

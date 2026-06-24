@@ -14,8 +14,9 @@ model User {
   email     String
   name      String?
   image     String?
-  role      Role     @default(USER)
+  designation      Role     @default(USER)
   createdAt DateTime @default(now())
+  role     String?
 
   leadActivities LeadActivity[] @relation("LeadActivityUser")
   createdLeads Lead[] @relation("LeadCreatedBy")

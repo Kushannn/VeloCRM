@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
 
 export async function DELETE(
   req: NextRequest,
@@ -14,38 +15,17 @@ export async function DELETE(
 
     const { projectId } = await params;
 
-    const dbUser = await prisma.user.findUnique({
-      where: { clerkId },
-      include: { ownedOrganizations: true },
-    });
+    const access = await getProjectAccessById(projectId);
 
-    if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-    });
-
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
-
-    // Check if user is owner or admin
-    const isOwner = dbUser.ownedOrganizations.some(
-      (org) => org.id === project.organizationId,
-    );
-
-    const isMemberAdmin = await prisma.userOrganization.findFirst({
-      where: {
-        userId: dbUser.id,
-        organizationId: project.organizationId,
-        role: "ADMIN",
-      },
-    });
-
-    if (!isOwner && !isMemberAdmin) {
+    if (!access) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    if (access.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Not authorized for this action" },
+        { status: 403 },
+      );
     }
 
     // Deleting all related items since mongoDB does not allow cascading

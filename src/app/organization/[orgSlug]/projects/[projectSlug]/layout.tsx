@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import {
-  getOrgBySlugForUser,
+  getProjectMembership,
   getCurrentUser,
 } from "@/lib/utils/authorizeUserOrgProject";
 
@@ -9,14 +9,14 @@ export default async function OrganizationLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ orgSlug: string }>;
+  params: Promise<{ projectSlug: string; organizationSlug: string }>;
 }) {
-  const { orgSlug } = await params;
+  const { projectSlug, organizationSlug } = await params;
 
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
 
-  const org = await getOrgBySlugForUser(orgSlug);
-  if (!org) notFound();
+  const projectMembership = getProjectMembership(projectSlug, organizationSlug);
+
   return <>{children}</>;
 }

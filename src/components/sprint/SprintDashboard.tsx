@@ -85,7 +85,11 @@ export default function SprintDashboard({
         const res = await fetch(`/api/task/${taskId}/update-task-status`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status, userId: dbUser?.id }),
+          body: JSON.stringify({
+            status,
+            userId: dbUser?.id,
+            projectId: project?.id,
+          }),
         });
         const data = await res.json();
         if (data.success) {
@@ -197,6 +201,7 @@ export default function SprintDashboard({
         dueDate: task.dueDate,
         assignedToId: task.assignedToId,
         userId: dbUser?.id,
+        projectId: project?.id,
       };
 
       const response = await fetch(`/api/task/${task.id}/update-task-details`, {

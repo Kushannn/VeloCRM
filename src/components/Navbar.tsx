@@ -68,11 +68,14 @@ export default function Navbar() {
 
             <SignedIn>
               <div className="flex items-center gap-4">
-                <img
-                  src={user.user?.imageUrl}
-                  alt="User"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                <Link href="/profile">
+                  <img
+                    src={user.user?.imageUrl}
+                    alt="User"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                </Link>
+
                 <button onClick={handleLogout}>
                   <LogOut />
                 </button>

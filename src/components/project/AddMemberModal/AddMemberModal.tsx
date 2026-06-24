@@ -56,7 +56,7 @@ export default function AddMemberModal({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userIds: selectedUserIds }),
+          body: JSON.stringify({ userIds: selectedUserIds, projectId }),
         },
       );
 

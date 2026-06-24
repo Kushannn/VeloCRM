@@ -3,14 +3,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ orgId: string }> }
+  { params }: { params: Promise<{ orgId: string }> },
 ) {
   const { orgId } = await params;
 
   if (!orgId) {
     return NextResponse.json(
       { success: false, error: "Organization ID missing in URL" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -22,6 +22,7 @@ export async function GET(
       select: {
         id: true,
         role: true,
+        designation: true,
         user: {
           select: {
             id: true,
@@ -45,7 +46,7 @@ export async function GET(
 
     const formattedMembers = members.map((member) => ({
       id: member.id,
-      role: member.role,
+      role: member.designation,
       user: {
         id: member.user.id,
         name: member.user.name,
@@ -60,7 +61,7 @@ export async function GET(
     console.error("Failed to fetch organization members:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch members." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

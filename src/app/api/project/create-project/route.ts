@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { getOrgMembershipById } from "@/lib/utils/authorizeUserOrgProject";
 
 function generateSlug(name: string) {
   return name
@@ -12,39 +13,29 @@ function generateSlug(name: string) {
 
 export async function POST(req: Request) {
   try {
-    const { userId: clerkId } = await auth();
-    if (!clerkId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { name, organizationId, description } = await req.json();
+
+    const access = await getOrgMembershipById(organizationId);
+
+    if (!access) {
+      return NextResponse.json(
+        { error: "No organization found for the id" },
+        { status: 500 },
+      );
     }
 
-    const { name, organizationId, description } = await req.json();
+    if (access.role != "ADMIN") {
+      return NextResponse.json(
+        { error: "Not authorized for this action" },
+        { status: 403 },
+      );
+    }
 
     if (!name || !organizationId) {
       return NextResponse.json(
         { error: "Name and organization ID are required" },
         { status: 400 },
       );
-    }
-
-    const dbUser = await prisma.user.findUnique({
-      where: { clerkId },
-      include: { ownedOrganizations: true },
-    });
-
-    if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const isOwner = dbUser.ownedOrganizations.some(
-      (org: any) => org.id === organizationId,
-    );
-
-    const isMemberAdmin = await prisma.userOrganization.findFirst({
-      where: { userId: dbUser.id, organizationId, role: "ADMIN" },
-    });
-
-    if (!isOwner && !isMemberAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const slug = `${generateSlug(name)}-${Date.now()}`;
@@ -68,9 +59,9 @@ export async function POST(req: Request) {
     });
 
     const projectUsers = [
-      { userId: dbUser.id, projectId: project.id }, // for owners
+      { userId: access.userId, projectId: project.id }, // for owners
       ...orgMembers
-        .filter((m) => m.userId !== dbUser.id) // avoid duplicate if owner is also admin
+        .filter((m) => m.userId !== access.userId) // avoid duplicate if owner is also admin
         .map((m) => ({ userId: m.userId, projectId: project.id })),
     ];
 
