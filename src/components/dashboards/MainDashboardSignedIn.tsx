@@ -22,7 +22,7 @@ interface userType {
   id: string;
   image: string | null;
   name: string | null;
-  role: string;
+  role: string | null;
   membership: {
     id: string;
     role: MembershipRole;
