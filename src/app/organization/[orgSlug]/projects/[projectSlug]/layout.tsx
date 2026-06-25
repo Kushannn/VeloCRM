@@ -9,14 +9,14 @@ export default async function OrganizationLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ projectSlug: string; organizationSlug: string }>;
+  params: Promise<{ projectSlug: string; orgSlug: string }>;
 }) {
-  const { projectSlug, organizationSlug } = await params;
+  const { projectSlug, orgSlug } = await params;
 
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
 
-  const projectMembership = getProjectMembership(projectSlug, organizationSlug);
+  const projectMembership = getProjectMembership(projectSlug, orgSlug);
 
   return <>{children}</>;
 }
