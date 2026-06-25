@@ -45,7 +45,7 @@ export async function POST(
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           createdById: userId,
-          organizationId: access.project.organizationId,
+          organizationId: access.project.project.organizationId,
           projectId,
           slug: `${title.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`,
         },

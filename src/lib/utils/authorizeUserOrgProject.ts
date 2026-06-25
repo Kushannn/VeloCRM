@@ -66,14 +66,15 @@ export const getProjectAccessById = cache(async (projectId: string) => {
 
   const project = await prisma.userProject.findUnique({
     where: { userId_projectId: { userId: user.id, projectId } },
-    select: { id: true, organizationId: true },
+    select: { id: true, userId: true, projectId: true, project: true },
   });
+
   if (!project) return null;
   const orgMembership = await prisma.userOrganization.findUnique({
     where: {
       userId_organizationId: {
         userId: user.id,
-        organizationId: project.organizationId,
+        organizationId: project.project.organizationId,
       },
     },
   });
