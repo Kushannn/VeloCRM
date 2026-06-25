@@ -59,8 +59,6 @@ export async function PATCH(
       },
     });
 
-    console.log("updated user ", updatedUser);
-
     return NextResponse.json(
       { success: true, user: updatedUser },
       { status: 200 },

@@ -21,13 +21,14 @@ export async function GET(
       },
       select: {
         id: true,
-        role: true,
-        designation: true,
+
         user: {
           select: {
             id: true,
             name: true,
             email: true,
+            role: true,
+            designation: true,
             image: true,
             userProjects: {
               where: {
@@ -46,7 +47,7 @@ export async function GET(
 
     const formattedMembers = members.map((member) => ({
       id: member.id,
-      role: member.designation,
+      role: member.user.designation,
       user: {
         id: member.user.id,
         name: member.user.name,
