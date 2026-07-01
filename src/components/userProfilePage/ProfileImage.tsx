@@ -17,6 +17,16 @@ export default function ProfileImageUpload() {
     try {
       await user.setProfileImage({ file });
       await user.reload();
+
+      await fetch(`/api/user/${user.id}/update-profile-picture`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: user.imageUrl,
+        }),
+      });
     } catch (err) {
       console.error("Failed to update profile image:", err);
     } finally {

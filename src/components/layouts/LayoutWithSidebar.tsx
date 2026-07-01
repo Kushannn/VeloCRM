@@ -19,7 +19,7 @@ export default function LayoutWithSidebar({
   const isPublicRoute = noSidebarRoutes.includes(pathname);
 
   return (
-    <div className="h-full flex flex-col bg-[#09080f]">
+    <div className="min-h-screen flex flex-col bg-[#09080f]">
       <Navbar />
 
       <div className="flex flex-1">

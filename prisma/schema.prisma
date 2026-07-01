@@ -231,6 +231,7 @@ enum LeadActivityType {
   EMAIL
   MEETING
   FOLLOW_UP
+  STATUS_CHANGE
 }
 
 

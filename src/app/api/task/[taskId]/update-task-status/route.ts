@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import {
-  getProjectAccessById,
-  getProjectMembership,
-} from "@/lib/utils/authorizeUserOrgProject";
+import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
 
 export async function PATCH(
   req: Request,

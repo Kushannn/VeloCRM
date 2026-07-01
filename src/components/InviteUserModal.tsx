@@ -26,7 +26,6 @@ export function InviteModal() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: inviteToken }),
     });
-
     const result = await res.json();
 
     if (result.success) {
@@ -40,17 +39,37 @@ export function InviteModal() {
 
   return (
     <Modal>
-      <Modal.Backdrop>
-        <Modal.Container>
-          <Modal.Dialog>
-            <Modal.CloseTrigger />
-            <Modal.Header>You've Been Invited!</Modal.Header>
-            <Modal.Body>
-              <p>Do you accept the invite?</p>
+      <Modal.Backdrop variant="blur" className="bg-[#09080f]/60">
+        <Modal.Container className="w-full max-w-2xl">
+          <Modal.Dialog className="bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
+            <Modal.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
+            <Modal.Header className="border-b border-[#2a2040] pb-4">
+              <Modal.Heading className="text-[#e8e4f0] text-2xl font-semibold">
+                You've been invited to a organization !
+              </Modal.Heading>
+            </Modal.Header>
+            <Modal.Body className="space-y-4 p-4">
+              <p className="text-[#7c6fa0] text-sm w-full">
+                Enter the email of the person you want to invite
+              </p>
             </Modal.Body>
-            <Modal.Footer>
-              <Button onClick={() => setShowModal(false)}>Cancel</Button>
-              <Button onClick={handleAcceptInvite}>Accept</Button>
+
+            <Modal.Footer className="border-t border-[#2a2040] pt-6">
+              <Button
+                variant="ghost"
+                onPress={() => setShowModal(false)}
+                className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant="secondary"
+                onPress={handleAcceptInvite}
+                className="bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] transition-colors"
+              >
+                Send Invite
+              </Button>
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>

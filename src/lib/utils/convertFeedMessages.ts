@@ -10,6 +10,7 @@ import {
   Phone,
   UserPlus,
   LucideIcon,
+  RefreshCcw,
 } from "lucide-react";
 
 export function getFeedMessage(item: FeedItem): string {
@@ -23,6 +24,9 @@ export function getFeedMessage(item: FeedItem): string {
         EMAIL: `${actor} sent an email to "${item.lead.name}"`,
         MEETING: `${actor} had a meeting with "${item.lead.name}"`,
         FOLLOW_UP: `${actor} followed up with "${item.lead.name}"`,
+        STATUS_CHANGE: item.note
+          ? `${actor} ${item.note.charAt(0).toLowerCase() + item.note.slice(1)} on lead "${item.lead.name}"`
+          : `${actor} changed the status of "${item.lead.name}"`,
       };
       return (
         activityMessages[item.type] ??
@@ -53,6 +57,7 @@ export function getFeedIcon(item: FeedItem): LucideIcon {
         EMAIL: Mail,
         MEETING: Calendar,
         FOLLOW_UP: Bell,
+        STATUS_CHANGE: RefreshCcw,
       };
       return icons[item.type] ?? FileText;
 
