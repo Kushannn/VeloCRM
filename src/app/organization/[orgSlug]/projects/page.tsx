@@ -11,15 +11,7 @@ export default async function Page({
   const { orgSlug } = await params;
 
   const clerkUser = await currentUser();
-  // const user = clerkUser
-  //   ? {
-  //       id: clerkUser.id,
-  //       firstName: clerkUser.firstName,
-  //       lastName: clerkUser.lastName,
-  //       imageUrl: clerkUser.imageUrl,
-  //       email: clerkUser.emailAddresses[0]?.emailAddress || "",
-  //     }
-  //   : null;
+
   const user = await prisma.user.findUnique({
     where: { clerkId: clerkUser?.id ?? "" },
     include: { ownedOrganizations: true },
@@ -31,7 +23,18 @@ export default async function Page({
   if (!organization) return notFound();
 
   const projects = await prisma.project.findMany({
-    where: { organizationId: organization.id },
+    where: {
+      organizationId: organization.id,
+    },
+    include: {
+      // sprints: true,
+      _count: {
+        select: {
+          sprints: true,
+          tasks: true,
+        },
+      },
+    },
   });
 
   const members = await prisma.userOrganization.findMany({

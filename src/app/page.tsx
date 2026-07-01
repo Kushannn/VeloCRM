@@ -1,14 +1,19 @@
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import HomeSignedOutWrapper from "@/components/HomeSignedOutWrapper";
+import { SignedOut } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import HomeSignedOut from "@/components/HomeSignedOut";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { userId } = await auth();
+
+  if (userId) {
+    redirect("/dashboard");
+  }
+
   return (
-    <main className="p-6">
-      <SignedIn>
-        <p className="text-gray-500">Redirecting to dashboard...</p>
-      </SignedIn>
+    <main>
       <SignedOut>
-        <HomeSignedOutWrapper />
+        <HomeSignedOut />
       </SignedOut>
     </main>
   );

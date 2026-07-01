@@ -2,28 +2,19 @@
 
 import {
   Button,
-  Pagination,
-  SearchField,
-  Table,
   Select,
   ListBox,
+  TextField,
+  Input,
+  Label,
 } from "@heroui/react";
-import { ListFilter, Pencil, Plus, Trash } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ListFilter, Plus, Search, LayoutGrid, List } from "lucide-react";
+import { useMemo, useState } from "react";
 import AddLead from "../addLead/AddLead";
 import { Leads } from "@/lib/types";
 import { useRouter } from "next/navigation";
-
-const columns = [
-  { id: "name", name: "Name" },
-  { id: "company", name: "Company" },
-  { id: "status", name: "Status" },
-  { id: "email", name: "Email" },
-  { id: "source", name: "Source" },
-  { id: "actions", name: "Actions" },
-];
-
-const ROWS_PER_PAGE = 4;
+import { LeadsKanbanBoard } from "../LeadsKanbanBoard";
+import LeadsTable from "../LeadsTable";
 
 export function LeadsDashboard({
   org,
@@ -38,12 +29,22 @@ export function LeadsDashboard({
 
   const [openAddLead, setOpenAddLead] = useState(false);
   const [editingLead, setEditingLead] = useState<Leads | null>(null);
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({
-    status: "",
-    source: "",
-  });
+  const [filters, setFilters] = useState({ status: "", source: "" });
   const [search, setSearch] = useState("");
+  const [view, setView] = useState<"table" | "board">("table");
+
+  const handleStatusChange = async (leadId: string, newStatus: string) => {
+    const res = await fetch(
+      `/api/organization/${org.id}/leads/${leadId}/update-lead-status`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      },
+    );
+    if (!res.ok) throw new Error("Failed to update lead status");
+    router.refresh();
+  };
 
   const filteredLeads = useMemo(() => {
     return leads.filter((lead) => {
@@ -60,17 +61,6 @@ export function LeadsDashboard({
     });
   }, [leads, filters, search]);
 
-  const totalPages = Math.ceil(filteredLeads.length / ROWS_PER_PAGE);
-
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const paginatedItems = useMemo(() => {
-    const start = (page - 1) * ROWS_PER_PAGE;
-    return filteredLeads.slice(start, start + ROWS_PER_PAGE);
-  }, [page, filteredLeads]);
-
-  const start = (page - 1) * ROWS_PER_PAGE + 1;
-  const end = Math.min(page * ROWS_PER_PAGE, filteredLeads.length);
-
   const handleAddLead = () => {
     setEditingLead(null);
     setOpenAddLead(true);
@@ -81,67 +71,100 @@ export function LeadsDashboard({
     setOpenAddLead(true);
   };
 
-  useEffect(() => {
-    setPage(1);
-  }, [filters, search]);
-
   return (
     <>
-      <div>
-        {/* Page Header */}
-        <div className="flex justify-between">
+      <div className="flex flex-col h-full min-h-0">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col">
-            <span className="text-white/75 text-4xl p-2">Leads</span>
-            <span className="text-white/55 text-lg m-2 ">
-              Manage and nurture your primary business relationships
-            </span>
+            <p className="text-[11px] font-medium uppercase tracking-widest text-violet-400 mb-1">
+              {org.name}
+            </p>
+            <h1 className="text-3xl font-semibold tracking-tight">Leads</h1>
           </div>
-          <Button
-            className="px-3 py-4 text-md font-medium flex items-center rounded-md"
-            onClick={handleAddLead}
-          >
-            <Plus />
-            Add new lead
-          </Button>
+          <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+            <div className="flex w-full sm:w-auto gap-1 bg-[#0e0c17] border border-[#2a2040] rounded-xl p-1">
+              <button
+                onClick={() => setView("table")}
+                className={`flex-1 cursor-pointer sm:flex-none p-2 rounded-lg transition-colors ${
+                  view === "table"
+                    ? "bg-violet-500/20 text-violet-300"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+                aria-label="Table view"
+              >
+                <List size={16} />
+              </button>
+              <button
+                onClick={() => setView("board")}
+                className={`flex-1 cursor-pointer sm:flex-none p-2 rounded-lg transition-colors ${
+                  view === "board"
+                    ? "bg-violet-500/20 text-violet-300"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+                aria-label="Board view"
+              >
+                <LayoutGrid size={16} />
+              </button>
+            </div>
+
+            <Button
+              className="w-full sm:w-fit px-3 py-4 text-md items-center gap-2 bg-[#6c3fc4] hover:scale-105 hover:bg-[#8b5cf6] text-[#ede8fb] text-sm font-medium rounded-xl transition-colors duration-300 cursor-pointer"
+              onClick={handleAddLead}
+            >
+              <Plus />
+              Add new lead
+            </Button>
+          </div>
         </div>
 
-        <div>
-          <div className="flex items-center gap-3 my-4">
-            <SearchField
-              name="search"
-              className="flex-1 max-w-4xl"
-              variant="secondary"
-              value={search}
-              onChange={setSearch}
-            >
-              <SearchField.Group className="flex items-center gap-2 bg-[#111111] border border-white/[0.07] hover:border-white/[0.14] focus-within:border-white/20 rounded-xl px-3 py-2 transition-all duration-200">
-                <SearchField.SearchIcon className="text-white/25 shrink-0 w-4 h-4" />
-                <SearchField.Input
-                  className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/25 focus:outline-none"
-                  placeholder="Search leads..."
-                />
-                <SearchField.ClearButton className="text-white/25 hover:text-white/60 transition-colors" />
-              </SearchField.Group>
-            </SearchField>
+        <div className="flex flex-col md:flex-row md:items-center gap-3 my-4">
+          <TextField
+            name="search"
+            className="w-full md:flex-1 md:max-w-4xl relative text-[#7c6fa0]"
+            value={search}
+            onChange={setSearch}
+          >
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7c6fa0] pointer-events-none z-10"
+            />
+            <Input
+              className="pl-9 pr-9 bg-[#0e0c17] text-[13px] text-[#7c6fa0] placeholder:text-[#7c6fa0] border border-white/[0.07] hover:border-white/[0.14] focus-visible:ring-0 focus-visible:border-white/20 data-[focus-visible=true]:ring-0 data-[focus-visible=true]:border-white/20 data-[focus-visible=true]:shadow-none rounded-xl"
+              placeholder="Search leads..."
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition-colors z-10 cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
+          </TextField>
 
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 md:gap-3">
             <Select
               aria-label="Filter by status"
-              value={filters.status}
-              onChange={(val) =>
+              className="w-full sm:w-36 md:w-40 bg-[#0e0c17] rounded-lg border-2 border-white/[0.07]"
+              value={filters.status || "ALL"}
+              onChange={(value) =>
                 setFilters((f) => ({
                   ...f,
-                  status: val === "ALL" ? "" : String(val),
+                  status: value === "ALL" ? "" : String(value),
                 }))
               }
-              placeholder="Status"
             >
-              <Select.Trigger className="bg-[#111111] border border-white/[0.07] hover:border-white/[0.14] rounded-xl px-3 py-2 text-white text-sm flex items-center gap-2 min-w-35">
-                <ListFilter />
-                <Select.Value className="text-white/60 text-sm" />
-                <Select.Indicator className="text-white/25" />
+              <Select.Trigger className="bg-[#0e0c17] rounded-lg text-[#7c6fa0] min-h-11">
+                <div className="flex items-center gap-2">
+                  <ListFilter size={16} />
+                  <Select.Value className="text-[#7c6fa0]" />
+                </div>
+                <Select.Indicator />
               </Select.Trigger>
-              <Select.Popover className="bg-[#111111] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-100">
-                <ListBox className="outline-none space-y-1">
+
+              <Select.Popover className="rounded-xl overflow-hidden bg-[#0e0c17] border border-[#2a2040] outline-none ring-0 shadow-none focus:outline-none focus:ring-0 [&::before]:hidden [&::after]:hidden">
+                <ListBox className="bg-[#0e0c17]">
                   {[
                     { id: "ALL", label: "All Statuses" },
                     { id: "NEW", label: "New" },
@@ -155,35 +178,36 @@ export function LeadsDashboard({
                     <ListBox.Item
                       key={s.id}
                       id={s.id}
-                      textValue={s.label}
-                      className="px-3 py-2 text-sm text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                      className="hover:bg-[#1a1232] transition-colors border-none"
                     >
-                      {s.label}
+                      <Label className="text-[#b8aed4]">{s.label}</Label>
                     </ListBox.Item>
                   ))}
                 </ListBox>
               </Select.Popover>
             </Select>
 
-            {/* Source Filter */}
             <Select
               aria-label="Filter by source"
-              value={filters.source}
-              onChange={(val) =>
+              className="w-full sm:w-36 md:w-40 bg-[#0e0c17] rounded-lg border-2 border-white/[0.07]"
+              value={filters.source || "ALL"}
+              onChange={(value) =>
                 setFilters((f) => ({
                   ...f,
-                  source: val === "ALL" ? "" : String(val),
+                  source: value === "ALL" ? "" : String(value),
                 }))
               }
-              placeholder="Source"
             >
-              <Select.Trigger className="bg-[#111111] border border-white/[0.07] hover:border-white/[0.14] rounded-xl px-3 py-2 text-white text-sm flex items-center gap-2 min-w-35">
-                <ListFilter />
-                <Select.Value className="text-white/60 text-sm" />
-                <Select.Indicator className="text-white/25" />
+              <Select.Trigger className="bg-[#0e0c17] rounded-lg text-[#b8aed4] min-h-11">
+                <div className="flex items-center gap-2">
+                  <ListFilter size={16} />
+                  <Select.Value className="text-[#b8aed4]" />
+                </div>
+                <Select.Indicator />
               </Select.Trigger>
-              <Select.Popover className="bg-[#111111] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-100">
-                <ListBox className="outline-none space-y-1">
+
+              <Select.Popover className="rounded-xl overflow-hidden bg-[#0e0c17] border border-[#2a2040] outline-none ring-0 shadow-none focus:outline-none focus:ring-0 [&::before]:hidden [&::after]:hidden">
+                <ListBox className="bg-[#0e0c17] border-none">
                   {[
                     { id: "ALL", label: "All Sources" },
                     { id: "WEBSITE", label: "Website" },
@@ -197,10 +221,9 @@ export function LeadsDashboard({
                     <ListBox.Item
                       key={s.id}
                       id={s.id}
-                      textValue={s.label}
-                      className="px-3 py-2 text-sm text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                      className="hover:bg-[#1a1232] transition-colors border-none"
                     >
-                      {s.label}
+                      <Label className="text-[#b8aed4]">{s.label}</Label>
                     </ListBox.Item>
                   ))}
                 </ListBox>
@@ -210,7 +233,7 @@ export function LeadsDashboard({
             {(filters.status || filters.source) && (
               <button
                 onClick={() => setFilters({ status: "", source: "" })}
-                className="text-xs text-zinc-500 hover:text-white transition-colors px-2 py-1 rounded hover:bg-[#1a1a1a]"
+                className="w-full sm:w-auto text-center text-xs text-zinc-500 hover:text-white transition-colors px-2 py-2 rounded hover:bg-[#1a1a1a]"
               >
                 Clear filters
               </button>
@@ -218,141 +241,18 @@ export function LeadsDashboard({
           </div>
         </div>
 
-        <div>
-          <Table
-            className="p-0 border-none bg-transparent min-h-screen"
-            variant="secondary"
-          >
-            <Table.ScrollContainer>
-              <Table.Content
-                aria-label="Leads table"
-                className="min-w-150 bg-[#0d0d0d] rounded-xl border border-[#1f1f1f]"
-              >
-                <Table.Header columns={columns}>
-                  {(column) => (
-                    <Table.Column
-                      isRowHeader={column.id === "name"}
-                      className="bg-[#111111] text-zinc-400 text-lg font-semibold uppercase tracking-wider px-4 py-3 border-b border-[#1f1f1f]"
-                    >
-                      {column.name}
-                    </Table.Column>
-                  )}
-                </Table.Header>
-
-                <Table.Body
-                  items={paginatedItems}
-                  className="divide-y divide-[#1f1f1f]"
-                  renderEmptyState={() => (
-                    <div className="text-center py-12 text-zinc-500 text-sm">
-                      No leads found. Try adjusting your filters.
-                    </div>
-                  )}
-                >
-                  {(lead) => (
-                    <Table.Row className="bg-[#0e0e0e]! border-b border-[#1f1f1f] hover:bg-[#141414]! data-hovered:bg-[#0e0e0e]!">
-                      <Table.Collection items={columns}>
-                        {(column) => (
-                          <Table.Cell className="px-4 py-3 text-md text-zinc-300">
-                            {column.id === "actions" ? (
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-xs"
-                                  onPress={() => handleEditLead(lead)}
-                                >
-                                  <Pencil className=" text-white" />
-                                </Button>
-
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-xs text-red-400"
-                                >
-                                  <Trash />
-                                </Button>
-                              </div>
-                            ) : column.id === "status" ? (
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  lead.status === "NEW"
-                                    ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                                    : lead.status === "CONTACTED"
-                                      ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-                                      : lead.status === "QUALIFIED"
-                                        ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
-                                        : lead.status === "PROPOSAL_SENT"
-                                          ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
-                                          : lead.status === "NEGOTIATION"
-                                            ? "bg-pink-500/10 text-pink-400 border border-pink-500/20"
-                                            : lead.status === "WON"
-                                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                              : "bg-red-500/10 text-red-400 border border-red-500/20"
-                                }`}
-                              >
-                                {lead.status}
-                              </span>
-                            ) : (
-                              String(lead[column.id as keyof typeof lead] ?? "")
-                            )}
-                          </Table.Cell>
-                        )}
-                      </Table.Collection>
-                    </Table.Row>
-                  )}
-                </Table.Body>
-              </Table.Content>
-            </Table.ScrollContainer>
-
-            <Table.Footer className="flex items-center justify-between px-4 py-3 border-t border-[#1f1f1f] bg-[#0d0d0d] rounded-b-xl">
-              <Pagination size="sm">
-                <Pagination.Summary className="text-xs text-zinc-500">
-                  {start} to {end} of {leads.length} results
-                </Pagination.Summary>
-                <Pagination.Content className="flex items-center gap-1">
-                  <Pagination.Item>
-                    <Pagination.Previous
-                      isDisabled={page === 1}
-                      onPress={() => setPage((p) => Math.max(1, p - 1))}
-                      className="px-2 py-1 text-xs text-zinc-400 hover:text-white hover:bg-[#1a1a1a] rounded disabled:opacity-30 transition-colors"
-                    >
-                      <Pagination.PreviousIcon />
-                      Prev
-                    </Pagination.Previous>
-                  </Pagination.Item>
-
-                  {pages.map((p) => (
-                    <Pagination.Item key={p}>
-                      <Pagination.Link
-                        isActive={p === page}
-                        onPress={() => setPage(p)}
-                        className={`w-7 h-7 text-xs rounded flex items-center justify-center transition-colors ${
-                          p === page
-                            ? "bg-violet-600 text-white"
-                            : "text-zinc-400 hover:bg-[#1a1a1a] hover:text-white"
-                        }`}
-                      >
-                        {p}
-                      </Pagination.Link>
-                    </Pagination.Item>
-                  ))}
-
-                  <Pagination.Item>
-                    <Pagination.Next
-                      isDisabled={page === totalPages}
-                      onPress={() =>
-                        setPage((p) => Math.min(totalPages, p + 1))
-                      }
-                      className="px-2 py-1 text-xs text-zinc-400 hover:text-white hover:bg-[#1a1a1a] rounded disabled:opacity-30 transition-colors"
-                    >
-                      Next
-                      <Pagination.NextIcon />
-                    </Pagination.Next>
-                  </Pagination.Item>
-                </Pagination.Content>
-              </Pagination>
-            </Table.Footer>
-          </Table>
+        <div className="flex-1 min-h-0 overflow-x-auto">
+          {view === "table" ? (
+            <LeadsTable
+              filteredLeads={filteredLeads}
+              onEditLead={handleEditLead}
+            />
+          ) : (
+            <LeadsKanbanBoard
+              leads={filteredLeads}
+              onStatusChange={handleStatusChange}
+            />
+          )}
         </div>
       </div>
 

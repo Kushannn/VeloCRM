@@ -17,6 +17,17 @@ type PipelineItem = {
 };
 
 export function LeadPipelineChart({ pipeline }: { pipeline: PipelineItem[] }) {
+  const hasLeads =
+    pipeline.length > 0 && pipeline.some((item) => item.count > 0);
+
+  if (!hasLeads) {
+    return (
+      <div className="flex h-full min-h-75 items-center justify-center">
+        <p className="text-[#b8aed4] text-2xl font-bold">No leads available!</p>
+      </div>
+    );
+  }
+
   const data = {
     labels: pipeline.map((p) => p.status.replace("_", " ")),
     datasets: [
@@ -39,23 +50,46 @@ export function LeadPipelineChart({ pipeline }: { pipeline: PipelineItem[] }) {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: {
+        display: false,
+      },
     },
     scales: {
       x: {
-        ticks: { color: "#7c6fa0", font: { size: 11 } },
-        grid: { display: false },
-        border: { display: false },
+        ticks: {
+          color: "#7c6fa0",
+          font: {
+            size: 11,
+          },
+        },
+        grid: {
+          display: false,
+        },
+        border: {
+          display: false,
+        },
       },
       y: {
-        ticks: { color: "#7c6fa0", stepSize: 1 },
-        grid: { color: "#2a2040" },
-        border: { display: false },
         beginAtZero: true,
+        ticks: {
+          color: "#7c6fa0",
+          stepSize: 1,
+        },
+        grid: {
+          color: "#2a2040",
+        },
+        border: {
+          display: false,
+        },
       },
     },
   } as const;
 
-  return <Bar data={data} options={options} />;
+  return (
+    <div className="h-75">
+      <Bar data={data} options={options} />
+    </div>
+  );
 }

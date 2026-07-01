@@ -35,6 +35,8 @@ export async function POST(req: NextRequest) {
       dueDate: Date;
     } = await req.json();
 
+    console.log("dueDate", dueDate);
+
     if (!title || !projectId || !sprintId) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
@@ -80,21 +82,49 @@ export async function POST(req: NextRequest) {
       .replace(" ", "_") as TaskStatus;
     const taskPriority: TaskPriority = priority?.toUpperCase() as TaskPriority;
 
-    const createdTask = await prisma.task.create({
-      data: {
-        title,
-        description,
-        status: taskStatus || TaskStatus.PENDING,
-        priority: taskPriority || TaskPriority.MEDIUM,
-        sprintId,
-        projectId,
-        createdById: user.id,
-        assignedToId: assignedTo || undefined,
-        dueDate: dueDate,
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const createdTask = await tx.task.create({
+        data: {
+          title,
+          description,
+          status: taskStatus || TaskStatus.PENDING,
+          priority: taskPriority || TaskPriority.MEDIUM,
+          sprintId,
+          projectId,
+          createdById: user.id,
+          assignedToId: assignedTo || undefined,
+          dueDate,
+        },
+      });
+
+      await tx.activityLog.create({
+        data: {
+          type: "TASK_CREATED",
+          projectId,
+          taskId: createdTask.id,
+          userId: user.id,
+          sprintId,
+        },
+      });
+
+      return createdTask;
     });
 
-    return NextResponse.json({ success: true, task: createdTask });
+    // const createdTask = await prisma.task.create({
+    //   data: {
+    //     title,
+    //     description,
+    //     status: taskStatus || TaskStatus.PENDING,
+    //     priority: taskPriority || TaskPriority.MEDIUM,
+    //     sprintId,
+    //     projectId,
+    //     createdById: user.id,
+    //     assignedToId: assignedTo || undefined,
+    //     dueDate: dueDate,
+    //   },
+    // });
+
+    return NextResponse.json({ success: true, task: result });
   } catch (error) {
     console.error("Create Task Error:", error);
     return NextResponse.json(

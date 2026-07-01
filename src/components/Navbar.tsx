@@ -2,7 +2,9 @@
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { logout } from "@/redux/slices/authSlice";
+import { clearOrganization } from "@/redux/slices/orgSlice";
 import {
+  SignInButton,
   SignUpButton,
   SignedIn,
   SignedOut,
@@ -24,10 +26,11 @@ export default function Navbar() {
   const handleLogout = async () => {
     await signOut();
     dispatch(logout());
+    dispatch(clearOrganization());
   };
 
   return (
-    <header className="bg-transparent z-100">
+    <header className="bg-transparent z-101">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="text-xl font-bold">
@@ -56,22 +59,23 @@ export default function Navbar() {
               <SignUpButton>
                 <button className="cursor-pointer">Sign Up</button>
               </SignUpButton>
-              <button
-                onClick={() => router.push("/sign-in")}
-                // onClick={() => console.log("Clicked")}
-                className="cursor-pointer"
-              >
-                Sign In
-              </button>
+              <SignInButton>
+                <button className="cursor-pointer hover:text-blue-500">
+                  Sign In
+                </button>
+              </SignInButton>
             </SignedOut>
 
             <SignedIn>
               <div className="flex items-center gap-4">
-                <img
-                  src={user.user?.imageUrl}
-                  alt="User"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                <Link href="/profile">
+                  <img
+                    src={user.user?.imageUrl}
+                    alt="User"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                </Link>
+
                 <button onClick={handleLogout}>
                   <LogOut />
                 </button>

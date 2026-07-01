@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskType } from "@/lib/types";
 import React, { useState } from "react";
-import TaskDetailsCard from "../taskDetails/TaskDetailsCard";
+import TaskDetailsCard from "../tasks/taskDetails/TaskDetailsCard";
 
 interface SprintTaskCardProps {
   task: TaskType;
@@ -64,7 +64,7 @@ export default function SprintTaskCard({ task }: SprintTaskCardProps) {
           </h3>
           <p
             className="mt-1 text-sm text-neutral-400 line-clamp-2"
-            title={task.description}
+            title={task.description ?? "No description available"}
           >
             {task.description}
           </p>

@@ -4,7 +4,7 @@ export interface OrganizationType {
   id: string;
   name: string;
   ownerId: string;
-  createdAt: string;
+  createdAt: Date;
   slug: string;
 }
 
@@ -22,7 +22,7 @@ export interface UserType {
   email: string;
   name?: string | null;
   image?: string | null;
-  role: string;
+  role: string | null;
   // createdAt: string;
   ownedOrganizations?: OrganizationType[];
   membership?: MembershipType[] | null;
@@ -42,14 +42,15 @@ export interface ColumnType {
 export interface TaskType {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
   priority: "LOW" | "MEDIUM" | "HIGH";
-  createdAt: string;
+  createdAt: Date;
   sprintId: string;
-  projectId?: string;
-  assignedToId?: string;
+  projectId?: string | null;
+  assignedToId?: string | null;
   createdById: string;
+  dueDate: Date | null;
 }
 
 export interface SprintType {

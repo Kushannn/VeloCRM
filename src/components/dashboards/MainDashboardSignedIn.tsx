@@ -22,7 +22,7 @@ interface userType {
   id: string;
   image: string | null;
   name: string | null;
-  role: string;
+  role: string | null;
   membership: {
     id: string;
     role: MembershipRole;
@@ -71,7 +71,6 @@ type Props = {
 
 export default function MainDasboardSignedIn({
   firstName,
-  todayShort,
   user,
   activeTasks,
   totalLeads,
@@ -84,41 +83,55 @@ export default function MainDasboardSignedIn({
 
   return (
     <>
-      <div className="px-4 space-y-6 bg-[#09080f]">
-        <h1 className="text-3xl font-bold">Welcome back, {firstName}</h1>
+      <div className="px-4 space-y-6 pb-4 bg-[#09080f]">
+        <h1 className="text-2xl md:text-3xl font-bold">
+          Welcome back, {firstName}
+        </h1>
 
-        {/* Cards */}
-        <div className="flex gap-6">
-          <MetricCards
-            noOfProjects={noOfProjects}
-            activeTasks={activeTasks}
-            totalLeads={totalLeads}
-          />
+        {/* Metrics */}
+        <MetricCards
+          noOfProjects={noOfProjects}
+          activeTasks={activeTasks}
+          totalLeads={totalLeads}
+        />
+
+        {/* Row 1 */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="w-full lg:w-1/2">
+            <div className="lg:h-125">
+              <RecentActivityCard feed={feed} />
+            </div>
+          </div>
+
+          <div className="w-full lg:w-1/2">
+            <div className="lg:h-125">
+              <SprintDetailsCard sprintsDetails={sprintsDetails} />
+            </div>
+          </div>
         </div>
 
-        {/* card row 1  */}
-        <div className="flex gap-4 items-stretch">
-          <div className="w-1/2 flex flex-col">
-            <RecentActivityCard feed={feed} />
+        {/* Row 2 */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="w-full lg:w-1/2">
+            <div className="lg:h-125">
+              <TasksDueSoonCard dueTasks={dueTasks} />
+            </div>
           </div>
 
-          <div className="w-1/2 flex flex-col">
-            <SprintDetailsCard sprintsDetails={sprintsDetails} />
-          </div>
-        </div>
+          <div className="w-full lg:w-1/2">
+            <div className="lg:h-125">
+              <Card className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-5 w-full h-full flex flex-col">
+                <Card.Header className="w-full border-b border-[#4d3d7a] pb-3">
+                  <Card.Title className="text-[#7c6fa0] text-md font-semibold uppercase tracking-wide">
+                    Leads Pipeline
+                  </Card.Title>
+                </Card.Header>
 
-        {/* card row 2  */}
-        <div className="flex gap-4 items-stretch">
-          <div className="w-1/2 flex flex-col">
-            <TasksDueSoonCard dueTasks={dueTasks} />
-          </div>
-
-          <div className="w-1/2 flex flex-col">
-            <Card className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-5 w-full h-full">
-              <Card.Content>
-                <LeadPipelineChart pipeline={pipelineData} />
-              </Card.Content>
-            </Card>
+                <Card.Content className="flex-1 min-h-0">
+                  <LeadPipelineChart pipeline={pipelineData} />
+                </Card.Content>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

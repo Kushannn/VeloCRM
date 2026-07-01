@@ -14,11 +14,13 @@ model User {
   email     String
   name      String?
   image     String?
-  role      Role     @default(USER)
+  designation      Role     @default(USER)
   createdAt DateTime @default(now())
+  role     String?
 
   leadActivities LeadActivity[] @relation("LeadActivityUser")
   createdLeads Lead[] @relation("LeadCreatedBy")
+  activityLogs  ActivityLog[]
   assignedTasks       Task[]             @relation("AssignedTasks")
   createdTasks        Task[]             @relation("CreatedTasks")
   sprints             Sprint[]           @relation("UserSprints")
@@ -84,6 +86,7 @@ model Project {
   tasks          Task[]
   notes          Note[]
   projectUsers UserProject[]
+  activityLogs ActivityLog[]
 }
 
 enum projectStatus {
@@ -98,18 +101,18 @@ model Sprint {
   description    String?
   startDate      DateTime
   endDate        DateTime
-  createdById    String
-  organizationId String
-  projectId      String
+  projectId      String   @db.ObjectId  
+  createdById    String   @db.ObjectId  
+  organizationId String   @db.ObjectId  
   createdAt      DateTime @default(now())
-  slug      String  @unique
+  slug           String   @unique
 
-  // Relations
   createdBy    User         @relation("UserSprints", fields: [createdById], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
   project      Project?     @relation(fields: [projectId], references: [id])
   tasks        Task[]
   notes        Note[]
+  activityLogs ActivityLog[]
 }
 
 model Task {
@@ -118,10 +121,10 @@ model Task {
   description  String?
   status       TaskStatus   @default(PENDING)
   priority     TaskPriority @default(MEDIUM)
-  assignedToId String?
-  createdById  String
-  sprintId     String
-  projectId    String?
+  assignedToId String?      @db.ObjectId  
+  createdById  String       @db.ObjectId  
+  sprintId     String       @db.ObjectId  
+  projectId    String?      @db.ObjectId  
   createdAt    DateTime     @default(now())
   dueDate      DateTime?
 
@@ -129,6 +132,7 @@ model Task {
   createdBy    User     @relation("CreatedTasks", fields: [createdById], references: [id])
   sprint       Sprint   @relation(fields: [sprintId], references: [id])
   project      Project? @relation(fields: [projectId], references: [id])
+  activityLogs ActivityLog[]
 }
 
 
@@ -227,6 +231,7 @@ enum LeadActivityType {
   EMAIL
   MEETING
   FOLLOW_UP
+  STATUS_CHANGE
 }
 
 
@@ -239,4 +244,30 @@ model UserProject {
   project Project @relation(fields: [projectId], references: [id])
 
   @@unique([userId, projectId])
+}
+
+
+model ActivityLog {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  type      ActivityType
+  projectId String       @db.ObjectId
+  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taskId    String?      @db.ObjectId
+  task      Task?        @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  sprintId  String?      @db.ObjectId
+  sprint    Sprint?      @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+  userId    String?      @db.ObjectId
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  metadata  Json?
+  createdAt DateTime     @default(now())
+
+  @@index([projectId, createdAt(sort: Desc)])
+}
+
+enum ActivityType {
+  SPRINT_CREATED
+  TASK_CREATED
+  TASK_UPDATED
+  TASK_COMPLETED
+  TASK_STATUS_CHANGED
 }

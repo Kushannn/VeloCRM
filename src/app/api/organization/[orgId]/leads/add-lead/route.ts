@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getOrgMembershipById } from "@/lib/utils/authorizeUserOrgProject";
 
 export async function POST(req: Request) {
   try {
@@ -15,6 +16,14 @@ export async function POST(req: Request) {
     if (!body.organizationId || typeof body.organizationId !== "string") {
       return NextResponse.json(
         { success: false, error: "Organization ID is required" },
+        { status: 400 },
+      );
+    }
+    const access = await getOrgMembershipById(body.organizationId);
+
+    if (!access) {
+      return NextResponse.json(
+        { success: false, error: "No organization found for the id" },
         { status: 400 },
       );
     }

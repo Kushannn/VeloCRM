@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Raleway, Manrope, Geist } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkProvider } from "@clerk/nextjs";
 import Providers from "./providers";
 import LayoutWithSidebar from "@/components/layouts/LayoutWithSidebar";
 import UserLoader from "./UserLoader";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -30,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${manrope.variable} antialiased min-h-screen`}
         style={{ fontFamily: "var(--font-manrope), sans-serif" }}
+        suppressHydrationWarning
       >
         <ClerkProvider
           publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
@@ -39,18 +40,6 @@ export default function RootLayout({
             <LayoutWithSidebar>{children}</LayoutWithSidebar>
           </Providers>
         </ClerkProvider>
-        {/* <ClerkProvider>
-          <SignedIn>
-            <Providers>
-              <UserLoader />
-              <LayoutWithSidebar>{children}</LayoutWithSidebar>
-            </Providers>
-          </SignedIn>
-
-          <SignedOut>
-            <HomeSignedOut />
-          </SignedOut>
-        </ClerkProvider> */}
       </body>
     </html>
   );

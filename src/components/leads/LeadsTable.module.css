@@ -1,0 +1,17 @@
+.row:hover {
+  background-color: #1a1232 !important;
+}
+
+.row:hover td {
+  background-color: #1a1232 !important;
+}
+
+.table__row {
+  border-bottom-width: 0 !important;
+  border-bottom: none !important;
+}
+
+.table__cell {
+  border-bottom-width: 0 !important;
+  border-bottom: none !important;
+}

@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   if (!secret) throw new Error("Missing INVITE_SECRET");
 
   const token = jwt.sign({ orgId, email }, secret, { expiresIn: "3d" });
-  const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?token=${token}`;
+  const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/onboarding?token=${token}`;
 
   await sendEmail({
     to: email,

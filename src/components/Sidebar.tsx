@@ -67,11 +67,6 @@ function Sidebar({ onExpandChange }: sidebarProps) {
 
   async function handleSendInvite() {
     if (!email) {
-      // addToast({
-      //   title: "Email is required",
-      //   variant: "solid",
-      //   color: "danger",
-      // });
       toast.danger("Email is required");
       return;
     }
@@ -88,32 +83,13 @@ function Sidebar({ onExpandChange }: sidebarProps) {
       const data = await res.json();
       if (data.success) {
         setSendInviteLoading(false);
-        // addToast({
-        //   title: "User invited successfully",
-        //   variant: "solid",
-        //   color: "success",
-        // });
+
         toast.success("User invited successfully");
       }
     } catch {
-      // addToast({
-      //   title: "Could not invite user",
-      //   variant: "solid",
-      //   color: "danger",
-      // });
       toast.danger("Could not invite user");
     }
   }
-
-  // const handleMouseEnter = () => {
-  //   setIsExpanded(true);
-  //   onExpandChange?.(true);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   setIsExpanded(false);
-  //   onExpandChange?.(false);
-  // };
 
   const navItems = [
     {
@@ -281,52 +257,55 @@ function Sidebar({ onExpandChange }: sidebarProps) {
 
       {/* Invite Modal */}
       <Modal isOpen={inviteModal} onOpenChange={setInviteModal}>
-        <Modal.Backdrop className="bg-black/50 backdrop-blur-sm" />
+        <Modal.Backdrop variant="blur" className="bg-[#09080f]/60">
+          <Modal.Container className="max-w-2xl w-full">
+            <Modal.Dialog className="bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
+              {({ close }) => (
+                <>
+                  <Modal.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
 
-        <Modal.Container className="bg-[#111111] border border-[#222222] max-w-md">
-          <Modal.Dialog>
-            {({ close }) => (
-              <>
-                <Modal.Header className="border-b border-[#1f1f1f] text-white">
-                  <Modal.Heading>
-                    Invite People to the Organization
-                  </Modal.Heading>
-                </Modal.Header>
+                  <Modal.Header className="border-b border-[#2a2040] pb-4">
+                    <Modal.Heading className="text-[#e8e4f0] text-2xl font-semibold">
+                      Invite User
+                    </Modal.Heading>
+                  </Modal.Header>
 
-                <Modal.Body className="space-y-4">
-                  <p className="text-zinc-400 text-sm">
-                    Enter the email of the person you want to invite
-                  </p>
+                  <Modal.Body className="space-y-4 p-4">
+                    <p className="text-[#7c6fa0] text-sm w-full">
+                      Enter the email of the person you want to invite
+                    </p>
 
-                  <Input
-                    placeholder="Enter email..."
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-zinc-600"
-                  />
-                </Modal.Body>
+                    <Input
+                      placeholder="Enter email..."
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-[#0e0c17] border border-[#2a2040] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6]/40 transition-colors w-full"
+                    />
+                  </Modal.Body>
 
-                <Modal.Footer className="border-t border-[#1f1f1f]">
-                  <Button
-                    variant="ghost"
-                    onPress={close}
-                    className="text-zinc-400"
-                  >
-                    Cancel
-                  </Button>
+                  <Modal.Footer className="border-t border-[#2a2040] pt-6">
+                    <Button
+                      variant="ghost"
+                      onPress={close}
+                      className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
+                    >
+                      Cancel
+                    </Button>
 
-                  <Button
-                    variant="secondary"
-                    onPress={handleSendInvite}
-                    isPending={sendInviteLoading}
-                  >
-                    Send Invite
-                  </Button>
-                </Modal.Footer>
-              </>
-            )}
-          </Modal.Dialog>
-        </Modal.Container>
+                    <Button
+                      variant="secondary"
+                      onPress={handleSendInvite}
+                      isPending={sendInviteLoading}
+                      className="bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] transition-colors"
+                    >
+                      Send Invite
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
 
       <CreateOrganization

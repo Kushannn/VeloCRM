@@ -18,16 +18,26 @@ import { parseDate } from "@internationalized/date";
 
 interface CreateSprintProps {
   projectId: string;
-  onSprintCreated?: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
   userId: string;
 }
 
 export default function CreateSprint({
   projectId,
-  // onSprintCreated,
   userId,
+  onClose,
+  onSuccess,
+  isOpen,
 }: CreateSprintProps) {
-  const state = useOverlayState();
+  const state = useOverlayState({
+    isOpen,
+    onOpenChange: (open) => {
+      if (!open) onClose();
+    },
+  });
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dateValue, setDateValue] = useState<any>(undefined);
@@ -69,7 +79,7 @@ export default function CreateSprint({
         setTitle("");
         setDescription("");
         setDateValue(null);
-        // onSprintCreated?.();
+        onSuccess();
         close(); // ← close modal on success
       } else {
         addToast({
@@ -86,14 +96,6 @@ export default function CreateSprint({
 
   return (
     <Modal state={state}>
-      {/* First child = trigger */}
-      <Button
-        className="bg-linear-to-r from-[#893168] to-purple-700"
-        onPress={state.open}
-      >
-        Create Sprint
-      </Button>
-
       <Modal.Backdrop variant="blur" className="bg-[#292f46]/50">
         <Modal.Container className="max-w-2xl w-full">
           <Modal.Dialog className="bg-[#19172c] border border-[#292f46] text-[#a8b0d3]">

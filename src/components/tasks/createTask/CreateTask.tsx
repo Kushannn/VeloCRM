@@ -14,9 +14,11 @@ import {
   DatePicker,
   DateField,
   Calendar,
+  DateValue,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { ProjectType, SprintType } from "@/lib/types";
+import { getLocalTimeZone } from "@internationalized/date";
 
 interface CreateTaskProps {
   isOpen: boolean;
@@ -81,7 +83,12 @@ export default function CreateTask({
   const [priority, setPriority] = useState("LOW");
   const [loading, setLoading] = useState(false);
   const [assignedTo, setAssignedTo] = useState("");
-  const [dueDate, setDueDate] = useState();
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+
+  const handleDateChange = (val: DateValue | null) => {
+    if (!val) return;
+    setDueDate(val.toDate(getLocalTimeZone()));
+  };
 
   const handleSubmit = async (close: () => void) => {
     if (!title.trim()) {
@@ -91,21 +98,20 @@ export default function CreateTask({
 
     setLoading(true);
     try {
-      const res = await fetch(
-        `/api/project/${project.id}/sprint/${sprint.id}/create-task`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title,
-            description,
-            status,
-            priority,
-            assignedTo,
-            dueDate,
-          }),
-        },
-      );
+      const res = await fetch(`/api/task/create-task`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description,
+          status,
+          priority,
+          assignedTo,
+          dueDate: dueDate?.toISOString(),
+          projectId: project.id,
+          sprintId: sprint.id,
+        }),
+      });
 
       const data = await res.json();
 
@@ -273,7 +279,11 @@ export default function CreateTask({
                   </div>
 
                   <div>
-                    <DatePicker className="w-64" name="date">
+                    <DatePicker
+                      className="w-64"
+                      name="date"
+                      onChange={handleDateChange}
+                    >
                       <Label>Due Date</Label>
                       <DateField.Group fullWidth>
                         <DateField.Input>

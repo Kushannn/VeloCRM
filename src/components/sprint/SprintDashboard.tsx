@@ -1,29 +1,64 @@
 "use client";
 
-import { Button, Chip, Modal, useOverlayState } from "@heroui/react";
+import { Button, Modal, toast, useOverlayState } from "@heroui/react";
 
-import { useState } from "react";
-import { Calendar, Circle, Clock, Dot } from "lucide-react";
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import { useEffect, useRef, useState } from "react";
+import { Calendar, Clock } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  DragOverlay,
+  useSensors,
+  useSensor,
+  PointerSensor,
+} from "@dnd-kit/core";
 
-import CreateTask from "@/components/createTask/CreateTask";
+import CreateTask from "@/components/tasks/createTask/CreateTask";
 import TaskColumns from "@/components/tasks/taskColumns";
-import { ColumnType } from "@/lib/types";
+import { ColumnType, TaskType, UserType } from "@/lib/types";
 import { useParams } from "next/navigation";
-import MagicBento from "../ui/MagicBento";
+import TaskCard from "../tasks/taskCard";
+import TaskDrawer from "../tasks/TaskDrawer";
+import { createPortal } from "react-dom";
+import { debounce } from "lodash";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 
-export default function SprintDashboard({ sprint, project }: any) {
+export default function SprintDashboard({
+  sprint,
+  project,
+  dbUser,
+}: {
+  sprint: any;
+  project: any;
+  dbUser: UserType | null;
+}) {
   const [localSprint, setLocalSprint] = useState(sprint);
   const [openTaskModal, setOpenTaskModal] = useState(false);
-  const [openDescModal, setOpenDescModal] = useState(false);
+  // const [openDescModal, setOpenDescModal] = useState(false);
+
+  //This determines which task has been selected to show the details
+  const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
+
+  //This determines which task has been selected to drag
+  const [activeTask, setActiveTask] = useState<TaskType | null>(null);
+
   const params = useParams<{
     orgId: string;
     projectId: string;
     sprintId: string;
   }>();
   const descState = useOverlayState();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+
   const calculateDaysRemaining = (startDate: string, endDate: string) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -43,6 +78,30 @@ export default function SprintDashboard({ sprint, project }: any) {
 
     return Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   };
+
+  const debouncedUpdate = useRef(
+    debounce(async (taskId: string, status: string) => {
+      try {
+        const res = await fetch(`/api/task/${taskId}/update-task-status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status,
+            userId: dbUser?.id,
+            projectId: project?.id,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Task status updated!");
+        } else {
+          throw new Error("Update failed");
+        }
+      } catch (err) {
+        toast.danger("Failed to update task status");
+      }
+    }, 1000),
+  ).current;
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -64,23 +123,7 @@ export default function SprintDashboard({ sprint, project }: any) {
       ),
     }));
 
-    try {
-      await fetch(
-        `/api/project/${params.projectId}/sprint/${params.sprintId}/task/${taskId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            taskId,
-            status: newStatus,
-          }),
-        },
-      );
-    } catch (error) {
-      console.log("Update failed");
-    }
+    debouncedUpdate(taskId, newStatus);
   };
 
   const columns: ColumnType[] = [
@@ -122,49 +165,129 @@ export default function SprintDashboard({ sprint, project }: any) {
   const progress = getProgress(localSprint.startDate, localSprint.endDate);
   const isActive = progress > 0 && progress < 100;
 
+  const handleTaskDetailsUpdate = async (task: TaskType) => {
+    try {
+      // Basic safety checks
+      if (!task) {
+        console.log("Task data missing");
+        return;
+      }
+
+      if (!task.id) {
+        console.log("Task ID missing");
+        return;
+      }
+
+      // Prevent empty updates
+      const hasValidData =
+        task.title ||
+        task.description ||
+        task.status ||
+        task.priority ||
+        task.dueDate ||
+        task.assignedToId;
+
+      if (!hasValidData) {
+        console.log("No valid fields to update");
+        return;
+      }
+
+      // Optional sanitization
+      const payload = {
+        title: task.title?.trim(),
+        description: task.description?.trim(),
+        status: task.status,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        assignedToId: task.assignedToId,
+        userId: dbUser?.id,
+        projectId: project?.id,
+      };
+
+      const response = await fetch(`/api/task/${task.id}/update-task-details`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log(data.error || "Update failed");
+        return;
+      }
+
+      setLocalSprint((prev: any) => ({
+        ...prev,
+        tasks: prev.tasks.map((t: TaskType) =>
+          t.id === task.id
+            ? {
+                ...t,
+                ...payload,
+              }
+            : t,
+        ),
+      }));
+
+      setSelectedTask(null);
+    } catch (error) {
+      console.log("Update failed", error);
+    }
+  };
+
   return (
     <>
-      <div className="px-4 pb-10 min-h-screen space-y-6">
+      <div className="h-full space-y-6 flex flex-col">
         {/* Header */}
-        <div className="bg-[#0f0f0f] border border-gray-800 rounded-xl p-4 flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-55">
-            {isActive && (
-              <p className="flex gap-3 items-center text-sm mb-2">
-                Active Sprint
-                <span className="w-2 h-2 bg-green-700 animate-pulse rounded-xl"></span>
-              </p>
-            )}
-            <h1 className="text-3xl font-medium text-white">
-              {localSprint.title}
-            </h1>
+        {/* ---- HEADER ---- */}
+        <div className="bg-[#110f1a] border border-[#2a2040] hover:border-[#3d2d6b] rounded-xl p-3 sm:p-4 flex flex-col gap-3">
+          {/* Row 1: title + button */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              {isActive && (
+                <p className="flex gap-2 text-[#7c6fa0] items-center text-xs mb-1">
+                  Active Sprint
+                  <span className="w-2 h-2 bg-green-700 animate-pulse rounded-xl" />
+                </p>
+              )}
+              <h1 className="text-xl sm:text-2xl font-medium text-[#e8e4f0] truncate">
+                {localSprint.title}
+              </h1>
+              {localSprint.description && (
+                <p
+                  onClick={() => descState.open()}
+                  className="text-xs text-[#b8aed4] line-clamp-1 mt-1 cursor-pointer"
+                >
+                  {localSprint.description}
+                </p>
+              )}
+            </div>
 
-            {localSprint.description && (
-              <p
-                onClick={() => descState.open()}
-                className="text-sm text-gray-400 line-clamp-2 mt-2"
-              >
-                {localSprint.description}
-              </p>
-            )}
+            <Button
+              onClick={() => setOpenTaskModal(true)}
+              className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6c3fc4] border border-[#2a2040] text-[#ede8fb] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] hover:text-white active:bg-[#4c2d9e] transition-all text-sm font-medium hover:scale-105 duration-300"
+            >
+              <span className="text-base leading-none">+</span>
+              New Task
+            </Button>
           </div>
 
-          <div className="items-center rounded-xl border border-zinc-800 flex gap-10 p-3 bg-[#16161c]">
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <Calendar className="w-4 h-4" />
+          {/* Row 2: date strip */}
+          <div className="flex items-center rounded-lg border border-zinc-800 bg-[#1a1232] px-3 py-2 gap-2 sm:gap-4 w-full sm:w-fit">
+            <div className="flex items-center gap-1.5 text-xs text-gray-300">
+              <Calendar className="w-3.5 h-3.5 shrink-0" />
               {new Date(localSprint.startDate).toLocaleDateString()}
             </div>
-
-            <div className="h-5 w-px bg-zinc-500"></div>
-
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <Calendar className="w-4 h-4" />
+            <div className="h-4 w-px bg-zinc-600" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-300">
+              <Calendar className="w-3.5 h-3.5 shrink-0" />
               {new Date(localSprint.endDate).toLocaleDateString()}
             </div>
-
-            <div className="h-5 w-px bg-zinc-500"></div>
-
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <Clock className="w-4 h-4" />
+            <div className="h-4 w-px bg-zinc-600" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-300">
+              <Clock className="w-3.5 h-3.5 shrink-0" />
               {calculateDaysRemaining(
                 localSprint.startDate,
                 localSprint.endDate,
@@ -172,39 +295,45 @@ export default function SprintDashboard({ sprint, project }: any) {
               days
             </div>
           </div>
-
-          <Button
-            onClick={() => setOpenTaskModal(true)}
-            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600/10 border border-violet-500/20 text-violet-400 hover:bg-violet-600/20 hover:border-violet-500/40 hover:text-violet-300 transition-all duration-200 text-sm font-medium 
-    shadow-[0_10px_25px_rgba(196,167,255,0.25)]"
-          >
-            <span className="text-lg leading-none">+</span>
-            New Task
-          </Button>
         </div>
 
-        {/* Board */}
+        {/* ---- BOARD ---- */}
         <DndContext
           collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+          onDragStart={({ active }) => {
+            const task =
+              columns
+                .flatMap((col) => col.tasks)
+                .find((t) => t.id === active.id) ?? null;
+            setActiveTask(task);
+          }}
+          onDragEnd={(e) => {
+            setActiveTask(null);
+            handleDragEnd(e);
+          }}
+          onDragCancel={() => setActiveTask(null)}
+          sensors={sensors}
         >
-          {/* No outer grid div needed */}
-          <MagicBento
-            cards={columns.map((col) => (
-              <TaskColumns key={col.key} col={col} />
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 overflow-hidden">
+            {columns.map((col) => (
+              <TaskColumns
+                key={col.key}
+                col={col}
+                onTaskClick={(task: TaskType) => setSelectedTask(task)}
+              />
             ))}
-            columns={3}
-            enableStars
-            enableSpotlight
-            enableBorderGlow={true}
-            enableTilt={false}
-            enableMagnetism={false}
-            clickEffect
-            spotlightRadius={400}
-            particleCount={12}
-            glowColor="132, 0, 255"
-            disableAnimations={false}
-          />
+          </div>
+
+          <DragOverlay
+            dropAnimation={{
+              duration: 180,
+              easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+            }}
+          >
+            {activeTask ? (
+              <TaskCard task={activeTask} onClick={() => {}} isOverlay />
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </div>
 
@@ -217,25 +346,6 @@ export default function SprintDashboard({ sprint, project }: any) {
         project={project}
         onTaskCreated={() => location.reload()}
       />
-
-      {/* Description Modal */}
-      {/* <Modal
-        isOpen={openDescModal}
-        onOpenChange={setOpenDescModal}
-        size="2xl"
-        classNames={{
-          base: "bg-[#2a2a2a]",
-          header: "text-white border-b border-gray-700",
-          body: "text-gray-300",
-        }}
-      >
-        <ModalContent>
-          <ModalHeader>Sprint Description</ModalHeader>
-          <ModalBody>
-            <p className="whitespace-pre-line">{localSprint.description}</p>
-          </ModalBody>
-        </ModalContent>
-      </Modal> */}
 
       {/* Description Modal */}
       <Modal state={descState}>
@@ -275,6 +385,16 @@ export default function SprintDashboard({ sprint, project }: any) {
           </Modal.Container>
         </Modal.Backdrop>
       </Modal>
+
+      {typeof window !== "undefined" &&
+        createPortal(
+          <TaskDrawer
+            task={selectedTask}
+            onClose={() => setSelectedTask(null)}
+            onUpdate={(task) => handleTaskDetailsUpdate(task)}
+          />,
+          document.body,
+        )}
     </>
   );
 }

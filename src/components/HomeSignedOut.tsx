@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import baseImage from "../../public/baseImage1.jpg";
-// import taskImage from "../../public/task.webp";
 import trackerImage from "../../public/tracking.jpg";
 import temp1 from "../../public/temp1.jpg";
 import temp2 from "../../public/temp2.jpg";
 import dashboardView from "../../public/dashboardview.jpg";
-import LightPillar from "./LightPillar";
+import LightPillar from "./ui/LightPillar";
 import TestimonialCard from "./testimonials/TestimonialCards";
 
 import {
@@ -119,17 +118,18 @@ function HomeSignedOut() {
           <div className="space-y-6">
             {/* Badge */}
 
-            <ScrollFloat
-              animationDuration={1}
-              ease="back.inOut(2)"
-              scrollStart="center bottom+=50%"
-              scrollEnd="bottom bottom-=40%"
-              stagger={0.03}
-            >
-              <div className="inline-flex items-center rounded-full border border-violet-500/30 px-4 py-2 text-sm text-violet-300 backdrop-blur-sm">
+            <div className="inline-flex items-center rounded-full border border-violet-500/30 px-4 py-2 text-sm text-violet-300 backdrop-blur-sm">
+              <ScrollFloat
+                animationDuration={1}
+                ease="back.inOut(2)"
+                scrollStart="center bottom+=50%"
+                scrollEnd="bottom bottom-=40%"
+                stagger={0.03}
+                textClassName=""
+              >
                 Built for modern teams & growing businesses
-              </div>
-            </ScrollFloat>
+              </ScrollFloat>
+            </div>
 
             <h1 className="text-6xl md:text-7xl font-bold leading-tight tracking-tight">
               Manage Projects,

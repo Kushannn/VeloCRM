@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { NextRequest } from "next/server";
+import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   const { projectId } = await params;
 
@@ -12,8 +13,14 @@ export async function GET(
     if (!projectId) {
       return NextResponse.json(
         { error: "Project ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
+    }
+
+    const access = await getProjectAccessById(projectId);
+
+    if (!access) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const project = await prisma.project.findUnique({
@@ -41,7 +48,7 @@ export async function GET(
     console.error("[GET_PROJECT_ERROR]", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
