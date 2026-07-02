@@ -20,7 +20,7 @@ export async function sendEmail({
   html: string;
 }) {
   const info = await transporter.sendMail({
-    from: `"Your App" <${process.env.EMAIL_USER}>`,
+    from: `"VeloCRM" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,

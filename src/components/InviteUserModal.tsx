@@ -6,6 +6,7 @@ import { Modal, Button } from "@heroui/react";
 
 export function InviteModal() {
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -20,6 +21,7 @@ export function InviteModal() {
 
   const handleAcceptInvite = async () => {
     if (!inviteToken) return;
+    setLoading(true);
 
     const res = await fetch("/api/invites/verify-invite", {
       method: "POST",
@@ -35,10 +37,12 @@ export function InviteModal() {
     } else {
       alert(result.error || "Failed to join.");
     }
+
+    setLoading(false);
   };
 
   return (
-    <Modal>
+    <Modal isOpen={showModal} onOpenChange={setShowModal}>
       <Modal.Backdrop variant="blur" className="bg-[#09080f]/60">
         <Modal.Container className="w-full max-w-2xl">
           <Modal.Dialog className="bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
@@ -50,7 +54,7 @@ export function InviteModal() {
             </Modal.Header>
             <Modal.Body className="space-y-4 p-4">
               <p className="text-[#7c6fa0] text-sm w-full">
-                Enter the email of the person you want to invite
+                Do you want to accept the invite?
               </p>
             </Modal.Body>
 
@@ -58,6 +62,7 @@ export function InviteModal() {
               <Button
                 variant="ghost"
                 onPress={() => setShowModal(false)}
+                isDisabled={loading}
                 className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
               >
                 Cancel
@@ -66,9 +71,10 @@ export function InviteModal() {
               <Button
                 variant="secondary"
                 onPress={handleAcceptInvite}
+                isDisabled={loading}
                 className="bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] transition-colors"
               >
-                Send Invite
+                {loading ? "Sending" : "Send Invite"}
               </Button>
             </Modal.Footer>
           </Modal.Dialog>
