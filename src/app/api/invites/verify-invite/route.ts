@@ -10,15 +10,40 @@ export async function POST(req: NextRequest) {
   if (!userId) {
     return NextResponse.json(
       { success: false, error: "Unauthorized" },
-      { status: 401 }
+      { status: 401 },
+    );
+  }
+
+  let decoded: { orgId: string; email: string };
+
+  try {
+    decoded = jwt.verify(token, process.env.INVITE_SECRET!) as {
+      orgId: string;
+      email: string;
+    };
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return NextResponse.json(
+        { success: false, error: "Invite link has expired" },
+        { status: 410 },
+      );
+    }
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json(
+        { success: false, error: "Invalid invite token" },
+        { status: 400 },
+      );
+    }
+
+    console.error("Error verifying token:", error);
+    return NextResponse.json(
+      { success: false, error: "Could not verify token" },
+      { status: 400 },
     );
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.INVITE_SECRET!) as {
-      orgId: string;
-      email: string;
-    };
     const { orgId, email } = decoded;
 
     const client = await clerkClient();
@@ -27,7 +52,7 @@ export async function POST(req: NextRequest) {
     if (!user || user.emailAddresses[0].emailAddress !== email) {
       return NextResponse.json(
         { success: false, error: "Email mismatch" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -41,7 +66,7 @@ export async function POST(req: NextRequest) {
     if (existingMembership) {
       return NextResponse.json(
         { success: false, error: "User is already in the organization" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -58,10 +83,10 @@ export async function POST(req: NextRequest) {
       message: "Successfully joined the organization",
     });
   } catch (error) {
-    console.error("Error verifying token or adding user:", error);
+    console.error("Error adding user to organization:", error);
     return NextResponse.json(
-      { success: false, error: "Invalid or expired token" },
-      { status: 400 }
+      { success: false, error: "Something went wrong" },
+      { status: 500 },
     );
   }
 }
