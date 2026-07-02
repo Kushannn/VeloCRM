@@ -74,7 +74,7 @@ export function InviteModal() {
                 isDisabled={loading}
                 className="bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] transition-colors"
               >
-                {loading ? "Sending" : "Send Invite"}
+                {loading ? "Accepting" : "Accept Invite"}
               </Button>
             </Modal.Footer>
           </Modal.Dialog>

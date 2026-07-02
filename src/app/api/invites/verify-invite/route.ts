@@ -49,6 +49,19 @@ export async function POST(req: NextRequest) {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
 
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        clerkId: user.id,
+      },
+    });
+
+    if (!dbUser) {
+      return NextResponse.json(
+        { success: false, error: "User is not signed up with VeloCRM" },
+        { status: 403 },
+      );
+    }
+
     if (!user || user.emailAddresses[0].emailAddress !== email) {
       return NextResponse.json(
         { success: false, error: "Email mismatch" },
@@ -72,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.userOrganization.create({
       data: {
-        userId,
+        userId: dbUser!.id,
         organizationId: orgId,
         role: "MEMBER",
       },

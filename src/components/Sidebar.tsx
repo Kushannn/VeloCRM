@@ -287,6 +287,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
                     <Button
                       variant="ghost"
                       onPress={close}
+                      isPending={sendInviteLoading}
                       className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
                     >
                       Cancel
@@ -298,7 +299,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
                       isPending={sendInviteLoading}
                       className="bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] transition-colors"
                     >
-                      Send Invite
+                      {sendInviteLoading ? "Sending" : "Send Invite"}
                     </Button>
                   </Modal.Footer>
                 </>
