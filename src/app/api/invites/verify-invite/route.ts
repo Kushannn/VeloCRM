@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     const existingMembership = await prisma.userOrganization.findFirst({
       where: {
-        userId,
+        userId: dbUser.id,
         organizationId: orgId,
       },
     });
