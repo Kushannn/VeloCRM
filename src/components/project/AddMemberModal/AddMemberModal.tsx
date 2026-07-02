@@ -76,26 +76,21 @@ export default function AddMemberModal({
 
   return (
     <Modal state={state}>
-      <Modal.Backdrop
-        variant="blur"
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-      >
+      <Modal.Backdrop variant="blur" className="bg-[#09080f]/60">
         <Modal.Container className="max-w-2xl w-full ">
-          <Modal.Dialog className="bg-[#19172c] border border-[#292f46] text-[#a8b0d3] rounded-xl shadow-2xl">
+          <Modal.Dialog className="bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
             {({ close }) => (
               <>
-                <Modal.Header className="border-b border-[#292f46] px-6 py-4">
-                  <div className="flex items-center justify-between w-full">
-                    <Modal.Heading className="text-2xl font-semibold">
-                      Select a Member
-                    </Modal.Heading>
-                    <Modal.CloseTrigger className="hover:bg-white/5 active:bg-white/10 rounded-lg p-1" />
-                  </div>
+                <Modal.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
+                <Modal.Header className="border-b border-[#2a2040] pb-4">
+                  <Modal.Heading className="text-[#e8e4f0] text-2xl font-semibold">
+                    Select a Member
+                  </Modal.Heading>
                 </Modal.Header>
 
                 <Modal.Body className="px-6 *:py-6 space-y-3 max-h-100 overflow-y-auto">
                   {organizationMembers.length === 0 ? (
-                    <p className="text-center text-sm text-gray-400">
+                    <p className="text-center text-sm text-[#7c6fa0]">
                       No members found.
                     </p>
                   ) : (
@@ -108,8 +103,8 @@ export default function AddMemberModal({
                           key={member.id}
                           className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
                             isSelected
-                              ? "bg-violet-500/10 border-violet-500/30"
-                              : "bg-[#262626] border-gray-700 hover:border-gray-600"
+                              ? "bg-[#2d1d5e] border-[#6c3fc4]"
+                              : "bg-[#1a1232] border-[#3d2d6b] hover:border-[#4c2d9e]"
                           } h-16 my-4`}
                         >
                           <div className="flex items-center gap-3">
@@ -120,18 +115,18 @@ export default function AddMemberModal({
                                 className="w-10 h-10 rounded-full object-cover"
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-full bg-violet-900/40 border border-violet-700/30 flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-full bg-[#2d1d5e] border border-[#3d2d6b] flex items-center justify-center">
                                 <CircleUser
                                   size={20}
-                                  className="text-violet-300"
+                                  className="text-[#c4a8f5]"
                                 />
                               </div>
                             )}
                             <div>
-                              <p className="font-semibold text-white">
+                              <p className="font-semibold text-[#e8e4f0]">
                                 {member.user.name ?? "Unknown"}
                               </p>
-                              <p className="text-sm text-gray-400">
+                              <p className="text-sm text-[#7c6fa0]">
                                 {member.user.email}
                               </p>
                             </div>
@@ -139,9 +134,13 @@ export default function AddMemberModal({
 
                           <Button
                             variant={isSelected ? "primary" : "secondary"}
-                            // color="primary"
                             size="sm"
                             onPress={() => handleSelect(member.user.id)}
+                            className={
+                              isSelected
+                                ? "bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb]"
+                                : "bg-[#1a1232] border border-[#3d2d6b] hover:border-[#4c2d9e] text-[#b8aed4] hover:text-[#e8e4f0]"
+                            }
                           >
                             {isSelected ? "Selected" : "Select"}
                           </Button>
@@ -155,7 +154,7 @@ export default function AddMemberModal({
                   <Button
                     variant="ghost"
                     onPress={close}
-                    className="text-white"
+                    className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
                   >
                     Cancel
                   </Button>
@@ -163,6 +162,7 @@ export default function AddMemberModal({
                     variant="primary"
                     onPress={() => handleSubmit(close)}
                     isDisabled={selectedUserIds.length === 0}
+                    className="bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] transition-colors"
                   >
                     Confirm ({selectedUserIds.length})
                   </Button>

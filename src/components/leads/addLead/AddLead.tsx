@@ -157,33 +157,30 @@ AddLeadProps) {
     <Modal state={state}>
       <Modal.Backdrop
         variant="blur"
-        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-10"
+        className="fixed inset-0 z-50 bg-[#09080f]/60 backdrop-blur-sm flex items-center justify-center p-4"
       >
-        <Modal.Container className="max-w-6xl w-full ">
-          <Modal.Dialog className="bg-[#19172c] border border-[#292f46] text-[#a8b0d3] rounded-xl w-full max-w-3xl">
+        <Modal.Container className="max-w-3xl w-full">
+          <Modal.Dialog className="bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40 max-w-3xl w-full">
             {({ close }) => (
               <>
-                <Modal.Header className="border-b border-[#292f46] flex items-center">
-                  <div className="flex items-center justify-between w-full">
-                    <Modal.Heading className="text-2xl font-semibold text-white">
-                      {editingLead ? "Edit Lead" : "Add Lead"}
-                    </Modal.Heading>
-                    <Modal.CloseTrigger className="hover:bg-white/5 bg-mist-900 rounded-xl" />
-                  </div>
+                <Modal.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
+                <Modal.Header className="border-b border-[#2a2040] p-2">
+                  <Modal.Heading className="text-2xl font-semibold text-[#e8e4f0]">
+                    Add Leads
+                  </Modal.Heading>
                 </Modal.Header>
 
                 <Modal.Body className="py-6 px-4 space-y-4">
-                  {/* Row 1 - Name + Email */}
                   <div className="flex gap-4">
-                    <TextField name="name" className="flex-1">
-                      <Label className="text-gray-300 text-sm">Name *</Label>
+                    <TextField name="name" className="flex-1" isRequired>
+                      <Label className="text-gray-300 text-sm">Name</Label>
                       <Input
                         placeholder="Enter lead name"
                         value={formData.name}
                         onChange={(e) => handleChange("name", e.target.value)}
-                        className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2"
+                        className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                       />
-                      <FieldError />
+                      <FieldError className="text-[#f87171] text-xs" />
                     </TextField>
 
                     <TextField name="email" className="flex-1">
@@ -192,13 +189,12 @@ AddLeadProps) {
                         placeholder="Enter lead email"
                         value={formData.email}
                         onChange={(e) => handleChange("email", e.target.value)}
-                        className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2"
+                        className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                       />
-                      <FieldError />
+                      <FieldError className="text-[#f87171] text-xs" />
                     </TextField>
                   </div>
 
-                  {/* Row 2 - Phone + Company */}
                   <div className="flex gap-4">
                     <TextField name="phone" className="flex-1">
                       <Label className="text-gray-300 text-sm">Phone</Label>
@@ -206,7 +202,7 @@ AddLeadProps) {
                         placeholder="Enter lead phone"
                         value={formData.phone}
                         onChange={(e) => handleChange("phone", e.target.value)}
-                        className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2"
+                        className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                       />
                       <FieldError />
                     </TextField>
@@ -219,13 +215,12 @@ AddLeadProps) {
                         onChange={(e) =>
                           handleChange("company", e.target.value)
                         }
-                        className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2"
+                        className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                       />
                       <FieldError />
                     </TextField>
                   </div>
 
-                  {/* Row 3 - Source + Expected Close */}
                   <div className="flex gap-4">
                     <div className="flex-1 flex flex-col gap-1">
                       <label className="text-gray-300 text-sm">Source</label>
@@ -234,12 +229,12 @@ AddLeadProps) {
                         value={formData.source}
                         onChange={(val) => handleChange("source", String(val))}
                       >
-                        <Select.Trigger className="bg-[#262626] border border-gray-700 rounded-lg px-3 py-2 text-white w-full flex items-center justify-between">
-                          <Select.Value className="text-white text-sm" />
-                          <Select.Indicator className="text-gray-400" />
+                        <Select.Trigger className="w-full h-10 bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg px-3 text-[#e8e4f0] flex items-center justify-between cursor-pointer transition-colors">
+                          <Select.Value className="[&_.label]:text-[#7c6fa0] text-[#7c6fa0]" />
+                          <Select.Indicator className="text-[#7c6fa0]" />
                         </Select.Trigger>
-                        <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-100">
-                          <ListBox className="outline-none space-y-1">
+                        <Select.Popover className="bg-[#110f1a] border border-[#2a2040] rounded-xl shadow-xl shadow-black/40">
+                          <ListBox className="outline-none text-[#e8e4f0] p-1 space-y-1">
                             {[
                               { id: "WEBSITE", label: "Website" },
                               { id: "REFERRAL", label: "Referral" },
@@ -253,7 +248,7 @@ AddLeadProps) {
                                 key={s.id}
                                 id={s.id}
                                 textValue={s.label}
-                                className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                                className="px-3 text-[#e8e4f0] hover:bg-[#2a2040] rounded-lg cursor-pointer"
                               >
                                 {s.label}
                               </ListBox.Item>
@@ -271,13 +266,13 @@ AddLeadProps) {
                         value={formData.status}
                         onChange={(val) => handleChange("status", String(val))}
                       >
-                        <Select.Trigger className="bg-[#262626] border border-gray-700 rounded-lg px-3 py-2 text-white w-full flex items-center justify-between">
-                          <Select.Value className="text-white text-sm" />
-                          <Select.Indicator className="text-gray-400" />
+                        <Select.Trigger className="w-full h-10 bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg px-3 text-[#e8e4f0] flex items-center justify-between cursor-pointer transition-colors">
+                          <Select.Value className="[&_.label]:text-[#7c6fa0] text-[#7c6fa0]" />
+                          <Select.Indicator className="text-[#7c6fa0]" />
                         </Select.Trigger>
 
-                        <Select.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-1 z-100">
-                          <ListBox className="outline-none space-y-1">
+                        <Select.Popover className="bg-[#110f1a] border border-[#2a2040] rounded-xl shadow-xl shadow-black/40">
+                          <ListBox className="outline-none text-[#e8e4f0] p-1 space-y-1">
                             {[
                               { id: "NEW", label: "New" },
                               { id: "CONTACTED", label: "Contacted" },
@@ -291,7 +286,7 @@ AddLeadProps) {
                                 key={s.id}
                                 id={s.id}
                                 textValue={s.label}
-                                className="px-3 py-2 text-white hover:bg-[#2a2a2a] rounded-lg cursor-pointer"
+                                className="px-3 text-[#e8e4f0] hover:bg-[#2a2040] rounded-lg cursor-pointer"
                               >
                                 {s.label}
                               </ListBox.Item>
@@ -316,46 +311,44 @@ AddLeadProps) {
                       >
                         <DateField.Group
                           fullWidth
-                          className="bg-[#262626] border border-gray-700 rounded-lg px-3 py-2 text-white w-full"
+                          className="bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg transition-colors"
                         >
                           <DateField.Input>
                             {(segment) => (
                               <DateField.Segment
                                 segment={segment}
-                                className="text-white focus:bg-violet-500/20 rounded px-0.5"
+                                className="text-[#7c6fa0] focus:bg-[#6c3fc4]/20 rounded px-0.5"
                               />
                             )}
                           </DateField.Input>
                           <DateField.Suffix>
-                            <DatePicker.Trigger className="text-gray-400 hover:text-white">
-                              <DatePicker.TriggerIndicator />
+                            <DatePicker.Trigger className="text-[#7c6fa0] hover:text-[#8b5cf6] px-2">
+                              <DatePicker.TriggerIndicator className="text-[#7c6fa0]" />
                             </DatePicker.Trigger>
                           </DateField.Suffix>
                         </DateField.Group>
 
-                        <DatePicker.Popover className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-xl p-2 z-100">
+                        <DatePicker.Popover className="bg-[#110f1a] border border-[#2a2040] rounded-xl shadow-xl shadow-black/40 p-3">
                           <Calendar>
-                            <Calendar.Header className="flex items-center justify-between px-2 py-1">
-                              <Calendar.YearPickerTrigger className="flex items-center gap-1 text-white text-sm font-medium">
-                                <Calendar.YearPickerTriggerHeading />
-                                <Calendar.YearPickerTriggerIndicator />
+                            <Calendar.Header className="flex items-center justify-between mb-2">
+                              <Calendar.YearPickerTrigger>
+                                <Calendar.YearPickerTriggerHeading className="text-[#e8e4f0] font-medium" />
+                                <Calendar.YearPickerTriggerIndicator className="text-[#7c6fa0]" />
                               </Calendar.YearPickerTrigger>
-                              <div className="flex gap-1">
-                                <Calendar.NavButton
-                                  slot="previous"
-                                  className="text-gray-400 hover:text-white p-1 rounded"
-                                />
-                                <Calendar.NavButton
-                                  slot="next"
-                                  className="text-gray-400 hover:text-white p-1 rounded"
-                                />
-                              </div>
+                              <Calendar.NavButton
+                                slot="previous"
+                                className="text-[#7c6fa0] hover:text-[#3d2d6b] p-1 rounded"
+                              />
+                              <Calendar.NavButton
+                                slot="next"
+                                className="text-[#7c6fa0] hover:text-[#3d2d6b] p-1 rounded"
+                              />
                             </Calendar.Header>
 
                             <Calendar.Grid className="w-full">
                               <Calendar.GridHeader>
                                 {(day) => (
-                                  <Calendar.HeaderCell className="text-zinc-500 text-xs font-medium text-center py-1">
+                                  <Calendar.HeaderCell className="text-[#4d3d7a] text-xs font-medium">
                                     {day}
                                   </Calendar.HeaderCell>
                                 )}
@@ -364,7 +357,7 @@ AddLeadProps) {
                                 {(date) => (
                                   <Calendar.Cell
                                     date={date}
-                                    className="text-sm text-zinc-300 hover:bg-violet-500/20 data-selected:bg-violet-600 data-selected:text-white rounded-lg text-center py-1 cursor-pointer"
+                                    className="text-[#e8e4f0] text-sm rounded hover:bg-[#6c3fc4]/20 data-selected:bg-[#6c3fc4]"
                                   />
                                 )}
                               </Calendar.GridBody>
@@ -375,7 +368,7 @@ AddLeadProps) {
                                 {({ year }) => (
                                   <Calendar.YearPickerCell
                                     year={year}
-                                    className="text-sm text-zinc-300 hover:bg-violet-500/20 data-selected:bg-violet-600 data-selected:text-white rounded-lg text-center py-1 cursor-pointer"
+                                    className="text-[#e8e4f0] hover:bg-[#2a2040] data-selected:bg-[#6c3fc4]"
                                   />
                                 )}
                               </Calendar.YearPickerGridBody>
@@ -386,15 +379,14 @@ AddLeadProps) {
                     </div>
                   </div>
 
-                  {/* Notes */}
                   <TextField name="notes" className="w-full">
-                    <Label className="text-gray-300 text-sm">Notes</Label>
+                    <Label className="text-[#b8aed4] text-sm">Notes</Label>
                     <textarea
                       placeholder="Optional notes"
                       value={formData.notes}
                       onChange={(e) => handleChange("notes", e.target.value)}
                       rows={3}
-                      className="bg-[#262626] border border-gray-700 rounded-lg text-white placeholder-gray-400 w-full px-3 py-2 resize-none"
+                      className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                     />
                     <FieldError />
                   </TextField>
@@ -404,6 +396,7 @@ AddLeadProps) {
                   <Button
                     variant="primary"
                     onPress={close}
+                    className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
                     // disabled={loading}
                   >
                     Cancel
@@ -412,6 +405,7 @@ AddLeadProps) {
                     // color="primary"
                     onPress={handleSubmit}
                     // isLoading={loading}
+                    className="bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] transition-colors"
                   >
                     {loading
                       ? editingLead
