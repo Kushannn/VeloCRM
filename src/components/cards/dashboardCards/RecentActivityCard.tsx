@@ -4,7 +4,11 @@ import { FeedItem } from "@/lib/types";
 import { getFeedIcon, getFeedMessage } from "@/lib/utils/convertFeedMessages";
 import { Card } from "@heroui/react";
 
-export default function RecentActivityCard({ feed }: { feed: FeedItem[] }) {
+export default function RecentActivityCard({
+  feed,
+}: {
+  feed: FeedItem[] | null;
+}) {
   return (
     <Card className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-3 sm:p-5 w-full h-full flex flex-col">
       <Card.Header className="w-full border-b border-[#4d3d7a] pb-3">
@@ -14,7 +18,7 @@ export default function RecentActivityCard({ feed }: { feed: FeedItem[] }) {
       </Card.Header>
 
       <Card.Content className="flex-1 min-h-0 overflow-y-auto">
-        {feed.length === 0 ? (
+        {feed?.length === 0 || !feed ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-center text-lg sm:text-2xl font-bold text-[#b8aed4]">
               No recent activity!
@@ -22,7 +26,7 @@ export default function RecentActivityCard({ feed }: { feed: FeedItem[] }) {
           </div>
         ) : (
           <div className="space-y-4 sm:space-y-5">
-            {feed.map((item, i) => {
+            {feed!.map((item, i) => {
               const Icon = getFeedIcon(item);
 
               return (

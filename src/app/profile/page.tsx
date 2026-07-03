@@ -12,11 +12,15 @@ export default async function page() {
     },
   });
 
-  const organization = await prisma.organization.findUnique({
-    where: {
-      id: userOrg?.organizationId,
-    },
-  });
+  let organization = null;
+
+  if (userOrg) {
+    organization = await prisma.organization.findUnique({
+      where: {
+        id: userOrg?.organizationId,
+      },
+    });
+  }
 
   const [totalProjects, totalTasks, totalLeads] = await Promise.all([
     prisma.userProject.count({
@@ -63,7 +67,6 @@ export default async function page() {
         title: log.sprint!.title,
       },
     }));
-
   return (
     <>
       <UserProfilePage

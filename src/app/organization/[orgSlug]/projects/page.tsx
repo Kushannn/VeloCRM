@@ -1,4 +1,4 @@
-import ProjectSummaryDashboard from "@/components/project/projectSummarDashboard/ProjectSummarDashboard";
+import ProjectSummaryDashboard from "@/components/project/projectSummaryDashboard/ProjectSummaryDashboard";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
@@ -12,35 +12,56 @@ export default async function Page({
 
   const clerkUser = await currentUser();
 
-  const user = await prisma.user.findUnique({
-    where: { clerkId: clerkUser?.id ?? "" },
-    include: { ownedOrganizations: true },
-  });
-  const organization = await prisma.organization.findUnique({
-    where: { slug: orgSlug },
-  });
+  const [user, organization] = await Promise.all([
+    prisma.user.findUnique({
+      where: { clerkId: clerkUser?.id ?? "" },
+      include: { ownedOrganizations: true },
+    }),
+    prisma.organization.findUnique({ where: { slug: orgSlug } }),
+  ]);
 
   if (!organization) return notFound();
 
-  const projects = await prisma.project.findMany({
-    where: {
-      organizationId: organization.id,
-    },
-    include: {
-      // sprints: true,
-      _count: {
-        select: {
-          sprints: true,
-          tasks: true,
+  const [projects, members] = await Promise.all([
+    prisma.project.findMany({
+      where: {
+        organizationId: organization.id,
+      },
+      include: {
+        projectUsers: {
+          take: 3, // only need 3 for the avatar stack
+          select: {
+            id: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                role: true,
+              },
+            },
+          },
+        },
+        _count: {
+          select: {
+            sprints: true,
+            tasks: true,
+            projectUsers: true,
+          },
         },
       },
-    },
-  });
-
-  const members = await prisma.userOrganization.findMany({
-    where: { organizationId: organization.id },
-    include: { user: true },
-  });
+    }),
+    prisma.userOrganization.findMany({
+      where: { organizationId: organization.id },
+      select: {
+        id: true,
+        role: true,
+        user: {
+          select: { id: true, name: true, image: true, email: true },
+        },
+      },
+    }),
+  ]);
 
   return (
     <ProjectSummaryDashboard

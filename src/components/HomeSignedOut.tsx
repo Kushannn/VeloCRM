@@ -20,6 +20,7 @@ import { Box, ChartNoAxesColumn, Crosshair, Fan } from "lucide-react";
 import ScrollFloat from "./ui/ScrollFloat";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { Chip } from "@heroui/react";
 
 const testimonials = [
   {
@@ -119,16 +120,7 @@ function HomeSignedOut() {
             {/* Badge */}
 
             <div className="inline-flex items-center rounded-full border border-violet-500/30 px-4 py-2 text-sm text-violet-300 backdrop-blur-sm">
-              <ScrollFloat
-                animationDuration={1}
-                ease="back.inOut(2)"
-                scrollStart="center bottom+=50%"
-                scrollEnd="bottom bottom-=40%"
-                stagger={0.03}
-                textClassName=""
-              >
-                Built for modern teams & growing businesses
-              </ScrollFloat>
+              Built for modern teams & growing business
             </div>
 
             <h1 className="text-6xl md:text-7xl font-bold leading-tight tracking-tight">

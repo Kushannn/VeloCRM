@@ -14,6 +14,7 @@ import { InviteModal } from "../InviteUserModal";
 import RecentActivityCard from "../cards/dashboardCards/RecentActivityCard";
 import SprintDetailsCard from "../cards/dashboardCards/SprintDetailsCard";
 import TasksDueSoonCard from "../cards/dashboardCards/TasksDueSoonCard";
+import { useEffect, useState } from "react";
 
 interface userType {
   clerkId: string;
@@ -88,14 +89,12 @@ export default function MainDasboardSignedIn({
           Welcome back, {firstName}
         </h1>
 
-        {/* Metrics */}
         <MetricCards
           noOfProjects={noOfProjects}
           activeTasks={activeTasks}
           totalLeads={totalLeads}
         />
 
-        {/* Row 1 */}
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="w-full lg:w-1/2">
             <div className="lg:h-125">
@@ -110,7 +109,6 @@ export default function MainDasboardSignedIn({
           </div>
         </div>
 
-        {/* Row 2 */}
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="w-full lg:w-1/2">
             <div className="lg:h-125">

@@ -13,7 +13,7 @@ import {
 } from "@clerk/nextjs";
 import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -22,6 +22,9 @@ export default function Navbar() {
   const dispatch = useAppDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathName = usePathname();
+
+  const isOnboardingPage = pathName === "/onboarding";
 
   const handleLogout = async () => {
     await signOut();
@@ -30,21 +33,25 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-transparent z-101">
+    <header
+      className={`h-16 z-50 ${
+        isOnboardingPage
+          ? "absolute top-0 left-0 right-0 bg-transparent"
+          : "sticky top-0 bg-[#09080f]"
+      }`}
+    >
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="text-xl font-bold">
             VeloCRM
           </Link>
 
-          {/* Mobile Menu Button */}
           <div className="sm:hidden">
             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               <Menu className="w-6 h-6 text-white" />
             </button>
           </div>
 
-          {/* Desktop Nav */}
           <nav className="hidden sm:flex items-center space-x-6">
             <SignedOut>
               <Link href="/" className="hover:text-blue-500">

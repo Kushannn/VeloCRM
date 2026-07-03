@@ -8,9 +8,9 @@ export function UserMetricCards({
   totalLeads,
   totalTasks,
 }: {
-  totalProjects: number;
-  totalTasks: number;
-  totalLeads: number;
+  totalProjects: number | null;
+  totalTasks: number | null;
+  totalLeads: number | null;
 }) {
   return (
     <>
@@ -24,7 +24,7 @@ export function UserMetricCards({
 
           <Card.Content className="text-[#e8e4f0] text-2xl sm:text-3xl font-semibold">
             <div className="flex justify-between items-center">
-              <p>{totalProjects}</p>
+              <p>{totalProjects ?? "No project data found"}</p>
 
               <div className="bg-[#2d1d5e] rounded-lg h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center">
                 <Layers size={18} className="sm:w-5 sm:h-5 text-[#ede8fb]" />
@@ -46,7 +46,7 @@ export function UserMetricCards({
 
           <Card.Content className="text-[#e8e4f0] text-2xl sm:text-3xl font-semibold">
             <div className="flex justify-between items-center">
-              <p>{totalTasks}</p>
+              <p>{totalTasks ?? "No task data found"}</p>
 
               <div className="bg-[#2d1d5e] rounded-lg h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center">
                 <ClipboardList
@@ -71,7 +71,7 @@ export function UserMetricCards({
 
           <Card.Content className="text-[#e8e4f0] text-2xl sm:text-3xl font-semibold">
             <div className="flex justify-between items-center">
-              <p>{totalLeads}</p>
+              <p>{totalLeads ?? "No lead data found"}</p>
 
               <div className="bg-[#2d1d5e] rounded-lg h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center">
                 <UserSearch

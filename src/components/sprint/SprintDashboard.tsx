@@ -2,7 +2,7 @@
 
 import { Button, Modal, toast, useOverlayState } from "@heroui/react";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Calendar, Clock } from "lucide-react";
 import {
   DndContext,
@@ -36,7 +36,6 @@ export default function SprintDashboard({
 }) {
   const [localSprint, setLocalSprint] = useState(sprint);
   const [openTaskModal, setOpenTaskModal] = useState(false);
-  // const [openDescModal, setOpenDescModal] = useState(false);
 
   //This determines which task has been selected to show the details
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
@@ -240,10 +239,7 @@ export default function SprintDashboard({
   return (
     <>
       <div className="h-full space-y-6 flex flex-col">
-        {/* Header */}
-        {/* ---- HEADER ---- */}
         <div className="bg-[#110f1a] border border-[#2a2040] hover:border-[#3d2d6b] rounded-xl p-3 sm:p-4 flex flex-col gap-3">
-          {/* Row 1: title + button */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               {isActive && (
@@ -274,7 +270,6 @@ export default function SprintDashboard({
             </Button>
           </div>
 
-          {/* Row 2: date strip */}
           <div className="flex items-center rounded-lg border border-zinc-800 bg-[#1a1232] px-3 py-2 gap-2 sm:gap-4 w-full sm:w-fit">
             <div className="flex items-center gap-1.5 text-xs text-gray-300">
               <Calendar className="w-3.5 h-3.5 shrink-0" />
@@ -297,7 +292,6 @@ export default function SprintDashboard({
           </div>
         </div>
 
-        {/* ---- BOARD ---- */}
         <DndContext
           collisionDetection={closestCenter}
           onDragStart={({ active }) => {
@@ -336,8 +330,6 @@ export default function SprintDashboard({
           </DragOverlay>
         </DndContext>
       </div>
-
-      {/* Create Task */}
       <CreateTask
         isOpen={openTaskModal}
         onClose={() => setOpenTaskModal(false)}
@@ -347,7 +339,6 @@ export default function SprintDashboard({
         onTaskCreated={() => location.reload()}
       />
 
-      {/* Description Modal */}
       <Modal state={descState}>
         <Modal.Backdrop
           variant="blur"
@@ -385,7 +376,6 @@ export default function SprintDashboard({
           </Modal.Container>
         </Modal.Backdrop>
       </Modal>
-
       {typeof window !== "undefined" &&
         createPortal(
           <TaskDrawer

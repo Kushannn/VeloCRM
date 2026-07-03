@@ -9,6 +9,7 @@ interface AddMemberModalProps {
   projectId: string;
   isOpen: boolean;
   onClose: () => void;
+  refreshProject: (projectId: string) => Promise<void>;
   organizationMembers: {
     id: string;
     role: string;
@@ -26,6 +27,7 @@ export default function AddMemberModal({
   onClose,
   organization,
   projectId,
+  refreshProject,
   organizationMembers,
 }: AddMemberModalProps) {
   const state = useOverlayState({
@@ -67,6 +69,7 @@ export default function AddMemberModal({
       }
 
       toast.success("Members added successfully");
+      await refreshProject?.(projectId);
       setSelectedUserIds([]);
       close();
     } catch {

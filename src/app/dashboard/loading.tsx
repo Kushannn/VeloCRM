@@ -10,13 +10,12 @@ export default function loading() {
       <div className="animate-pulse p-6">
         <div className="flex gap-4 flex-col">
           <div className="flex gap-2">
-            <div className="h-8 w-xs bg-[#2a2040] rounded-full mb-4"></div>
-            <div className="h-8 w-xs bg-[#2a2040] rounded-full mb-4"></div>
-            {/* <div className="h-2.5 bg-green-500 rounded-full w-48 mb-4"></div> */}
+            <div className="h-8 w-3xs bg-[#2a2040] rounded-full mb-4"></div>
+            <div className="h-8 w-2xs bg-[#2a2040] rounded-full mb-4"></div>
           </div>
 
           <div className="flex gap-4 items-stretch">
-            <div className="w-1/2 flex flex-col">
+            <div className="w-full flex flex-col">
               <MetricCardsSkeleton />
             </div>
           </div>

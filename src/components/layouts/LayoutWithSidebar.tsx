@@ -15,8 +15,11 @@ export default function LayoutWithSidebar({
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const pathname = usePathname();
 
-  const noSidebarRoutes = ["/", "/sign-in", "/sign-up"];
+  const noSidebarRoutes = ["/", "/sign-in", "/sign-up", "/onboarding"];
   const isPublicRoute = noSidebarRoutes.includes(pathname);
+
+  const noPaddingRoutes = ["/onboarding"];
+  const hasMainPadding = !noPaddingRoutes.includes(pathname);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09080f]">
@@ -51,8 +54,7 @@ export default function LayoutWithSidebar({
         )}
 
         <main
-          className="flex-1 min-w-0 overflow-x-hidden p-2 sm:p-6 transition-all duration-300 ease-in-out
-             ml-0 sm:ml-(--sidebar-w)"
+          className={`flex-1 min-w-0 overflow-x-hidden transition-all duration-300 ease-in-out ml-0 sm:ml-(--sidebar-w) ${hasMainPadding ? "p-2 sm:p-6" : "p-0"}`}
           style={
             {
               "--sidebar-w": isPublicRoute

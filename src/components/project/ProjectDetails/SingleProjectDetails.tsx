@@ -1,16 +1,16 @@
 "use client";
 
-import CreateSprint from "@/components/createSprint/CreateSprint";
+import CreateSprint from "@/components/sprint/createSprint/CreateSprint";
 import { ProjectType, TaskType, UserType } from "@/lib/types";
 import { Chip } from "@heroui/react";
 import { Calendar, ChevronLeft, ChevronRight, Plus, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProjectDetailsMetricCards from "./ProjectDetailMetricCards";
-import ProjectSprintCarousel from "../ProjectSprintCarousel/ProjectSprintCarousel";
+import ProjectSprintCarousel from "./ProjectSprintCarousel/ProjectSprintCarousel";
 import { useState } from "react";
-import { ProjectActivityLogs } from "../ActivityLogs/ProjectActivityLogs";
-import { ProjectSprintVelocity } from "../ProjectSprintVelocity/ProjectSprintVelocity";
-import { ProjectTaskOverview } from "../ProjectTaskOverview/ProjectTaskOverview";
+import { ProjectActivityLogs } from "./ProjectActivityLogs/ProjectActivityLogs";
+import { ProjectSprintVelocity } from "./ProjectSprintVelocity/ProjectSprintVelocity";
+import { ProjectTaskOverview } from "./ProjectTaskOverview/ProjectTaskOverview";
 
 const PAGE_SIZE = 4;
 

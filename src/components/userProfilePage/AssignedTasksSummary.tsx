@@ -8,12 +8,16 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function AssignedTasksSummary({ tasks }: { tasks: TaskType[] }) {
+export default function AssignedTasksSummary({
+  tasks,
+}: {
+  tasks: TaskType[] | null;
+}) {
   const counts = useMemo(() => {
     return {
-      pending: tasks.filter((t) => t.status === "PENDING").length,
-      inProgress: tasks.filter((t) => t.status === "IN_PROGRESS").length,
-      completed: tasks.filter((t) => t.status === "COMPLETED").length,
+      pending: tasks?.filter((t) => t.status === "PENDING").length || 0,
+      inProgress: tasks?.filter((t) => t.status === "IN_PROGRESS").length || 0,
+      completed: tasks?.filter((t) => t.status === "COMPLETED").length || 0,
     };
   }, [tasks]);
 
@@ -56,7 +60,7 @@ export default function AssignedTasksSummary({ tasks }: { tasks: TaskType[] }) {
       </Card.Header>
 
       <Card.Content className="flex-1 flex flex-col gap-4">
-        {tasks.length === 0 ? (
+        {(tasks?.length || !tasks) === 0 ? (
           <div className="flex w-full items-center justify-center flex-1">
             <p className="text-center text-lg font-medium text-[#b8aed4]">
               No tasks assigned
@@ -64,9 +68,7 @@ export default function AssignedTasksSummary({ tasks }: { tasks: TaskType[] }) {
           </div>
         ) : (
           <>
-            {/* Equal split: stat cards left, chart right */}
             <div className="grid grid-cols-2 gap-4 items-center mb-4">
-              {/* Stat cards column */}
               <div className="flex flex-col gap-3">
                 {[
                   {
@@ -100,7 +102,6 @@ export default function AssignedTasksSummary({ tasks }: { tasks: TaskType[] }) {
                 ))}
               </div>
 
-              {/* Chart column */}
               <div className="flex items-center justify-center">
                 <div className="relative h-36 w-36 sm:h-36 sm:w-36">
                   <Doughnut data={chartData} options={chartOptions} />
@@ -112,7 +113,6 @@ export default function AssignedTasksSummary({ tasks }: { tasks: TaskType[] }) {
               </div>
             </div>
 
-            {/* Progress bar */}
             <ProgressBar
               value={total > 0 ? (counts.completed / total) * 100 : 0}
               className="w-full"
