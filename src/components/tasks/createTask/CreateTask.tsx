@@ -15,8 +15,8 @@ import {
   DateField,
   Calendar,
   DateValue,
+  toast,
 } from "@heroui/react";
-import { addToast } from "@heroui/toast";
 import { ProjectType, SprintType } from "@/lib/types";
 import { getLocalTimeZone } from "@internationalized/date";
 
@@ -94,7 +94,7 @@ export default function CreateTask({
 
   const handleSubmit = async (close: () => void) => {
     if (!title.trim()) {
-      addToast({ title: "Title is required.", color: "danger" });
+      toast.danger("Title is required");
       return;
     }
 
@@ -118,7 +118,7 @@ export default function CreateTask({
       const data = await res.json();
 
       if (data.success) {
-        addToast({ title: "Task created successfully!", color: "success" });
+        toast.success("Task created successfully");
         setTitle("");
         setDescription("");
         setStatus("PENDING");
@@ -127,13 +127,10 @@ export default function CreateTask({
         onTaskCreated?.();
         close();
       } else {
-        addToast({
-          title: data.error || "Something went wrong.",
-          color: "danger",
-        });
+        toast.danger("Something went wrong");
       }
     } catch {
-      addToast({ title: "Failed to create task.", color: "danger" });
+      toast.danger("Failed to create task");
     } finally {
       setLoading(false);
     }

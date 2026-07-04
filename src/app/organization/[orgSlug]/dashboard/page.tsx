@@ -4,7 +4,22 @@ import { FeedItem } from "@/lib/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+  params: Promise<{ orgSlug: string }>;
+}
+
+export default async function DashboardPage({ params }: DashboardPageProps) {
+  const { orgSlug } = await params;
+
+  const org = await prisma.organization.findUnique({
+    where: {
+      slug: orgSlug,
+    },
+    select: {
+      id: true,
+    },
+  });
+
   const clerkUser = await currentUser();
 
   if (!clerkUser) redirect("/sign-in");
@@ -25,11 +40,25 @@ export default async function DashboardPage() {
 
   if (!dbUser) redirect("/sign-in");
 
-  if (!dbUser.membership || dbUser.membership.length == 0) {
+  if (!dbUser.membership || dbUser.membership.length === 0) {
     redirect("/onboarding");
   }
 
-  const userProjectIds = dbUser?.userProjects.map((up) => up.projectId);
+  // Validate the org id in the URL against actual memberships — never trust
+  // the param blindly, since a user could type any id into the address bar.
+  const activeMembership = dbUser.membership.find(
+    (m) => m.organizationId === org?.id,
+  );
+
+  if (!activeMembership) {
+    redirect("/"); // let the landing page resolve a valid org for them
+  }
+
+  const activeOrgId = activeMembership.organizationId;
+
+  const userProjectIds = dbUser.userProjects
+    .filter((up) => up.project.organizationId === activeOrgId)
+    .map((up) => up.projectId);
 
   const activeSprints = await prisma.sprint.findMany({
     where: {
@@ -38,12 +67,8 @@ export default async function DashboardPage() {
       endDate: { gte: now },
     },
     include: {
-      tasks: {
-        select: { status: true },
-      },
-      project: {
-        select: { name: true },
-      },
+      tasks: { select: { status: true } },
+      project: { select: { name: true } },
     },
     orderBy: { endDate: "asc" },
   });
@@ -74,8 +99,9 @@ export default async function DashboardPage() {
 
   const activeTasks = await prisma.task.findMany({
     where: {
-      assignedToId: dbUser?.id,
+      assignedToId: dbUser.id,
       status: { not: "COMPLETED" },
+      project: { organizationId: activeOrgId },
     },
     select: {
       id: true,
@@ -91,7 +117,6 @@ export default async function DashboardPage() {
 
   const taskStats = {
     total: activeTasks.length,
-    // overdueTasks: activeTasks.filter((t) => t.dueDate && t.dueDate < now),
     dueTodayTasks: activeTasks.filter(
       (t) =>
         t.dueDate &&
@@ -101,12 +126,11 @@ export default async function DashboardPage() {
     dueSoonTasks: activeTasks.filter(
       (t) => t.dueDate && t.dueDate > now && t.dueDate <= threeDaysFromNow,
     ),
-    // noDueDateTasks: activeTasks.filter((t) => !t.dueDate),
   };
 
-  const totalLeads = await prisma.lead.count();
-
-  if (!dbUser) redirect("/sign-in");
+  const totalLeads = await prisma.lead.count({
+    where: { organizationId: activeOrgId },
+  });
 
   const firstName = clerkUser.firstName || "";
   const todayShort = new Date().toLocaleDateString("en-US", {
@@ -116,16 +140,14 @@ export default async function DashboardPage() {
   });
 
   const orgProjects = await prisma.project.findMany({
-    where: { organizationId: dbUser.membership[0].organizationId },
+    where: { organizationId: activeOrgId },
     select: { id: true },
   });
 
   const projectIds = orgProjects.map((p) => p.id);
 
   const recentTasks = await prisma.task.findMany({
-    where: {
-      projectId: { in: projectIds },
-    },
+    where: { projectId: { in: projectIds } },
     orderBy: { createdAt: "desc" },
     take: 10,
     select: {
@@ -138,9 +160,7 @@ export default async function DashboardPage() {
   });
 
   const recentLeadActivity = await prisma.leadActivity.findMany({
-    where: {
-      lead: { organizationId: dbUser.membership[0].organizationId },
-    },
+    where: { lead: { organizationId: activeOrgId } },
     orderBy: { createdAt: "desc" },
     take: 10,
     select: {
@@ -153,7 +173,7 @@ export default async function DashboardPage() {
   });
 
   const recentLeads = await prisma.lead.findMany({
-    where: { organizationId: dbUser.membership[0].organizationId },
+    where: { organizationId: activeOrgId },
     orderBy: { createdAt: "desc" },
     take: 10,
     select: {
@@ -197,7 +217,7 @@ export default async function DashboardPage() {
 
   const leadPipeline = await prisma.lead.groupBy({
     by: ["status"],
-    where: { organizationId: dbUser.membership[0].organizationId },
+    where: { organizationId: activeOrgId },
     _count: { id: true },
   });
 

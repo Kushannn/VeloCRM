@@ -12,12 +12,15 @@ import {
 } from "@heroui/react";
 import { useAppDispatch } from "@/redux/hooks";
 import { setOrganization } from "@/redux/slices/orgSlice";
+import { addOwnedOrganization } from "@/redux/slices/authSlice";
+import Cookies from "js-cookie";
 
 interface CreateOrganizationProps {
   isOpen: boolean;
   onClose: () => void;
   setOrganizationName: (name: string) => void;
   // This prop is used to set the organization name in the parent component
+  onSuccess: () => void;
 }
 
 export default function CreateOrganization({
@@ -32,7 +35,7 @@ export default function CreateOrganization({
 
   async function handleSubmit() {
     if (!orgName.trim()) {
-      toast.danger("Organization name is required");
+      toast.danger("Organization name is required!");
       return;
     }
 
@@ -49,11 +52,18 @@ export default function CreateOrganization({
       const data = await res.json();
 
       if (data.success) {
-        toast.success("Organization created successfully!");
+        toast.success("Organization successfully created", {
+          description: "You will be shown data for the new organization",
+        });
+        dispatch(addOwnedOrganization(data.organization));
         dispatch(setOrganization(data.organization));
         onClose();
         setOrgName("");
         setOrganizationName(data.organization.name);
+        Cookies.set("orgSlug", data.organization.slug, {
+          expires: 30,
+          path: "/",
+        });
       } else {
         toast.danger("Something went wrong");
       }

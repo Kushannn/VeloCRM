@@ -26,9 +26,10 @@ import {
   Label,
 } from "@heroui/react";
 import { useAppSelector } from "@/redux/hooks";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setOrganization } from "@/redux/slices/orgSlice";
+import Cookies from "js-cookie";
 
 function Sidebar({ onExpandChange }: sidebarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +47,8 @@ function Sidebar({ onExpandChange }: sidebarProps) {
   const currentOrg = useAppSelector((state) => state.organization.currentOrg);
   const activeOrg = currentOrg;
   const user = useAppSelector((state) => state.auth.user);
+
+  const pathname = usePathname();
 
   useEffect(() => {
     if (urlSlug && user?.membership) {
@@ -84,7 +87,9 @@ function Sidebar({ onExpandChange }: sidebarProps) {
       if (data.success) {
         setSendInviteLoading(false);
 
-        toast.success("User invited successfully");
+        toast.success("User invited successfully", {
+          description: "An email has been sent to the user!",
+        });
       }
     } catch {
       toast.danger("Could not invite user");
@@ -135,63 +140,76 @@ function Sidebar({ onExpandChange }: sidebarProps) {
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}
       >
-        {/* Background */}
         <div className="absolute inset-0 bg-[#09080f] border-r border-[#1f1f1f]" />
 
-        {/* Content */}
         <div className="relative flex flex-col h-full py-4 overflow-hidden">
-          {/* Org Switcher */}
-          <div className="px-3 mb-4">
+          <div className="pr-3 mb-4">
             <Dropdown>
-              {/* Trigger — first child */}
-              <Dropdown.Trigger>
-                <div className="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-[#1a1a1a] transition-colors group">
-                  <div className="w-8 h-8 rounded-md bg-violet-900/60 border border-violet-700/40 flex items-center justify-center shrink-0">
-                    <Building size={14} className="text-violet-300" />
+              <Dropdown.Trigger className="w-57.5">
+                <div className="ml-2 flex items-center gap-3 rounded-lg border border-[#3d2d6b] bg-[#1a1232] px-3 py-2 hover:bg-[#2a2040] hover:border-[#4c2d9e] transition-all">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#2d1d5e] border border-[#4c2d9e]">
+                    <Building size={18} className="text-[#c4a8f5]" />
                   </div>
-                  <div
-                    className="flex-1 min-w-0 transition-all duration-300 overflow-hidden"
-                    style={{
-                      opacity: isExpanded ? 1 : 0,
-                      width: isExpanded ? "auto" : 0,
-                    }}
-                  >
-                    <p className="text-xs font-semibold text-white truncate">
-                      {activeOrg?.name ?? "Select org"}
+
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <p className="truncate text-sm font-semibold text-[#e8e4f0]">
+                      {activeOrg?.name ?? "Select organization"}
                     </p>
-                    <p className="text-[10px] text-zinc-500">Organization</p>
+
+                    <p className="truncate text-xs text-[#7c6fa0]">
+                      Organization
+                    </p>
                   </div>
-                  {isExpanded && (
-                    <ChevronRight
-                      size={14}
-                      className="text-zinc-600 shrink-0"
-                    />
-                  )}
+
+                  <ChevronRight
+                    size={16}
+                    className="ml-2 shrink-0 text-[#7c6fa0]"
+                  />
                 </div>
               </Dropdown.Trigger>
 
-              {/* Popover */}
-              <Dropdown.Popover className="bg-[#111111] border border-[#222222] rounded-xl shadow-xl p-1">
-                <Dropdown.Menu className="outline-none">
+              {/* Dropdown */}
+              <Dropdown.Popover className="bg-[#1a1232] border border-[#3d2d6b] rounded-md shadow-2xl p-2 min-w-64">
+                <Dropdown.Menu
+                  className="outline-none"
+                  onAction={async (key) => {
+                    const org = allOrgs.find((o) => o.id === key);
+                    if (!org) return;
+
+                    dispatch(setOrganization(org));
+                    Cookies.set("orgSlug", org.slug);
+
+                    const currentSection =
+                      pathname?.split("/").slice(3).join("/") ?? "dashboard";
+                    router.push(`/organization/${org.slug}/${currentSection}`);
+                  }}
+                >
                   {allOrgs.map((org) => (
                     <Dropdown.Item
                       key={org.id}
                       id={org.id}
                       textValue={org.name}
-                      onAction={() => {
-                        dispatch(setOrganization(org));
-                        router.push(`/organization/${org.slug}/projects`);
-                      }}
-                      className={`px-3 py-2 rounded-lg cursor-pointer hover:bg-[#1a1a1a] ${
-                        activeOrg?.id === org.id
-                          ? "text-violet-400"
-                          : "text-zinc-200"
-                      }`}
+                      className={`rounded-md px-3 py-3 transition-colors cursor-pointer
+                        ${
+                          activeOrg?.id === org.id
+                            ? "bg-[#2d1d5e] border border-[#4c2d9e]"
+                            : "hover:bg-[#2a2040]"
+                        }
+                      `}
                     >
-                      <Label>{org.name}</Label>
-                      <Description className="text-zinc-600 text-xs">
+                      <Label
+                        className={`font-medium ${
+                          activeOrg?.id === org.id
+                            ? "text-[#c4a8f5]"
+                            : "text-[#e8e4f0]"
+                        }`}
+                      >
+                        {org.name}
+                      </Label>
+                      {/* 
+                      <Description className="text-xs text-[#7c6fa0]">
                         {org.slug}
-                      </Description>
+                      </Description> */}
                     </Dropdown.Item>
                   ))}
                 </Dropdown.Menu>
@@ -313,6 +331,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         setOrganizationName={setOrganizationName}
+        onSuccess={() => router.refresh()}
       />
       <CreateProject
         isOpen={isProjectModalOpen}

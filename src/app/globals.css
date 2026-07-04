@@ -187,3 +187,31 @@ body {
 .animate-fadein {
   animation: fadein 0.35s ease-out both;
 }
+
+@layer components {
+  .toast {
+    background: linear-gradient(135deg, #110f1a 0%, #1a1232 55%, #2d1d5e 100%);
+    border: 1px solid #3d2d6b;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  .toast:hover {
+    border-color: #4c2d9e;
+  }
+  .toast__title {
+    color: #e8e4f0;
+    font-size: 15px;
+    font-weight: bold;
+  }
+  .toast__description {
+    color: #b8aed4;
+  }
+  .toast__close-button {
+    color: #7c6fa0;
+  }
+  .toast__close-button:hover {
+    color: #c4a8f5;
+  }
+  .toast__indicator {
+    color: #8b5cf6;
+  }
+}

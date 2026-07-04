@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
-  const { id } = await params;
+  const { projectId } = await params;
   const page = Number(req.nextUrl.searchParams.get("page") ?? "1");
   const limit = Number(req.nextUrl.searchParams.get("limit") ?? "20");
 
   const projectUsers = await prisma.userProject.findMany({
-    where: { projectId: id },
+    where: { projectId: projectId },
     skip: (page - 1) * limit,
     take: limit,
     select: {

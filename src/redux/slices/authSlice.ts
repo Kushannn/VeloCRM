@@ -1,4 +1,4 @@
-import { UserType } from "@/lib/types";
+import { OrganizationType, UserType } from "@/lib/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
@@ -23,8 +23,16 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.user = null;
     },
+    addOwnedOrganization: (state, action: PayloadAction<OrganizationType>) => {
+      if (state.user) {
+        state.user.ownedOrganizations = [
+          ...(state.user.ownedOrganizations ?? []),
+          action.payload,
+        ];
+      }
+    },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, addOwnedOrganization } = authSlice.actions;
 export default authSlice.reducer;

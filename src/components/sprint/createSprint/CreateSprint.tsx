@@ -11,8 +11,8 @@ import {
   useOverlayState,
   DateField,
   RangeCalendar,
+  toast,
 } from "@heroui/react";
-import { addToast } from "@heroui/toast";
 import { DateRangePicker } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 
@@ -45,10 +45,7 @@ export default function CreateSprint({
 
   async function handleSubmit(close: () => void) {
     if (!title.trim() || !dateValue) {
-      addToast({
-        title: "All required fields must be filled.",
-        color: "danger",
-      });
+      toast.danger("All required fields must be filled");
       return;
     }
 
@@ -75,20 +72,18 @@ export default function CreateSprint({
       const data = await res.json();
 
       if (data.success) {
-        addToast({ title: "Sprint created successfully!", color: "success" });
+        toast.success("Sprint created successfully");
         setTitle("");
         setDescription("");
         setDateValue(null);
         onSuccess();
         close(); // ← close modal on success
       } else {
-        addToast({
-          title: data.error || "Something went wrong.",
-          color: "danger",
-        });
+        toast.danger(data.error || "Something went wrong");
       }
     } catch {
-      addToast({ title: "Failed to create sprint.", color: "danger" });
+      // addToast({ title: "Failed to create sprint.", color: "danger" });
+      toast.danger("Failed to create sprint");
     } finally {
       setLoading(false);
     }

@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { InviteModal } from "../InviteUserModal";
 import CreateOrganization from "../createOrganization/CreateOrganization";
-import { UserType } from "@/lib/types";
 import { useAppDispatch } from "@/redux/hooks";
+import { useRouter } from "next/navigation";
 
 export default function MainOnboardingPage(user: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [organizationName, setOrganizationName] = useState("");
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   return (
     <>
@@ -75,6 +76,7 @@ export default function MainOnboardingPage(user: any) {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           setOrganizationName={setOrganizationName}
+          onSuccess={() => router.refresh()}
         />
       </div>
     </>
