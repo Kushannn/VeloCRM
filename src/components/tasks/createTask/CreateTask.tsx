@@ -24,7 +24,7 @@ interface CreateTaskProps {
   isOpen: boolean;
   onClose: () => void;
   sprintId: string;
-  onTaskCreated?: () => void;
+  onTaskCreated?: (newTask: any) => void;
   sprint: SprintType;
   project: ProjectType;
 }
@@ -124,7 +124,7 @@ export default function CreateTask({
         setStatus("PENDING");
         setPriority("LOW");
         setAssignedTo("");
-        onTaskCreated?.();
+        onTaskCreated?.(data.task);
         close();
       } else {
         toast.danger("Something went wrong");

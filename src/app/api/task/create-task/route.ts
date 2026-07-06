@@ -95,6 +95,9 @@ export async function POST(req: NextRequest) {
           assignedToId: assignedTo || undefined,
           dueDate,
         },
+        include: {
+          assignedTo: { select: { image: true, name: true, id: true } },
+        },
       });
 
       await tx.activityLog.create({

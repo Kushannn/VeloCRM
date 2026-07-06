@@ -16,7 +16,7 @@ import { useAppSelector } from "@/redux/hooks";
 interface CreateProjectProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (newProject: any) => void;
 }
 
 export default function CreateProject({
@@ -42,6 +42,8 @@ export default function CreateProject({
       return;
     }
 
+    if (loading) return;
+
     setLoading(true);
     try {
       const res = await fetch("/api/project/create-project", {
@@ -60,7 +62,7 @@ export default function CreateProject({
         toast.success("Project created successfully!");
         setProjectName("");
         setDescription("");
-        onSuccess();
+        onSuccess(data.fullProject);
         close();
       } else {
         toast.danger(data.error || "Something went wrong");

@@ -336,7 +336,13 @@ export default function SprintDashboard({
         sprintId={params?.sprintId}
         sprint={localSprint}
         project={project}
-        onTaskCreated={() => location.reload()}
+        onTaskCreated={(newTask: TaskType) => {
+          setLocalSprint((prev: any) => ({
+            ...prev,
+            tasks: [...prev.tasks, newTask],
+          }));
+          setOpenTaskModal(false);
+        }}
       />
 
       <Modal state={descState}>

@@ -37,7 +37,7 @@ export default function Navbar() {
       className={`h-16 z-50 ${
         isOnboardingPage
           ? "absolute top-0 left-0 right-0 bg-transparent"
-          : "sticky top-0 bg-[#09080f]"
+          : "sticky top-0"
       }`}
     >
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">

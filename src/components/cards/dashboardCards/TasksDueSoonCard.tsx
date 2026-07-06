@@ -22,7 +22,7 @@ export default function TasksDueSoonCard({
         </Card.Title>
       </Card.Header>
 
-      <Card.Content className="overflow-y-auto min-h-0">
+      <Card.Content className="overflow-y-auto min-h-0 p-6">
         {upcomingTasks.length == 0 ? (
           <>
             <div className="flex h-full items-center justify-center">

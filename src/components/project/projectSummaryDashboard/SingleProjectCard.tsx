@@ -180,7 +180,7 @@ export default function SingleProjectCard({
             <div>
               <p className="text-[11px] text-[#7c6fa0]">Sprints</p>
               <p className="text-base font-semibold text-[#e8e4f0]">
-                {project._count.sprints || 0}
+                {project?._count?.sprints || 0}
               </p>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default function SingleProjectCard({
             <div>
               <p className="text-[11px] text-[#7c6fa0]">Tasks</p>
               <p className="text-base font-semibold text-[#e8e4f0]">
-                {project._count.tasks || 0}
+                {project?._count?.tasks || 0}
               </p>
             </div>
           </div>
@@ -198,7 +198,7 @@ export default function SingleProjectCard({
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center sm:justify-between pt-2 border-t border-[#2a2040]">
           <div className="flex items-center">
             <div className="flex items-center">
-              {project.projectUsers.slice(0, 3).map((pu: any, i: number) => (
+              {project?.projectUsers?.slice(0, 3).map((pu: any, i: number) => (
                 <div
                   key={pu.user.id}
                   onClick={() => onOpenMembers(project)}
@@ -206,7 +206,7 @@ export default function SingleProjectCard({
                     i !== 0 ? "-ml-2" : ""
                   }`}
                 >
-                  {pu.user.image ? (
+                  {pu?.user?.image ? (
                     <img
                       src={pu.user.image}
                       alt={pu.user.name ?? "User"}
@@ -221,19 +221,19 @@ export default function SingleProjectCard({
                 </div>
               ))}
 
-              {project._count.projectUsers > 3 && (
+              {project?._count?.projectUsers > 3 && (
                 <button
                   onClick={() => onOpenMembers(project)}
                   className="w-6 h-6 sm:w-7 sm:h-7 -ml-2 rounded-full bg-[#1a1232] border-2 border-[#09080f] flex items-center justify-center text-[10px] font-semibold text-[#c4a8f5] hover:bg-[#2a2040] transition-colors cursor-pointer"
                 >
-                  +{project._count.projectUsers - 3}
+                  +{project?._count?.projectUsers - 3}
                 </button>
               )}
             </div>
           </div>
           <button
             onClick={() =>
-              router.push(`/organization/${orgSlug}/projects/${project.slug}`)
+              router.push(`/organization/${orgSlug}/projects/${project?.slug}`)
             }
             className="flex items-center gap-1.5 text-sm text-[#8b5cf6] hover:text-[#c4a8f5] transition-colors font-medium cursor-pointer"
           >

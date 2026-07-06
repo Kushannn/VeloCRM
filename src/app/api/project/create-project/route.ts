@@ -80,7 +80,21 @@ export async function POST(req: Request) {
       ),
     );
 
-    return NextResponse.json({ success: true, project }, { status: 201 });
+    const fullProject = await prisma.project.findUnique({
+      where: { id: project.id },
+      include: {
+        projectUsers: {
+          include: {
+            user: true,
+          },
+        },
+        _count: {
+          select: { projectUsers: true },
+        },
+      },
+    });
+
+    return NextResponse.json({ success: true, fullProject }, { status: 201 });
   } catch (error) {
     console.error("Error creating project:", error);
     return NextResponse.json(

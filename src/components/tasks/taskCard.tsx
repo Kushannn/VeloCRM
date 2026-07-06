@@ -67,7 +67,7 @@ const TaskCard = ({
       <div className="flex justify-between items-center mt-2">
         <p className="text-white font-medium text-sm">{task.title}</p>
         <img
-          src={task.assignedTo.image}
+          src={task?.assignedTo?.image}
           className="w-6 h-6 rounded-full border border-gray-600"
         />
       </div>

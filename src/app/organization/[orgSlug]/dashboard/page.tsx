@@ -11,17 +11,13 @@ interface DashboardPageProps {
 export default async function DashboardPage({ params }: DashboardPageProps) {
   const { orgSlug } = await params;
 
-  const org = await prisma.organization.findUnique({
-    where: {
-      slug: orgSlug,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  const clerkUser = await currentUser();
-
+  const [org, clerkUser] = await Promise.all([
+    prisma.organization.findUnique({
+      where: { slug: orgSlug },
+      select: { id: true },
+    }),
+    currentUser(),
+  ]);
   if (!clerkUser) redirect("/sign-in");
 
   const now = new Date();
@@ -30,10 +26,13 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     where: { clerkId: clerkUser.id },
     include: {
       userProjects: {
-        include: { project: true },
+        select: {
+          projectId: true,
+          project: { select: { organizationId: true } },
+        },
       },
       membership: {
-        include: { organization: true },
+        select: { organizationId: true },
       },
     },
   });
@@ -60,18 +59,111 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     .filter((up) => up.project.organizationId === activeOrgId)
     .map((up) => up.projectId);
 
-  const activeSprints = await prisma.sprint.findMany({
-    where: {
-      projectId: { in: userProjectIds },
-      startDate: { lte: now },
-      endDate: { gte: now },
-    },
-    include: {
-      tasks: { select: { status: true } },
-      project: { select: { name: true } },
-    },
-    orderBy: { endDate: "asc" },
-  });
+  // const activeSprints = await prisma.sprint.findMany({
+  //   where: {
+  //     projectId: { in: userProjectIds },
+  //     startDate: { lte: now },
+  //     endDate: { gte: now },
+  //   },
+  //   include: {
+  //     tasks: { select: { status: true } },
+  //     project: { select: { name: true } },
+  //   },
+  //   orderBy: { endDate: "asc" },
+  // });
+
+  const [
+    activeSprints,
+    activeTasks,
+    recentSprints,
+    recentTasks,
+    recentLeadActivity,
+    recentLeads,
+    leadPipeline,
+  ] = await Promise.all([
+    prisma.sprint.findMany({
+      where: {
+        projectId: { in: userProjectIds },
+        startDate: { lte: now },
+        endDate: { gte: now },
+      },
+      include: {
+        tasks: { select: { status: true } },
+        project: { select: { name: true } },
+      },
+      orderBy: { endDate: "asc" },
+    }),
+    prisma.task.findMany({
+      where: {
+        assignedToId: dbUser.id,
+        status: { not: "COMPLETED" },
+        project: { organizationId: activeOrgId },
+      },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        priority: true,
+        dueDate: true,
+        sprint: { select: { title: true } },
+        project: { select: { name: true } },
+      },
+      orderBy: { dueDate: "asc" },
+    }),
+    prisma.sprint.findMany({
+      where: { projectId: { in: userProjectIds } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        title: true,
+        createdAt: true,
+        project: { select: { name: true } },
+        endDate: true,
+        createdBy: { select: { name: true, image: true } },
+      },
+    }),
+    prisma.task.findMany({
+      where: { project: { organizationId: activeOrgId } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        title: true,
+        status: true,
+        createdAt: true,
+        sprint: { select: { title: true } },
+        createdBy: { select: { name: true, image: true } },
+      },
+    }),
+    prisma.leadActivity.findMany({
+      where: { lead: { organizationId: activeOrgId } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        type: true,
+        note: true,
+        createdAt: true,
+        user: { select: { name: true, image: true } },
+        lead: { select: { name: true } },
+      },
+    }),
+    prisma.lead.findMany({
+      where: { organizationId: activeOrgId },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        name: true,
+        status: true,
+        createdAt: true,
+        assignedTo: { select: { name: true, image: true } },
+        createdByUser: { select: { name: true, image: true } },
+      },
+    }),
+    prisma.lead.groupBy({
+      by: ["status"],
+      where: { organizationId: activeOrgId },
+      _count: { id: true },
+    }),
+  ]);
 
   const sprintProgress = activeSprints.map((sprint) => {
     const total = sprint.tasks.length;
@@ -97,23 +189,23 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const threeDaysFromNow = new Date();
   threeDaysFromNow.setDate(now.getDate() + 14);
 
-  const activeTasks = await prisma.task.findMany({
-    where: {
-      assignedToId: dbUser.id,
-      status: { not: "COMPLETED" },
-      project: { organizationId: activeOrgId },
-    },
-    select: {
-      id: true,
-      title: true,
-      status: true,
-      priority: true,
-      dueDate: true,
-      sprint: { select: { title: true } },
-      project: { select: { name: true } },
-    },
-    orderBy: { dueDate: "asc" },
-  });
+  // const activeTasks = await prisma.task.findMany({
+  //   where: {
+  //     assignedToId: dbUser.id,
+  //     status: { not: "COMPLETED" },
+  //     project: { organizationId: activeOrgId },
+  //   },
+  //   select: {
+  //     id: true,
+  //     title: true,
+  //     status: true,
+  //     priority: true,
+  //     dueDate: true,
+  //     sprint: { select: { title: true } },
+  //     project: { select: { name: true } },
+  //   },
+  //   orderBy: { dueDate: "asc" },
+  // });
 
   const taskStats = {
     total: activeTasks.length,
@@ -128,10 +220,6 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     ),
   };
 
-  const totalLeads = await prisma.lead.count({
-    where: { organizationId: activeOrgId },
-  });
-
   const firstName = clerkUser.firstName || "";
   const todayShort = new Date().toLocaleDateString("en-US", {
     weekday: "short",
@@ -139,51 +227,71 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     day: "numeric",
   });
 
-  const orgProjects = await prisma.project.findMany({
-    where: { organizationId: activeOrgId },
-    select: { id: true },
-  });
+  // const orgProjects = await prisma.project.findMany({
+  //   where: { organizationId: activeOrgId },
+  //   select: { id: true },
+  // });
 
-  const projectIds = orgProjects.map((p) => p.id);
+  // const projectIds = orgProjects.map((p) => p.id);
 
-  const recentTasks = await prisma.task.findMany({
-    where: { projectId: { in: projectIds } },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-    select: {
-      title: true,
-      status: true,
-      createdAt: true,
-      sprint: { select: { title: true } },
-      createdBy: { select: { name: true, image: true } },
-    },
-  });
+  // const recentProjects = await prisma.project.findMany({
+  //   where: { organizationId: activeOrgId },
+  //   orderBy:{createdAt:"desc"},
+  //   take:10,
+  //   select:{
+  //     name:true,
+  //     status:true,
+  //   }
+  // });
 
-  const recentLeadActivity = await prisma.leadActivity.findMany({
-    where: { lead: { organizationId: activeOrgId } },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-    select: {
-      type: true,
-      note: true,
-      createdAt: true,
-      user: { select: { name: true, image: true } },
-      lead: { select: { name: true } },
-    },
-  });
+  // const recentSprints = await prisma.sprint.findMany({
+  //   where: { organizationId: activeOrgId },
+  //   orderBy: { createdAt: "desc" },
+  //   take: 10,
+  //   select: {
+  //     title: true,
+  //     status: true,
+  //   },
+  // });
 
-  const recentLeads = await prisma.lead.findMany({
-    where: { organizationId: activeOrgId },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-    select: {
-      name: true,
-      status: true,
-      createdAt: true,
-      assignedTo: { select: { name: true, image: true } },
-      createdByUser: { select: { name: true, image: true } },
-    },
-  });
+  // const recentTasks = await prisma.task.findMany({
+  //   where: { project: { organizationId: activeOrgId } },
+  //   orderBy: { createdAt: "desc" },
+  //   take: 10,
+  //   select: {
+  //     title: true,
+  //     status: true,
+  //     createdAt: true,
+  //     sprint: { select: { title: true } },
+  //     createdBy: { select: { name: true, image: true } },
+  //   },
+  // });
+
+  // const recentLeadActivity = await prisma.leadActivity.findMany({
+  //   where: { lead: { organizationId: activeOrgId } },
+  //   orderBy: { createdAt: "desc" },
+  //   take: 10,
+  //   select: {
+  //     type: true,
+  //     note: true,
+  //     createdAt: true,
+  //     user: { select: { name: true, image: true } },
+  //     lead: { select: { name: true } },
+  //   },
+  // });
+
+  // const recentLeads = await prisma.lead.findMany({
+  //   where: { organizationId: activeOrgId },
+  //   orderBy: { createdAt: "desc" },
+  //   take: 10,
+  //   select: {
+  //     name: true,
+  //     status: true,
+  //     createdAt: true,
+  //     assignedTo: { select: { name: true, image: true } },
+  //     createdByUser: { select: { name: true, image: true } },
+  //   },
+  // });
 
   const feed: FeedItem[] = [
     ...recentLeadActivity.map((a) => ({
@@ -211,15 +319,23 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       sprint: t.sprint,
       user: t.createdBy,
     })),
+    ...recentSprints.map((s) => ({
+      kind: "sprint_created" as const,
+      createdAt: s.createdAt,
+      title: s.title,
+      project: s.project,
+      user: s.createdBy,
+      endDate: s.endDate,
+    })),
   ]
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     .slice(0, 6);
 
-  const leadPipeline = await prisma.lead.groupBy({
-    by: ["status"],
-    where: { organizationId: activeOrgId },
-    _count: { id: true },
-  });
+  // const leadPipeline = await prisma.lead.groupBy({
+  //   by: ["status"],
+  //   where: { organizationId: activeOrgId },
+  //   _count: { id: true },
+  // });
 
   const statusOrder = [
     "NEW",
@@ -235,6 +351,9 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     status,
     count: leadPipeline.find((l) => l.status === status)?._count.id ?? 0,
   }));
+
+  //Calculating total , since we already have per status sum of leads
+  const totalLeads = pipeline.reduce((sum, p) => sum + p.count, 0);
 
   return (
     <MainDashboardSignedIn

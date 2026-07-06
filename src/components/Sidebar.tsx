@@ -100,7 +100,7 @@ function Sidebar({ onExpandChange }: sidebarProps) {
     {
       icon: <Home size={18} />,
       label: "Home",
-      onClick: () => router.push("/dashboard"),
+      onClick: () => router.push(`/organization/${activeOrg?.slug}/dashboard`),
     },
     {
       icon: <FolderOpenDot size={18} />,

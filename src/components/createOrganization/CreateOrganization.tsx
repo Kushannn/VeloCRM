@@ -14,6 +14,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { setOrganization } from "@/redux/slices/orgSlice";
 import { addOwnedOrganization } from "@/redux/slices/authSlice";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface CreateOrganizationProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export default function CreateOrganization({
 }: CreateOrganizationProps) {
   const [orgName, setOrgName] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const dispatch = useAppDispatch();
 
@@ -64,6 +66,7 @@ export default function CreateOrganization({
           expires: 30,
           path: "/",
         });
+        router.push(`/organization/${data.organization.slug}/dashboard`);
       } else {
         toast.danger("Something went wrong");
       }

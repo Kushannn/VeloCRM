@@ -11,6 +11,7 @@ import {
   UserPlus,
   LucideIcon,
   RefreshCcw,
+  Rocket,
 } from "lucide-react";
 
 export function getFeedMessage(item: FeedItem): string {
@@ -45,6 +46,14 @@ export function getFeedMessage(item: FeedItem): string {
       return (
         taskMessages[item.status] ?? `${actor} updated task "${item.title}"`
       );
+    case "sprint_created":
+      const formatDate = (date: Date) =>
+        date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      return `${actor} created the sprint ${item.title} for project ${item.project?.name} from ${formatDate(item.createdAt)} to ${formatDate(item.endDate)}`;
   }
 }
 
@@ -63,6 +72,9 @@ export function getFeedIcon(item: FeedItem): LucideIcon {
 
     case "lead_created":
       return UserPlus;
+
+    case "sprint_created":
+      return Rocket;
 
     case "task":
       const taskIcons = {

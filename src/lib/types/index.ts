@@ -132,7 +132,19 @@ type TaskFeed = BaseActivity & {
   sprint: { title: string };
 };
 
-export type FeedItem = LeadActivityFeed | LeadCreatedFeed | TaskFeed;
+type SprintFeed = BaseActivity & {
+  kind: "sprint_created";
+  title: string;
+  project: { name: string } | null;
+  user: { name: string | null; image: string | null } | null;
+  endDate: Date;
+};
+
+export type FeedItem =
+  | LeadActivityFeed
+  | LeadCreatedFeed
+  | TaskFeed
+  | SprintFeed;
 
 export type TaskStats = {
   total: number;

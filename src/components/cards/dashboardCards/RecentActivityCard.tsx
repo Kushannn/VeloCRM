@@ -17,7 +17,7 @@ export default function RecentActivityCard({
         </Card.Title>
       </Card.Header>
 
-      <Card.Content className="flex-1 min-h-0 overflow-y-auto">
+      <Card.Content className="flex-1 min-h-0 overflow-y-auto p-6">
         {feed?.length === 0 || !feed ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-center text-lg sm:text-2xl font-bold text-[#b8aed4]">

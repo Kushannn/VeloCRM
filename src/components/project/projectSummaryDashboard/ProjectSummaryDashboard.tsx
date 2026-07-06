@@ -4,7 +4,7 @@ import { toast } from "@heroui/react";
 import { CircleCheck, CirclePause, Plus, Zap } from "lucide-react";
 import CreateProject from "../createProject/CreateProject";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
 import ProjectMembersModal from "./ProjectMembersModal";
@@ -236,7 +236,6 @@ export default function ProjectSummaryDashboard({
           })}
         </div>
 
-        {/* Project cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredProjects.length === 0 ? (
             <p className="text-center text-[#7c6fa0] col-span-full py-12">
@@ -267,7 +266,10 @@ export default function ProjectSummaryDashboard({
       <CreateProject
         isOpen={openProjectModal}
         onClose={() => setOpenProjectModal(false)}
-        onSuccess={() => router.refresh()}
+        onSuccess={(newProject) => {
+          setProjects((prev) => [newProject, ...prev]);
+          setOpenProjectModal(false);
+        }}
       />
 
       <AddMemberModal
