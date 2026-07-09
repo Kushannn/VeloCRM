@@ -57,6 +57,7 @@ type PipelineItem = {
 };
 
 type Props = {
+  orgId: string;
   firstName: string;
   todayShort: string;
   user: userType;
@@ -69,6 +70,7 @@ type Props = {
 };
 
 export default function MainDasboardSignedIn({
+  orgId,
   firstName,
   user,
   activeTasks,
@@ -78,9 +80,9 @@ export default function MainDasboardSignedIn({
   dueTasks,
   pipelineData,
 }: Props) {
-  const noOfProjects = user?.userProjects?.length ?? 0;
-
-  console.log("feed ", feed);
+  const noOfProjects = user.userProjects.filter(
+    (p) => p.project.organizationId == orgId,
+  ).length;
 
   return (
     <>

@@ -71,9 +71,17 @@ function ActivitySkeleton() {
   );
 }
 
-export function ProjectActivityLogs({ projectId }: { projectId?: string }) {
-  const { items, loading, loadMore, hasMore } =
-    useFetchProjectActivity(projectId);
+export function ProjectActivityLogs({
+  projectId,
+  refreshKey,
+}: {
+  projectId?: string;
+  refreshKey: number;
+}) {
+  const { items, loading, loadMore, hasMore } = useFetchProjectActivity(
+    projectId,
+    refreshKey,
+  );
 
   return (
     <div className="h-180 rounded-xl border border-white/8 bg-[#110f1a] overflow-y-auto">

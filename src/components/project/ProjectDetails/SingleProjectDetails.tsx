@@ -46,6 +46,8 @@ export default function SingleProjectDetails({
 
   const [openSprintModal, setOpenSprintModal] = useState(false);
 
+  const [activityRefreshKey, setActivityRefreshKey] = useState(0);
+
   //Function for the nextpage animation of sprints
   function goNext() {
     if (animating) return;
@@ -170,7 +172,10 @@ export default function SingleProjectDetails({
             <CreateSprint
               isOpen={openSprintModal}
               onClose={() => setOpenSprintModal(false)}
-              onSuccess={() => router.refresh()}
+              onSuccess={() => {
+                router.refresh();
+                setActivityRefreshKey((k) => k + 1);
+              }}
               projectId={project?.id ?? ""}
               userId={user?.id ?? ""}
             />
@@ -200,7 +205,10 @@ export default function SingleProjectDetails({
                   "transform 0.25s ease-in-out, opacity 0.25s ease-in-out",
               }}
             >
-              <ProjectSprintCarousel sprints={visibleSprints} />
+              <ProjectSprintCarousel
+                sprints={visibleSprints}
+                projectId={project!.id}
+              />
             </div>
           </div>
 
@@ -227,7 +235,10 @@ export default function SingleProjectDetails({
         </div>
 
         <div className="bg-[#0f0f0f] rounded-2xl w-full">
-          <ProjectActivityLogs projectId={project?.id} />
+          <ProjectActivityLogs
+            projectId={project?.id}
+            refreshKey={activityRefreshKey}
+          />
         </div>
       </div>
     </div>

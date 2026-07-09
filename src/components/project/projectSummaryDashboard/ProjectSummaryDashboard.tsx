@@ -278,6 +278,7 @@ export default function ProjectSummaryDashboard({
         organization={organization}
         organizationMembers={organizationMembers}
         projectId={projectId}
+        projectMembers={projectMembers}
         refreshProject={refreshProject}
       />
 

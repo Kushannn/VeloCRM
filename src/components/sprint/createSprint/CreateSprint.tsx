@@ -168,7 +168,7 @@ export default function CreateSprint({
                         </DateField.InputContainer>
 
                         <DateField.Suffix>
-                          <DateRangePicker.Trigger className="text-[#7c6fa0] hover:text-[#8b5cf6] px-2">
+                          <DateRangePicker.Trigger className="text-[#000000] hover:text-[#8b5cf6] px-2">
                             <DateRangePicker.TriggerIndicator />
                           </DateRangePicker.Trigger>
                         </DateField.Suffix>
@@ -207,7 +207,7 @@ export default function CreateSprint({
                               {(date) => (
                                 <RangeCalendar.Cell
                                   date={date}
-                                  className="text-[#e8e4f0] text-sm rounded hover:bg-[#6c3fc4]/20 data-selected:bg-[#6c3fc4] data-selection-start:bg-[#4c2d9e] data-selection-end:bg-[#4c2d9e]"
+                                  className="text-[#e8e4f0]! text-sm rounded hover:bg-[#6c3fc4]/20 data-selected:bg-[#6c3fc4] data-selection-start:bg-[#4c2d9e] data-selection-end:bg-[#4c2d9e] hover:text-black "
                                 />
                               )}
                             </RangeCalendar.GridBody>

@@ -18,6 +18,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     }),
     currentUser(),
   ]);
+
   if (!clerkUser) redirect("/sign-in");
 
   const now = new Date();
@@ -357,6 +358,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   return (
     <MainDashboardSignedIn
+      orgId={org!.id}
       firstName={firstName}
       todayShort={todayShort}
       user={dbUser}

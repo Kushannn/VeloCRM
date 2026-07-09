@@ -41,11 +41,11 @@ export default function TasksDueSoonCard({
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <p className="font-medium text-white truncate">
+                        <p className="font-medium text-lg text-white truncate">
                           {t.title}
                         </p>
                         <span className="text-white/40">•</span>
-                        <p className="text-white/40 shrink-0">
+                        <p className="text-white/40 text-sm shrink-0">
                           {t.sprint.title}
                         </p>
                       </div>

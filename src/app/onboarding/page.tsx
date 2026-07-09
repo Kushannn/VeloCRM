@@ -14,11 +14,14 @@ export default async function OnboardingPage() {
       },
       membership: {
         include: { organization: true },
-      },  
+      },
     },
   });
 
-  if (dbUser?.membership.length != 0) redirect("/dashboard");
+  if (dbUser?.membership.length != 0) {
+    console.log("redirecting from onboarding page ");
+    redirect("/dashboard");
+  }
 
   return <MainOnboardingPage user={dbUser} />;
 }

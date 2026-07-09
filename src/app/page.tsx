@@ -1,9 +1,9 @@
 import { SignedOut } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import HomeSignedOut from "@/components/HomeSignedOut";
+import Cookies from "js-cookie";
 
 export default async function HomePage() {
   const { userId } = await auth();
@@ -24,15 +24,13 @@ export default async function HomePage() {
       redirect("/onboarding");
     }
 
-    const cookieStore = await cookies();
-    const activeOrgIdFromCookie = cookieStore.get("activeOrgId")?.value;
+    let activeOrgSlug = Cookies.get("orgSlug");
 
-    const activeMembership =
-      dbUser.membership.find(
-        (m) => m.organizationId === activeOrgIdFromCookie,
-      ) ?? dbUser.membership[0];
+    if (activeOrgSlug == null) {
+      activeOrgSlug = dbUser.membership[0].organization.slug;
+    }
 
-    redirect(`/organization/${activeMembership.organization.slug}/dashboard`);
+    redirect(`/organization/${activeOrgSlug}/dashboard`);
   }
 
   return (

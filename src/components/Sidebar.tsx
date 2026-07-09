@@ -177,11 +177,12 @@ function Sidebar({ onExpandChange }: sidebarProps) {
                     if (!org) return;
 
                     dispatch(setOrganization(org));
-                    Cookies.set("orgSlug", org.slug);
+                    Cookies.set("orgSlug", org.slug, {
+                      expires: 30,
+                      path: "/",
+                    });
 
-                    const currentSection =
-                      pathname?.split("/").slice(3).join("/") ?? "dashboard";
-                    router.push(`/organization/${org.slug}/${currentSection}`);
+                    router.push(`/organization/${org.slug}/dashboard`);
                   }}
                 >
                   {allOrgs.map((org) => (

@@ -20,8 +20,7 @@ import { Box, ChartNoAxesColumn, Crosshair, Fan } from "lucide-react";
 import ScrollFloat from "./ui/ScrollFloat";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { Chip } from "@heroui/react";
-
+import Cookies from "js-cookie";
 const testimonials = [
   {
     name: "David Kim",
@@ -90,10 +89,11 @@ function HomeSignedOut() {
   const [activeIndex, setActiveIndex] = useState(0);
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
+  const orgSlug = Cookies.get("orgSlug");
 
   useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      router.replace("/dashboard");
+    if (isLoaded && isSignedIn && orgSlug) {
+      router.replace(`/organization/${orgSlug}/dashboard`);
     }
   }, [isLoaded, isSignedIn]);
   return (

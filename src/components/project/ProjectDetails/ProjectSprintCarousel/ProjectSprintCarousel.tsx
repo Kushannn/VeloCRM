@@ -1,16 +1,34 @@
 "use client";
 
 import { SprintType } from "@/lib/types";
-import { Card, Label, ProgressBar, Separator } from "@heroui/react";
-import { ArrowRight, Calendar, CircleCheck, MoveRight } from "lucide-react";
+import {
+  AlertDialog,
+  Button,
+  Card,
+  Label,
+  ProgressBar,
+  Separator,
+  toast,
+} from "@heroui/react";
+import {
+  ArrowRight,
+  Calendar,
+  CircleCheck,
+  MoveRight,
+  Trash,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ProjectSprintCarousel({
   sprints,
+  projectId,
 }: {
   sprints?: SprintType[] | null;
+  projectId: string;
 }) {
   const currentUrl = window.location.href;
+  const [showSprints, setShowSprints] = useState(sprints);
 
   const router = useRouter();
 
@@ -29,11 +47,35 @@ export default function ProjectSprintCarousel({
     });
   }
 
+  const handleDelete = async (sprintId: string) => {
+    try {
+      const res = await fetch(
+        `/api/project/${projectId}/sprint/${sprintId}/delete-sprint`,
+        { method: "DELETE" },
+      );
+      if (!res.ok) toast.danger("Could not delete sprint");
+
+      const data = await res.json();
+
+      if (data.success) {
+        setShowSprints((prev) => prev?.filter((p) => p.id !== sprintId));
+        toast.success("Sprint deleted successfully");
+      }
+    } catch (error) {
+      toast.danger("Could not delete sprint ");
+      console.log("error ", error);
+    }
+  };
+
+  useEffect(() => {
+    setShowSprints(sprints);
+  }, [sprints]);
+
   const today = new Date();
 
   return (
     <div className="flex gap-3">
-      {sprints?.map((sprint, index) => {
+      {showSprints?.map((sprint, index) => {
         const completedTasks =
           sprint.tasks?.filter((task) => task.status === "COMPLETED").length ??
           0;
@@ -99,10 +141,64 @@ export default function ProjectSprintCarousel({
               <Separator className="bg-violet-500/10" />
 
               <div className="mt-2 flex w-full items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CircleCheck className="h-3 w-3 text-green-700" />
-                  <span className="text-xs">
-                    {completedTasks} / {sprint.tasks?.length}
+                <div className="flex gap-5 items-center ">
+                  <div className="flex items-center gap-2">
+                    <CircleCheck className="h-3 w-3 text-green-700" />
+                    <span className="text-xs">
+                      {completedTasks} / {sprint.tasks?.length}
+                    </span>
+                  </div>
+
+                  <span>
+                    <AlertDialog>
+                      <Button
+                        size="sm"
+                        className="bg-[#110f1a] hover:bg-[#3d2d6b]"
+                      >
+                        <Trash className="h-4 w-4 text-red-500" />
+                      </Button>
+                      <AlertDialog.Backdrop
+                        className="bg-[#09080f]/60"
+                        variant="blur"
+                      >
+                        <AlertDialog.Container>
+                          <AlertDialog.Dialog className="sm:max-w-100 bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
+                            <AlertDialog.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
+                            <AlertDialog.Header className="border-b border-[#2a2040] pb-4">
+                              <AlertDialog.Icon status="danger" />
+                              <AlertDialog.Heading className="text-[#e8e4f0] text-2xl font-semibold">
+                                Delete sprint permanently?
+                              </AlertDialog.Heading>
+                            </AlertDialog.Header>
+                            <AlertDialog.Body>
+                              <p className="text-[#7c6fa0] text-sm w-full">
+                                This will permanently delete the sprint and all
+                                of its related data. This action cannot be
+                                undone.
+                              </p>
+                            </AlertDialog.Body>
+                            <AlertDialog.Footer className="border-t border-[#2a2040] pt-6">
+                              <Button
+                                slot="close"
+                                variant="ghost"
+                                className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                slot="close"
+                                variant="danger"
+                                onClick={() => {
+                                  handleDelete(sprint.id);
+                                }}
+                              >
+                                Delete Sprint
+                              </Button>
+                            </AlertDialog.Footer>
+                          </AlertDialog.Dialog>
+                        </AlertDialog.Container>
+                      </AlertDialog.Backdrop>
+                    </AlertDialog>
                   </span>
                 </div>
 

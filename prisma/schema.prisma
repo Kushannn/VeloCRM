@@ -26,6 +26,7 @@ model User {
   sprints             Sprint[]           @relation("UserSprints")
   notes               Note[]
   leads               Lead[]             @relation("LeadAssignee")
+  
   //membership for organizations
   membership         UserOrganization[]   
   ownedOrganizations  Organization[]     @relation("OrganizationOwner")
@@ -50,6 +51,7 @@ model Organization {
   leads       Lead[]
   memberships UserOrganization[]
   projects    Project[]         
+  invites Invite[]
 }
 
 
@@ -270,4 +272,25 @@ enum ActivityType {
   TASK_UPDATED
   TASK_COMPLETED
   TASK_STATUS_CHANGED
+}
+
+model Invite {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  orgId        String        @db.ObjectId
+  email        String
+  token        String        @unique
+  invitedBy    String        @db.ObjectId
+  status       InviteStatus  @default(PENDING)
+  expiresAt    DateTime
+  createdAt    DateTime      @default(now())
+
+  organization Organization  @relation(fields: [orgId], references: [id])
+
+  @@index([orgId, email])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
 }

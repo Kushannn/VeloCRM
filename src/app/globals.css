@@ -4,7 +4,6 @@
 @import "@heroui/styles";
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
-
 :root {
   --border-angle: 0deg;
   --background: oklch(1 0 0);
@@ -213,5 +212,27 @@ body {
   }
   .toast__indicator {
     color: #8b5cf6;
+  }
+
+  .range-calendar__cell-button {
+    color: #e8e4f0 !important;
+  }
+
+  .range-calendar__cell[data-selection-start="true"]
+    .range-calendar__cell-button,
+  .range-calendar__cell[data-selection-end="true"]
+    .range-calendar__cell-button {
+    background-color: #4c2d9e !important;
+    color: #e8e4f0 !important;
+  }
+
+  .range-calendar__cell[data-selected="true"] .range-calendar__cell-button {
+    background-color: rgb(108 63 196 / 0.3) !important;
+    color: #e8e4f0 !important;
+  }
+
+  .range-calendar__cell[data-hovered="true"] .range-calendar__cell-button {
+    background-color: rgb(108 63 196 / 0.2) !important;
+    color: #e8e4f0 !important;
   }
 }

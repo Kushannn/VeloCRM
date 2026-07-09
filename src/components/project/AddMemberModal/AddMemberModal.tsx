@@ -20,6 +20,7 @@ interface AddMemberModalProps {
       image: string | null;
     };
   }[];
+  projectMembers: any[];
 }
 
 export default function AddMemberModal({
@@ -29,6 +30,7 @@ export default function AddMemberModal({
   projectId,
   refreshProject,
   organizationMembers,
+  projectMembers,
 }: AddMemberModalProps) {
   const state = useOverlayState({
     isOpen,
@@ -37,6 +39,12 @@ export default function AddMemberModal({
     },
   });
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+  const availableMembers = organizationMembers.filter(
+    (member) => member.user.id !== organization.ownerId,
+  );
+  const projectMemberIds = projectMembers.map((m) => m.id);
+  const projectMemberSet = new Set(projectMemberIds);
 
   function handleSelect(userId: string) {
     setSelectedUserIds((prev) =>
@@ -92,15 +100,21 @@ export default function AddMemberModal({
                 </Modal.Header>
 
                 <Modal.Body className="px-6 *:py-6 space-y-3 max-h-100 overflow-y-auto">
-                  {organizationMembers.length === 0 ? (
+                  {availableMembers.length === 0 ? (
                     <p className="text-center text-sm text-[#7c6fa0]">
                       No members found.
                     </p>
                   ) : (
-                    organizationMembers.map((member) => {
-                      const isSelected = selectedUserIds.includes(
+                    availableMembers.map((member) => {
+                      // const isSelected = selectedUserIds.includes(
+                      //   member.user.id,
+                      // );
+                      const alreadyInProject = projectMemberSet.has(
                         member.user.id,
                       );
+                      const isSelected =
+                        alreadyInProject ||
+                        selectedUserIds.includes(member.user.id);
                       return (
                         <div
                           key={member.id}
@@ -136,16 +150,19 @@ export default function AddMemberModal({
                           </div>
 
                           <Button
-                            variant={isSelected ? "primary" : "secondary"}
-                            size="sm"
-                            onPress={() => handleSelect(member.user.id)}
-                            className={
-                              isSelected
-                                ? "bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb]"
-                                : "bg-[#1a1232] border border-[#3d2d6b] hover:border-[#4c2d9e] text-[#b8aed4] hover:text-[#e8e4f0]"
+                            isDisabled={alreadyInProject}
+                            variant={
+                              alreadyInProject || isSelected
+                                ? "primary"
+                                : "secondary"
                             }
+                            onPress={() => handleSelect(member.user.id)}
                           >
-                            {isSelected ? "Selected" : "Select"}
+                            {alreadyInProject
+                              ? "Already Added"
+                              : isSelected
+                                ? "Selected"
+                                : "Select"}
                           </Button>
                         </div>
                       );
