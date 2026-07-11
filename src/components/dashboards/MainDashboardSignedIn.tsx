@@ -13,6 +13,9 @@ import RecentActivityCard from "../cards/dashboardCards/RecentActivityCard";
 import SprintDetailsCard from "../cards/dashboardCards/SprintDetailsCard";
 import TasksDueSoonCard from "../cards/dashboardCards/TasksDueSoonCard";
 import MagicBento from "../ui/MagicBento";
+import { useState } from "react";
+import { usePusherChannels } from "@/hooks/pusher/usePusherChannels";
+import { activityLogToFeedItem } from "@/lib/utils/activityLogsToFeedItem";
 
 interface userType {
   clerkId: string;
@@ -23,30 +26,12 @@ interface userType {
   name: string | null;
   role: string | null;
   membership: {
-    // id: string;
-    // role: MembershipRole;
-    // userId: string;
     organizationId: string;
-    // organization: {
-    //   id: string;
-    //   name: string;
-    //   createdAt: Date;
-    //   slug: string;
-    //   ownerId: string;
-    // };
   }[];
   userProjects: {
-    // id: string;
-    // userId: string;
     projectId: string;
     project: {
-      // id: string;
-      // name: string;
-      // description: string | null;
-      // createdAt: Date;
       organizationId: string;
-      // slug: string;
-      // status: projectStatus;
     };
   }[];
 }
@@ -75,11 +60,26 @@ export default function MainDasboardSignedIn({
   user,
   activeTasks,
   totalLeads,
-  feed,
+  feed: initialFeed,
   sprintsDetails,
   dueTasks,
   pipelineData,
 }: Props) {
+  const [feed, setFeed] = useState<FeedItem[] | null>(initialFeed);
+
+  const myProjectIds = user.userProjects
+    .filter((p) => p.project.organizationId === orgId)
+    .map((p) => p.projectId);
+
+  usePusherChannels<{ log: Parameters<typeof activityLogToFeedItem>[0] }>(
+    myProjectIds.map((id) => `private-project-${id}`),
+    "activity:new",
+    (data) => {
+      const feedItem = activityLogToFeedItem(data.log);
+      setFeed((prev) => [feedItem!, ...(prev ?? [])]);
+    },
+  );
+
   const noOfProjects = user.userProjects.filter(
     (p) => p.project.organizationId == orgId,
   ).length;

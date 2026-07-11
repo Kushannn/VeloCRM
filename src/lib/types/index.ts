@@ -130,6 +130,7 @@ type TaskFeed = BaseActivity & {
   status: TaskStatus;
   user: { name: string | null; image: string | null };
   sprint: { title: string };
+  transition?: { from: TaskStatus; to: TaskStatus };
 };
 
 type SprintFeed = BaseActivity & {

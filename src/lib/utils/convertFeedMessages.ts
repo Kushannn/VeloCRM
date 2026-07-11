@@ -47,13 +47,19 @@ export function getFeedMessage(item: FeedItem): string {
         taskMessages[item.status] ?? `${actor} updated task "${item.title}"`
       );
     case "sprint_created":
-      const formatDate = (date: Date) =>
-        date.toLocaleDateString("en-US", {
+      const formatDate = (date: Date | string | undefined | null) => {
+        if (!date) return "an unspecified date";
+        const d = date instanceof Date ? date : new Date(date);
+        if (isNaN(d.getTime())) return "an unspecified date";
+        return d.toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
           year: "numeric",
         });
-      return `${actor} created the sprint ${item.title} for project ${item.project?.name} from ${formatDate(item.createdAt)} to ${formatDate(item.endDate)}`;
+      };
+      return `${actor} created the sprint ${item.title} for project ${item.project?.name ?? "Unknown"} from ${formatDate(item.createdAt)} to ${formatDate(item.endDate)}`;
+    default:
+      return "";
   }
 }
 
@@ -83,5 +89,7 @@ export function getFeedIcon(item: FeedItem): LucideIcon {
         COMPLETED: CircleCheck,
       };
       return taskIcons[item.status] ?? Circle;
+    default:
+      return FileText;
   }
 }

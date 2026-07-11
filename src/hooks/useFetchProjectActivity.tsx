@@ -1,10 +1,13 @@
+import { FeedItem, UserType } from "@/lib/types";
+import { activityLogToFeedItem } from "@/lib/utils/activityLogsToFeedItem";
 import { useState, useEffect, useCallback } from "react";
 
 export function useFetchProjectActivity(
   projectId?: string,
   refreshKey?: number,
 ) {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<FeedItem[]>([]);
+
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -16,7 +19,11 @@ export function useFetchProjectActivity(
       const res = await fetch(url);
       const data = await res.json();
 
-      setItems((prev) => (cursor ? [...prev, ...data.items] : data.items));
+      const mapped: FeedItem[] = data.items
+        .map(activityLogToFeedItem)
+        .filter((item: FeedItem | null): item is FeedItem => item !== null);
+
+      setItems((prev) => (cursor ? [...prev, ...mapped] : mapped));
       setCursor(data.nextCursor);
       setHasMore(!!data.nextCursor);
       setLoading(false);
@@ -33,6 +40,7 @@ export function useFetchProjectActivity(
     items,
     loading,
     hasMore,
+    setItems,
     loadMore: () => cursor && fetchLogs(cursor),
     refetch: () => fetchLogs(),
   };

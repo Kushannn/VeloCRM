@@ -3,6 +3,7 @@ import { getAuth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 import { TaskStatus, TaskPriority } from "@prisma/client";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,8 +35,6 @@ export async function POST(req: NextRequest) {
       sprintId: string;
       dueDate: Date;
     } = await req.json();
-
-    console.log("dueDate", dueDate);
 
     if (!title || !projectId || !sprintId) {
       return NextResponse.json(
@@ -99,8 +98,7 @@ export async function POST(req: NextRequest) {
           assignedTo: { select: { image: true, name: true, id: true } },
         },
       });
-
-      await tx.activityLog.create({
+      const activityLog = await tx.activityLog.create({
         data: {
           type: "TASK_CREATED",
           projectId,
@@ -108,9 +106,24 @@ export async function POST(req: NextRequest) {
           userId: user.id,
           sprintId,
         },
+        include: {
+          user: { select: { id: true, name: true, image: true } },
+          task: { select: { title: true } },
+          sprint: { select: { title: true } },
+        },
       });
 
-      return createdTask;
+      return { createdTask, activityLog };
+    });
+
+    await pusherServer.trigger(`private-project-${projectId}`, "activity:new", {
+      log: result.activityLog,
+    });
+
+    console.log("Sprint id", sprintId);
+
+    await pusherServer.trigger(`private-sprint-${sprintId}`, "task:created", {
+      task: result.createdTask,
     });
 
     // const createdTask = await prisma.task.create({
@@ -127,7 +140,7 @@ export async function POST(req: NextRequest) {
     //   },
     // });
 
-    return NextResponse.json({ success: true, task: result });
+    return NextResponse.json({ success: true, task: result.createdTask });
   } catch (error) {
     console.error("Create Task Error:", error);
     return NextResponse.json(

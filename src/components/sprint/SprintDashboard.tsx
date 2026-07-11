@@ -22,6 +22,7 @@ import TaskCard from "../tasks/taskCard";
 import TaskDrawer from "../tasks/TaskDrawer";
 import { createPortal } from "react-dom";
 import { debounce } from "lodash";
+import { usePusherEvents } from "@/hooks/pusher/usePusherEvents";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 
@@ -236,6 +237,50 @@ export default function SprintDashboard({
     }
   };
 
+  const handleTaskDelete = async (task: TaskType) => {
+    try {
+      const res = await fetch(`/api/task/${task.id}/delete-task`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: project?.id, sprintId: sprint?.id }),
+      });
+
+      if (!res.ok) {
+        toast.danger("The task could not be deleted");
+        return;
+      }
+
+      setLocalSprint((prev: any) => ({
+        ...prev,
+        tasks: prev.tasks.filter((t: TaskType) => t.id !== task.id),
+      }));
+
+      setSelectedTask(null);
+    } catch (error) {
+      toast.danger("Could not delete task");
+      console.log("error ", error);
+    }
+  };
+
+  console.log("sprintid", sprint.id);
+
+  usePusherEvents(`private-sprint-${sprint.id}`, {
+    "task:created": (data: { task: TaskType }) =>
+      setLocalSprint((prev: any) => {
+        // if (data.task.sprintId !== prev.id) return prev;
+        console.log("task received ", data);
+        if (prev.tasks.some((t: TaskType) => t.id === data.task.id))
+          return prev;
+        return { ...prev, tasks: [...prev.tasks, data.task] };
+      }),
+
+    "task:deleted": (data: { taskId: string }) =>
+      setLocalSprint((prev: any) => ({
+        ...prev,
+        tasks: prev.tasks.filter((t: any) => t.id !== data.taskId),
+      })),
+  });
+
   return (
     <>
       <div className="h-full space-y-6 flex flex-col">
@@ -388,6 +433,7 @@ export default function SprintDashboard({
             task={selectedTask}
             onClose={() => setSelectedTask(null)}
             onUpdate={(task) => handleTaskDetailsUpdate(task)}
+            onDelete={(task) => handleTaskDelete(task)}
           />,
           document.body,
         )}

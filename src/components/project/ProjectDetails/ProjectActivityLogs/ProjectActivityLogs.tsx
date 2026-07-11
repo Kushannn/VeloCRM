@@ -1,22 +1,11 @@
 import Image from "next/image";
-import { UserType } from "@/lib/types";
+import { FeedItem } from "@/lib/types";
 import { useFetchProjectActivity } from "@/hooks/useFetchProjectActivity";
-import { Activity, Icon } from "lucide-react";
-import {
-  formatActivityMessages,
-  TYPE_CONFIG,
-  STATUS_COLORS,
-} from "@/lib/utils/formatActivityMessages";
-
-type ActivityLog = {
-  id: string;
-  type: "SPRINT_CREATED" | "TASK_CREATED" | "TASK_UPDATED" | "TASK_COMPLETED";
-  metadata?: { from?: string; to?: string; taskTitle?: string } | null;
-  user?: UserType;
-  task: { title: string } | null;
-  sprint: { title: string } | null;
-  createdAt: Date;
-};
+import { Activity } from "lucide-react";
+import { getFeedIcon, getFeedMessage } from "@/lib/utils/convertFeedMessages";
+import { STATUS_COLORS } from "@/lib/utils/formatActivityMessages";
+import { usePusherChannel } from "@/hooks/pusher/usePusherChannel";
+import { activityLogToFeedItem } from "@/lib/utils/activityLogsToFeedItem";
 
 export function timeAgo(date: Date | string): string {
   const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
@@ -31,7 +20,7 @@ export function timeAgo(date: Date | string): string {
   });
 }
 
-function groupByDate(items: ActivityLog[]) {
+function groupByDate(items: FeedItem[]) {
   const today = new Date().toDateString();
   const yesterday = new Date(Date.now() - 86400000).toDateString();
   return items.reduce(
@@ -43,7 +32,7 @@ function groupByDate(items: ActivityLog[]) {
       acc[label].push(item);
       return acc;
     },
-    {} as Record<string, ActivityLog[]>,
+    {} as Record<string, FeedItem[]>,
   );
 }
 
@@ -77,10 +66,18 @@ export function ProjectActivityLogs({
 }: {
   projectId?: string;
   refreshKey: number;
+  userId: string;
 }) {
-  const { items, loading, loadMore, hasMore } = useFetchProjectActivity(
-    projectId,
-    refreshKey,
+  const { items, loading, loadMore, hasMore, setItems } =
+    useFetchProjectActivity(projectId, refreshKey);
+
+  usePusherChannel<{ log: Parameters<typeof activityLogToFeedItem>[0] }>(
+    projectId ? `project-${projectId}` : null,
+    "activity:new",
+    (data) => {
+      const feedItem = activityLogToFeedItem(data.log);
+      if (feedItem) setItems((prev) => [feedItem, ...prev]);
+    },
   );
 
   return (
@@ -102,7 +99,6 @@ export function ProjectActivityLogs({
         <div className="flex flex-col">
           {Object.entries(groupByDate(items)).map(([label, logs]) => (
             <div key={label}>
-              {/* Date label */}
               <div className="flex items-center gap-3 px-4 py-2">
                 <div className="h-px flex-1 bg-white/5" />
                 <span className="text-[11px] text-white/30 font-medium tracking-wide uppercase">
@@ -111,47 +107,42 @@ export function ProjectActivityLogs({
                 <div className="h-px flex-1 bg-white/5" />
               </div>
 
-              {logs.map((log) => {
-                const config = TYPE_CONFIG[log.type];
-                const Icon = config.icon;
+              {logs.map((item, i) => {
+                const Icon = getFeedIcon(item);
                 return (
                   <div
-                    key={log.id}
+                    key={`${item.kind}-${item.createdAt}-${i}`}
                     className="flex items-start gap-3 px-4 py-2.5 hover:bg-white/3 transition-colors"
                   >
-                    <span
-                      className={`mt-0.5 p-2.5 rounded-lg shrink-0 ${config.color}`}
-                    >
+                    <span className="mt-0.5 p-2.5 rounded-lg shrink-0 bg-white/5">
                       <Icon size={18} strokeWidth={1.75} />
                     </span>
 
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#e8e4f0] leading-snug">
-                        {formatActivityMessages(log)}
+                        {getFeedMessage(item)}
                       </p>
-                      {log.type === "TASK_UPDATED" &&
-                        log.metadata?.from &&
-                        log.metadata?.to && (
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <StatusBadge status={log.metadata.from} />
-                            <span className="text-white/20 text-xs">→</span>
-                            <StatusBadge status={log.metadata.to} />
-                          </div>
-                        )}
+                      {item.kind === "task" && item.transition && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <StatusBadge status={item.transition.from} />
+                          <span className="text-white/20 text-xs">→</span>
+                          <StatusBadge status={item.transition.to} />
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
-                      {log.user?.image && (
+                      {item.user?.image && (
                         <Image
-                          src={log.user.image}
-                          alt={log.user.name ?? ""}
+                          src={item.user.image}
+                          alt={item.user.name ?? ""}
                           width={18}
                           height={18}
                           className="rounded-full opacity-80"
                         />
                       )}
                       <span className="text-xs text-white/30">
-                        {timeAgo(log.createdAt)}
+                        {timeAgo(item.createdAt)}
                       </span>
                     </div>
                   </div>

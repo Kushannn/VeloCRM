@@ -238,6 +238,7 @@ export default function SingleProjectDetails({
           <ProjectActivityLogs
             projectId={project?.id}
             refreshKey={activityRefreshKey}
+            userId={user!.id}
           />
         </div>
       </div>
