@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
+import { pusherServer } from "@/lib/pusher";
 
 export async function DELETE(
   req: NextRequest,
@@ -34,6 +35,12 @@ export async function DELETE(
     await prisma.task.deleteMany({ where: { sprintId } });
     await prisma.note.deleteMany({ where: { sprintId } });
     await prisma.sprint.deleteMany({ where: { id: sprintId } });
+
+    await pusherServer.trigger(
+      `private-project-${projectId}`,
+      "sprint:deleted",
+      { sprintId },
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

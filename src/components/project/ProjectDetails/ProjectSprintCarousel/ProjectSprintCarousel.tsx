@@ -23,13 +23,13 @@ import { useEffect, useState } from "react";
 export default function ProjectSprintCarousel({
   sprints,
   projectId,
+  onSprintDeleted,
 }: {
   sprints?: SprintType[] | null;
   projectId: string;
+  onSprintDeleted: (sprintId: string) => void;
 }) {
   const currentUrl = window.location.href;
-  const [showSprints, setShowSprints] = useState(sprints);
-
   const router = useRouter();
 
   function getProgress(startDate: Date, endDate: Date) {
@@ -51,31 +51,30 @@ export default function ProjectSprintCarousel({
     try {
       const res = await fetch(
         `/api/project/${projectId}/sprint/${sprintId}/delete-sprint`,
-        { method: "DELETE" },
+        {
+          method: "DELETE",
+        },
       );
-      if (!res.ok) toast.danger("Could not delete sprint");
-
+      if (!res.ok) {
+        toast.danger("Could not delete sprint");
+        return;
+      }
       const data = await res.json();
-
       if (data.success) {
-        setShowSprints((prev) => prev?.filter((p) => p.id !== sprintId));
+        onSprintDeleted(sprintId);
         toast.success("Sprint deleted successfully");
       }
     } catch (error) {
-      toast.danger("Could not delete sprint ");
+      toast.danger("Could not delete sprint");
       console.log("error ", error);
     }
   };
-
-  useEffect(() => {
-    setShowSprints(sprints);
-  }, [sprints]);
 
   const today = new Date();
 
   return (
     <div className="flex gap-3">
-      {showSprints?.map((sprint, index) => {
+      {sprints?.map((sprint, index) => {
         const completedTasks =
           sprint.tasks?.filter((task) => task.status === "COMPLETED").length ??
           0;

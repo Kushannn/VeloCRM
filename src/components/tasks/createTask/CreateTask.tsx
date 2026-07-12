@@ -6,19 +6,19 @@ import {
   Button,
   TextField,
   Label,
-  Input,
   FieldError,
+  Description,
   Select,
   ListBox,
   useOverlayState,
   DatePicker,
   DateField,
   Calendar,
-  DateValue,
   toast,
 } from "@heroui/react";
+import type { DateValue } from "@internationalized/date";
 import { ProjectType, SprintType } from "@/lib/types";
-import { getLocalTimeZone } from "@internationalized/date";
+import { getLocalTimeZone, parseDate } from "@internationalized/date";
 
 interface CreateTaskProps {
   isOpen: boolean;
@@ -29,7 +29,6 @@ interface CreateTaskProps {
   project: ProjectType;
 }
 
-// Reusable styled select to avoid repeating compound structure
 function StyledSelect({
   label,
   value,
@@ -44,8 +43,6 @@ function StyledSelect({
   return (
     <div className="flex flex-col gap-1 flex-1">
       <p className="text-gray-300 text-sm">{label}</p>
-
-      {/* Select has NO Label child at all */}
       <Select
         aria-label={label}
         value={value}
@@ -85,16 +82,26 @@ export default function CreateTask({
   const [priority, setPriority] = useState("LOW");
   const [loading, setLoading] = useState(false);
   const [assignedTo, setAssignedTo] = useState("");
-  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [dueDate, setDueDate] = useState<DateValue | null>(null);
 
-  const handleDateChange = (val: DateValue | null) => {
-    if (!val) return;
-    setDueDate(val.toDate(getLocalTimeZone()));
-  };
+  const toISODateString = (date: Date | string) =>
+    (typeof date === "string" ? date : date.toISOString()).slice(0, 10);
+
+  const minValue = parseDate(toISODateString(sprint.startDate));
+  const maxValue = parseDate(toISODateString(sprint.endDate));
+
+  const isInvalid =
+    dueDate != null &&
+    (dueDate.compare(minValue) < 0 || dueDate.compare(maxValue) > 0);
 
   const handleSubmit = async (close: () => void) => {
     if (!title.trim()) {
       toast.danger("Title is required");
+      return;
+    }
+
+    if (dueDate && isInvalid) {
+      toast.danger("Due date must fall within the sprint dates");
       return;
     }
 
@@ -109,7 +116,7 @@ export default function CreateTask({
           status,
           priority,
           assignedTo,
-          dueDate: dueDate?.toISOString(),
+          dueDate: dueDate?.toDate(getLocalTimeZone()).toISOString(),
           projectId: project.id,
           sprintId: sprint.id,
         }),
@@ -124,6 +131,7 @@ export default function CreateTask({
         setStatus("PENDING");
         setPriority("LOW");
         setAssignedTo("");
+        setDueDate(null);
         onTaskCreated?.(data.task);
         close();
       } else {
@@ -148,11 +156,9 @@ export default function CreateTask({
               <>
                 <Modal.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
                 <Modal.Header className="border-b border-[#2a2040]">
-                  {/* <div className="flex items-center justify-between w-full"> */}
                   <Modal.Heading className="text-2xl font-semibold text-[#e8e4f0]">
                     Create Task
                   </Modal.Heading>
-                  {/* </div> */}
                 </Modal.Header>
 
                 <Modal.Body className="py-6 px-6 space-y-4">
@@ -184,7 +190,6 @@ export default function CreateTask({
 
                   <div className="flex flex-col gap-1 w-full">
                     <span className="text-[#b8aed4] text-sm">Assign To</span>
-
                     <Select
                       aria-label="Assign To"
                       value={assignedTo}
@@ -215,7 +220,6 @@ export default function CreateTask({
                                     (u.user?.name?.[0]?.toUpperCase() ?? "?")
                                   )}
                                 </div>
-
                                 <div className="flex flex-col">
                                   <span className="text-[#e8e4f0] text-sm font-medium leading-tight">
                                     {u.user?.name ?? "Unknown"}
@@ -285,7 +289,11 @@ export default function CreateTask({
                     <DatePicker
                       className="w-64"
                       name="date"
-                      onChange={handleDateChange}
+                      isInvalid={isInvalid}
+                      minValue={minValue}
+                      maxValue={maxValue}
+                      value={dueDate}
+                      onChange={setDueDate}
                     >
                       <Label className="text-[#b8aed4] text-sm">Due Date</Label>
                       <DateField.Group
@@ -306,6 +314,15 @@ export default function CreateTask({
                           </DatePicker.Trigger>
                         </DateField.Suffix>
                       </DateField.Group>
+                      {isInvalid ? (
+                        <FieldError className="text-[#f87171] text-xs">
+                          Due date must fall within the sprint dates.
+                        </FieldError>
+                      ) : (
+                        <Description className="text-[#7c6fa0] text-xs">
+                          Choose a date within the sprint's timeframe.
+                        </Description>
+                      )}
                       <DatePicker.Popover className="bg-[#110f1a] border border-[#2a2040] rounded-xl shadow-xl shadow-black/40 p-3">
                         <Calendar aria-label="Event date">
                           <Calendar.Header className="flex items-center justify-between mb-2">
@@ -368,6 +385,7 @@ export default function CreateTask({
                     variant="primary"
                     onPress={() => handleSubmit(close)}
                     isPending={loading}
+                    isDisabled={isInvalid}
                     className="cursor-pointer bg-[#6c3fc4] hover:bg-[#8b5cf6] active:bg-[#4c2d9e] text-[#ede8fb] p-2 rounded-xl transition-colors"
                   >
                     {loading ? "Creating..." : "Create Task"}

@@ -15,12 +15,13 @@ import {
 } from "@heroui/react";
 import { DateRangePicker } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
+import { SprintType } from "@/lib/types";
 
 interface CreateSprintProps {
   projectId: string;
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (newSprint: SprintType) => void;
   userId: string;
 }
 
@@ -76,7 +77,7 @@ export default function CreateSprint({
         setTitle("");
         setDescription("");
         setDateValue(null);
-        onSuccess();
+        onSuccess(data.sprint);
         close(); // ← close modal on success
       } else {
         toast.danger(data.error || "Something went wrong");

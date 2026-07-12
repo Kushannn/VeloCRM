@@ -1,16 +1,17 @@
 "use client";
 
 import CreateSprint from "@/components/sprint/createSprint/CreateSprint";
-import { ProjectType, TaskType, UserType } from "@/lib/types";
+import { ProjectType, SprintType, TaskType, UserType } from "@/lib/types";
 import { Chip } from "@heroui/react";
 import { Calendar, ChevronLeft, ChevronRight, Plus, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProjectDetailsMetricCards from "./ProjectDetailMetricCards";
 import ProjectSprintCarousel from "./ProjectSprintCarousel/ProjectSprintCarousel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProjectActivityLogs } from "./ProjectActivityLogs/ProjectActivityLogs";
 import { ProjectSprintVelocity } from "./ProjectSprintVelocity/ProjectSprintVelocity";
 import { ProjectTaskOverview } from "./ProjectTaskOverview/ProjectTaskOverview";
+import { usePusherEvents } from "@/hooks/pusher/usePusherEvents";
 
 const PAGE_SIZE = 4;
 
@@ -38,8 +39,22 @@ export default function SingleProjectDetails({
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(0);
   const [animating, setAnimating] = useState(false);
-  const totalPages = Math.ceil((project?.sprints?.length ?? 0) / PAGE_SIZE);
-  const visibleSprints = project?.sprints?.slice(
+
+  const [localSprints, setLocalSprints] = useState<SprintType[]>(
+    project?.sprints ?? [],
+  );
+
+  useEffect(() => {
+    setLocalSprints(project?.sprints ?? []);
+  }, [project?.sprints]);
+
+  const totalPages = Math.ceil((localSprints?.length ?? 0) / PAGE_SIZE);
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(Math.max(0, totalPages - 1));
+    }
+  }, [totalPages, page]);
+  const visibleSprints = localSprints.slice(
     page * PAGE_SIZE,
     page * PAGE_SIZE + PAGE_SIZE,
   );
@@ -105,6 +120,19 @@ export default function SingleProjectDetails({
 
   const statusConfig = getStatusConfig(project?.status);
 
+  usePusherEvents(`private-project-${project!.id}`, {
+    "sprint:created": (data: { sprint: SprintType }) => {
+      console.log("data ", data);
+      setLocalSprints((prev) =>
+        prev.some((s) => s.id === data.sprint.id)
+          ? prev
+          : [...prev, data.sprint],
+      );
+    },
+    "sprint:deleted": (data: { sprintId: string }) =>
+      setLocalSprints((prev) => prev.filter((s) => s.id !== data.sprintId)),
+  });
+
   return (
     <div className="w-full space-y-6">
       {/* Header */}
@@ -158,7 +186,7 @@ export default function SingleProjectDetails({
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-purple-400" />
             <span className="font-semibold text-white">Sprints</span>
-            <Chip size="sm">{project?.sprints?.length}</Chip>
+            <Chip size="sm">{localSprints?.length}</Chip>
           </div>
 
           <div className="flex items-center gap-2">
@@ -172,8 +200,12 @@ export default function SingleProjectDetails({
             <CreateSprint
               isOpen={openSprintModal}
               onClose={() => setOpenSprintModal(false)}
-              onSuccess={() => {
-                router.refresh();
+              onSuccess={(newSprint: SprintType) => {
+                setLocalSprints((prev) =>
+                  prev.some((s) => s.id === newSprint.id)
+                    ? prev
+                    : [...prev, newSprint],
+                );
                 setActivityRefreshKey((k) => k + 1);
               }}
               projectId={project?.id ?? ""}
@@ -208,6 +240,11 @@ export default function SingleProjectDetails({
               <ProjectSprintCarousel
                 sprints={visibleSprints}
                 projectId={project!.id}
+                onSprintDeleted={(sprintId) =>
+                  setLocalSprints((prev) =>
+                    prev.filter((s) => s.id !== sprintId),
+                  )
+                }
               />
             </div>
           </div>
@@ -226,11 +263,11 @@ export default function SingleProjectDetails({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
         <div className="flex flex-col gap-2">
           <div className="bg-[#110f1a] border border-[#1f1f1f] rounded-2xl w-full h-80">
-            <ProjectSprintVelocity sprints={project?.sprints} />
+            <ProjectSprintVelocity sprints={localSprints} />
           </div>
 
           <div className="w-full border border-[#2a2040] rounded-2xl">
-            <ProjectTaskOverview sprints={project?.sprints} />
+            <ProjectTaskOverview sprints={localSprints} />
           </div>
         </div>
 

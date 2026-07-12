@@ -2,42 +2,58 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { pusherServer } from "@/lib/pusher";
 import { prisma } from "@/lib/prisma";
+import {
+  getProjectAccessById,
+  getOrgMembershipById,
+} from "@/lib/utils/authorizeUserOrgProject";
+
+const hasProjectAccess = async (projectId: string) =>
+  (await getProjectAccessById(projectId)) !== null;
+
+const hasOrgAccess = async (orgId: string) =>
+  (await getOrgMembershipById(orgId)) !== null;
+
+type ChannelRule = {
+  prefix: string;
+  authorize: (resourceId: string) => Promise<boolean>;
+};
+
+const channelRules: ChannelRule[] = [
+  {
+    prefix: "private-project-",
+    authorize: hasProjectAccess,
+  },
+  {
+    prefix: "private-sprint-",
+    authorize: async (sprintId) => {
+      const sprint = await prisma.sprint.findUnique({
+        where: { id: sprintId },
+        select: { projectId: true },
+      });
+      if (!sprint) return false;
+      return hasProjectAccess(sprint.projectId);
+    },
+  },
+  {
+    prefix: "private-org-",
+    authorize: hasOrgAccess,
+  },
+];
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });
 
-  const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
-  if (!dbUser) return new Response("Unauthorized", { status: 401 });
-
   const formData = await req.formData();
   const socketId = formData.get("socket_id") as string;
   const channel = formData.get("channel_name") as string;
 
-  if (channel.startsWith("private-project-")) {
-    const requestedProjectId = channel.replace("private-project-", "");
+  const rule = channelRules.find((r) => channel.startsWith(r.prefix));
+  if (!rule) return new Response("Forbidden", { status: 403 });
 
-    const membership = await prisma.userProject.findFirst({
-      where: { userId: dbUser.id, projectId: requestedProjectId },
-    });
-
-    if (!membership) {
-      return new Response("Forbidden", { status: 403 });
-    }
-  } else if (channel.startsWith("private-org-")) {
-    const requestedOrgId = channel.replace("private-org-", "");
-
-    const membership = await prisma.userOrganization.findFirst({
-      where: { userId: dbUser.id, organizationId: requestedOrgId },
-    });
-
-    if (!membership) {
-      return new Response("Forbidden", { status: 403 });
-    }
-  } else {
-    // Unknown channel pattern — reject rather than silently authorize
-    return new Response("Forbidden", { status: 403 });
-  }
+  const resourceId = channel.replace(rule.prefix, "");
+  const allowed = await rule.authorize(resourceId);
+  if (!allowed) return new Response("Forbidden", { status: 403 });
 
   const authResponse = pusherServer.authorizeChannel(socketId, channel);
   return NextResponse.json(authResponse);

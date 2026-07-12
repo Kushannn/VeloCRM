@@ -126,20 +126,6 @@ export async function POST(req: NextRequest) {
       task: result.createdTask,
     });
 
-    // const createdTask = await prisma.task.create({
-    //   data: {
-    //     title,
-    //     description,
-    //     status: taskStatus || TaskStatus.PENDING,
-    //     priority: taskPriority || TaskPriority.MEDIUM,
-    //     sprintId,
-    //     projectId,
-    //     createdById: user.id,
-    //     assignedToId: assignedTo || undefined,
-    //     dueDate: dueDate,
-    //   },
-    // });
-
     return NextResponse.json({ success: true, task: result.createdTask });
   } catch (error) {
     console.error("Create Task Error:", error);

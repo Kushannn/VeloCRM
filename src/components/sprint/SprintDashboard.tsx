@@ -262,17 +262,16 @@ export default function SprintDashboard({
     }
   };
 
-  console.log("sprintid", sprint.id);
-
   usePusherEvents(`private-sprint-${sprint.id}`, {
-    "task:created": (data: { task: TaskType }) =>
+    "task:created": (data: { task: TaskType }) => {
+      console.log("data ", data);
       setLocalSprint((prev: any) => {
-        // if (data.task.sprintId !== prev.id) return prev;
-        console.log("task received ", data);
+        if (data.task.sprintId !== prev.id) return prev;
         if (prev.tasks.some((t: TaskType) => t.id === data.task.id))
           return prev;
         return { ...prev, tasks: [...prev.tasks, data.task] };
-      }),
+      });
+    },
 
     "task:deleted": (data: { taskId: string }) =>
       setLocalSprint((prev: any) => ({
@@ -382,10 +381,11 @@ export default function SprintDashboard({
         sprint={localSprint}
         project={project}
         onTaskCreated={(newTask: TaskType) => {
-          setLocalSprint((prev: any) => ({
-            ...prev,
-            tasks: [...prev.tasks, newTask],
-          }));
+          setLocalSprint((prev: any) => {
+            if (prev.tasks.some((t: TaskType) => t.id === newTask.id))
+              return prev;
+            return { ...prev, tasks: [...prev.tasks, newTask] };
+          });
           setOpenTaskModal(false);
         }}
       />
