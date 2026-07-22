@@ -79,7 +79,6 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
     recentSprints,
     recentTasks,
     recentLeadActivity,
-    recentLeads,
     leadPipeline,
   ] = await Promise.all([
     prisma.sprint.findMany({
@@ -143,22 +142,24 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
         type: true,
         note: true,
         createdAt: true,
-        user: { select: { name: true, image: true } },
-        lead: { select: { name: true } },
+        previousStatus: true, // needed for STATUS_CHANGE transition
+        newStatus: true, // needed for STATUS_CHANGE transition
+        user: { select: { id: true, name: true, image: true } },
+        lead: { select: { id: true, name: true } }, // id needed, not just name
       },
     }),
-    prisma.lead.findMany({
-      where: { organizationId: activeOrgId },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: {
-        name: true,
-        status: true,
-        createdAt: true,
-        assignedTo: { select: { name: true, image: true } },
-        createdByUser: { select: { name: true, image: true } },
-      },
-    }),
+    // prisma.lead.findMany({
+    //   where: { organizationId: activeOrgId },
+    //   orderBy: { createdAt: "desc" },
+    //   take: 10,
+    //   select: {
+    //     name: true,
+    //     status: true,
+    //     createdAt: true,
+    //     assignedTo: { select: { name: true, image: true } },
+    //     createdByUser: { select: { name: true, image: true } },
+    //   },
+    // }),
     prisma.lead.groupBy({
       by: ["status"],
       where: { organizationId: activeOrgId },
@@ -299,18 +300,16 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       kind: "lead_activity" as const,
       createdAt: a.createdAt,
       type: a.type,
+      activityType: a.type, // matches LeadActivityFeed's duplicate field
       note: a.note,
       user: a.user,
       lead: a.lead,
+      transition:
+        a.previousStatus && a.newStatus
+          ? { from: a.previousStatus, to: a.newStatus }
+          : undefined,
     })),
-    ...recentLeads.map((l) => ({
-      kind: "lead_created" as const,
-      createdAt: l.createdAt,
-      name: l.name,
-      status: l.status,
-      assignedTo: l.assignedTo,
-      user: l.createdByUser,
-    })),
+
     ...recentTasks.map((t) => ({
       kind: "task" as const,
       createdAt: t.createdAt,

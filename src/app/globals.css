@@ -4,6 +4,11 @@
 @import "@heroui/styles";
 @source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-brand: var(--font-my-font), sans-serif;
+}
+
 :root {
   --border-angle: 0deg;
   --background: oklch(1 0 0);

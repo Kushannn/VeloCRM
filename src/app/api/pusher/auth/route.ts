@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   getProjectAccessById,
   getOrgMembershipById,
+  getCurrentUser,
 } from "@/lib/utils/authorizeUserOrgProject";
 
 const hasProjectAccess = async (projectId: string) =>
@@ -37,6 +38,13 @@ const channelRules: ChannelRule[] = [
   {
     prefix: "private-org-",
     authorize: hasOrgAccess,
+  },
+  {
+    prefix: "private-user-",
+    authorize: async (targetUserId) => {
+      const user = await getCurrentUser();
+      return user?.id === targetUserId;
+    },
   },
 ];
 

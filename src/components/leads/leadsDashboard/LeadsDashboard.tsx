@@ -9,12 +9,13 @@ import {
   Label,
 } from "@heroui/react";
 import { ListFilter, Plus, Search, LayoutGrid, List } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AddLead from "../addLead/AddLead";
 import { Leads } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { LeadsKanbanBoard } from "../LeadsKanbanBoard";
 import LeadsTable from "../LeadsTable";
+import { usePusherEvents } from "@/hooks/pusher/usePusherEvents";
 
 export function LeadsDashboard({
   org,
@@ -27,6 +28,7 @@ export function LeadsDashboard({
 }) {
   const router = useRouter();
 
+  const [localLeads, setLocalLeads] = useState(leads);
   const [openAddLead, setOpenAddLead] = useState(false);
   const [editingLead, setEditingLead] = useState<Leads | null>(null);
   const [filters, setFilters] = useState({ status: "", source: "" });
@@ -47,7 +49,7 @@ export function LeadsDashboard({
   };
 
   const filteredLeads = useMemo(() => {
-    return leads.filter((lead) => {
+    return localLeads.filter((lead) => {
       if (filters.status && lead.status !== filters.status) return false;
       if (filters.source && lead.source !== filters.source) return false;
       if (
@@ -59,7 +61,7 @@ export function LeadsDashboard({
         return false;
       return true;
     });
-  }, [leads, filters, search]);
+  }, [localLeads, filters, search]);
 
   const handleAddLead = () => {
     setEditingLead(null);
@@ -70,6 +72,17 @@ export function LeadsDashboard({
     setEditingLead(lead);
     setOpenAddLead(true);
   };
+
+  usePusherEvents(`private-org-${org.id}`, {
+    "lead:added": (data) => {
+      setLocalLeads((prev) => [...prev, data.lead]);
+    },
+    "lead:updated": (data) => {
+      setLocalLeads((prev) =>
+        prev.map((l) => (l.id === data.lead.id ? data.lead : l)),
+      );
+    },
+  });
 
   return (
     <>

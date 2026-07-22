@@ -1,4 +1,4 @@
-import { LeadActivityType } from "@prisma/client";
+import { LeadActivityType, LeadStatus } from "@prisma/client";
 
 export interface OrganizationType {
   id: string;
@@ -113,7 +113,9 @@ type LeadActivityFeed = BaseActivity & {
   type: LeadActivityType;
   note: string | null;
   user: { name: string | null; image: string | null };
-  lead: { name: string };
+  lead: { name: string; id: string };
+  activityType: string;
+  transition?: { from: LeadStatus; to: LeadStatus };
 };
 
 type LeadCreatedFeed = BaseActivity & {

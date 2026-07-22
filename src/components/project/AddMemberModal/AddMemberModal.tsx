@@ -9,7 +9,7 @@ interface AddMemberModalProps {
   projectId: string;
   isOpen: boolean;
   onClose: () => void;
-  refreshProject: (projectId: string) => Promise<void>;
+  onMembersAdded: (updatedProject: any) => void;
   organizationMembers: {
     id: string;
     role: string;
@@ -28,7 +28,7 @@ export default function AddMemberModal({
   onClose,
   organization,
   projectId,
-  refreshProject,
+  onMembersAdded,
   organizationMembers,
   projectMembers,
 }: AddMemberModalProps) {
@@ -38,6 +38,9 @@ export default function AddMemberModal({
       if (!open) onClose();
     },
   });
+
+  const [addLoading, setAddLoading] = useState(false);
+
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
   const availableMembers = organizationMembers.filter(
@@ -55,6 +58,7 @@ export default function AddMemberModal({
   }
 
   async function handleSubmit(close: () => void) {
+    setAddLoading(true);
     if (selectedUserIds.length === 0) {
       toast.danger("No users selected");
       return;
@@ -77,10 +81,12 @@ export default function AddMemberModal({
       }
 
       toast.success("Members added successfully");
-      await refreshProject?.(projectId);
+      onMembersAdded(data.project);
       setSelectedUserIds([]);
       close();
+      setAddLoading(false);
     } catch {
+      setAddLoading(false);
       toast.danger("Error adding members");
     }
   }
@@ -89,7 +95,7 @@ export default function AddMemberModal({
     <Modal state={state}>
       <Modal.Backdrop variant="blur" className="bg-[#09080f]/60">
         <Modal.Container className="max-w-2xl w-full ">
-          <Modal.Dialog className="bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
+          <Modal.Dialog className="bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40 max-w-full">
             {({ close }) => (
               <>
                 <Modal.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
@@ -99,7 +105,7 @@ export default function AddMemberModal({
                   </Modal.Heading>
                 </Modal.Header>
 
-                <Modal.Body className="px-6 *:py-6 space-y-3 max-h-100 overflow-y-auto">
+                <Modal.Body className="px-6 *:py-6 space-y-3 max-h-100 overflow-y-auto w-full">
                   {availableMembers.length === 0 ? (
                     <p className="text-center text-sm text-[#7c6fa0]">
                       No members found.
@@ -150,19 +156,23 @@ export default function AddMemberModal({
                           </div>
 
                           <Button
-                            isDisabled={alreadyInProject}
-                            variant={
-                              alreadyInProject || isSelected
-                                ? "primary"
-                                : "secondary"
-                            }
+                            isDisabled={alreadyInProject || addLoading}
                             onPress={() => handleSelect(member.user.id)}
+                            className={`rounded-lg px-4 py-2 font-medium transition-colors ${
+                              alreadyInProject
+                                ? "bg-gray-700 text-gray-300 border border-gray-600 cursor-not-allowed"
+                                : isSelected
+                                  ? "bg-green-600 hover:bg-green-700 text-white"
+                                  : "bg-[#6c3fc4] hover:bg-[#8b5cf6] text-white"
+                            }`}
                           >
-                            {alreadyInProject
-                              ? "Already Added"
-                              : isSelected
-                                ? "Selected"
-                                : "Select"}
+                            {addLoading
+                              ? "Adding..."
+                              : alreadyInProject
+                                ? "Already Added"
+                                : isSelected
+                                  ? "Selected"
+                                  : "Select"}
                           </Button>
                         </div>
                       );

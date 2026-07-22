@@ -14,20 +14,37 @@ import {
   Rocket,
 } from "lucide-react";
 
+const LEAD_STATUS_LABELS: Record<string, string> = {
+  NEW: "New",
+  CONTACTED: "Contacted",
+  QUALIFIED: "Qualified",
+  PROPOSAL_SENT: "Proposal Sent",
+  NEGOTIATION: "Negotiation",
+  WON: "Won",
+  LOST: "Lost",
+};
+
+function formatLeadStatus(status: string): string {
+  return LEAD_STATUS_LABELS[status] ?? status;
+}
+
 export function getFeedMessage(item: FeedItem): string {
   const actor = item.user?.name ?? "Someone";
 
   switch (item.kind) {
     case "lead_activity":
       const activityMessages = {
+        CREATED: `${actor} added a new lead ${item.lead.name}`,
         NOTE: `${actor} added a note on lead "${item.lead.name}"`,
         CALL: `${actor} logged a call with "${item.lead.name}"`,
         EMAIL: `${actor} sent an email to "${item.lead.name}"`,
         MEETING: `${actor} had a meeting with "${item.lead.name}"`,
         FOLLOW_UP: `${actor} followed up with "${item.lead.name}"`,
-        STATUS_CHANGE: item.note
-          ? `${actor} ${item.note.charAt(0).toLowerCase() + item.note.slice(1)} on lead "${item.lead.name}"`
-          : `${actor} changed the status of "${item.lead.name}"`,
+        STATUS_CHANGE: item.transition
+          ? `${actor} moved "${item.lead.name}" from ${formatLeadStatus(item.transition.from)} to ${formatLeadStatus(item.transition.to)}`
+          : item.note
+            ? `${actor} ${item.note.charAt(0).toLowerCase() + item.note.slice(1)} on lead "${item.lead.name}"`
+            : `${actor} changed the status of "${item.lead.name}"`,
       };
       return (
         activityMessages[item.type] ??
@@ -67,6 +84,7 @@ export function getFeedIcon(item: FeedItem): LucideIcon {
   switch (item.kind) {
     case "lead_activity":
       const icons = {
+        CREATED: UserPlus,
         NOTE: FileText,
         CALL: Phone,
         EMAIL: Mail,

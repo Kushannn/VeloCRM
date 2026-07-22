@@ -195,6 +195,9 @@ model LeadActivity {
   userId    String           @db.ObjectId
   createdAt DateTime         @default(now())
 
+  previousStatus LeadStatus?
+  newStatus       LeadStatus?
+
   lead Lead @relation(fields: [leadId], references: [id])
   user User @relation("LeadActivityUser", fields: [userId], references: [id])
 }
@@ -228,6 +231,7 @@ enum LeadSource {
 }
 
 enum LeadActivityType {
+  CREATED
   NOTE
   CALL
   EMAIL

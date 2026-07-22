@@ -6,6 +6,7 @@ import Providers from "./providers";
 import LayoutWithSidebar from "@/components/layouts/LayoutWithSidebar";
 import UserLoader from "./UserLoader";
 import { cn } from "@/lib/utils";
+import { myFont } from "./fonts";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -26,7 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    // <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en" className={myFont.variable}>
       <body
         className={`${manrope.variable} antialiased min-h-screen`}
         style={{ fontFamily: "var(--font-manrope), sans-serif" }}

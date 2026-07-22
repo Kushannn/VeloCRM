@@ -26,28 +26,22 @@ export default async function Page({
     prisma.project.findMany({
       where: {
         organizationId: organization.id,
+        projectUsers: {
+          some: { userId: user!.id },
+        },
       },
       include: {
         projectUsers: {
-          take: 3, // only need 3 for the avatar stack
+          take: 3,
           select: {
             id: true,
             user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-                role: true,
-              },
+              select: { id: true, name: true, image: true, role: true },
             },
           },
         },
         _count: {
-          select: {
-            sprints: true,
-            tasks: true,
-            projectUsers: true,
-          },
+          select: { sprints: true, tasks: true, projectUsers: true },
         },
       },
     }),
@@ -56,9 +50,7 @@ export default async function Page({
       select: {
         id: true,
         role: true,
-        user: {
-          select: { id: true, name: true, image: true, email: true },
-        },
+        user: { select: { id: true, name: true, image: true, email: true } },
       },
     }),
   ]);

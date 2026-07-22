@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
+import { pusherServer } from "@/lib/pusher";
 
 export async function DELETE(
   req: NextRequest,
@@ -28,6 +29,11 @@ export async function DELETE(
       );
     }
 
+    const projectMembers = await prisma.userProject.findMany({
+      where: { projectId },
+      select: { userId: true },
+    });
+
     // Deleting all related items since mongoDB does not allow cascading
     await prisma.userProject.deleteMany({ where: { projectId } });
     await prisma.task.deleteMany({ where: { projectId } });
@@ -35,6 +41,25 @@ export async function DELETE(
     await prisma.sprint.deleteMany({ where: { projectId } });
 
     await prisma.project.delete({ where: { id: projectId } });
+
+    try {
+      await Promise.all([
+        ...projectMembers.map((m) =>
+          pusherServer.trigger(`private-user-${m.userId}`, "project:deleted", {
+            projectId,
+          }),
+        ),
+        pusherServer.trigger(
+          `private-project-${projectId}`,
+          "project:deleted",
+          {
+            projectId,
+          },
+        ),
+      ]);
+    } catch (pusherError) {
+      console.error("Pusher trigger failed:", pusherError);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

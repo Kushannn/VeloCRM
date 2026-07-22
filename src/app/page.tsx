@@ -2,8 +2,9 @@ import { SignedOut } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import HomeSignedOut from "@/components/HomeSignedOut";
+import HomeSignedOut from "@/components/homeSignedOut/HomeSignedOut";
 import Cookies from "js-cookie";
+import SideRays from "@/components/SideRays";
 
 export default async function HomePage() {
   const { userId } = await auth();

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getOrgMembershipById } from "@/lib/utils/authorizeUserOrgProject";
 import { LeadStatus } from "@prisma/client";
+import { pusherServer } from "@/lib/pusher";
 
 export async function PATCH(
   req: Request,
@@ -22,8 +23,6 @@ export async function PATCH(
     }
 
     if (!orgId || !leadId || !newStatus) {
-      console.log("status", newStatus);
-      console.log("error here 1 ");
       return NextResponse.json(
         { success: false, error: "Org ID | Lead ID | Status are required" },
         { status: 400 },
@@ -31,7 +30,6 @@ export async function PATCH(
     }
 
     if (!Object.values(LeadStatus).includes(newStatus)) {
-      console.log("error here 2 ");
       return NextResponse.json(
         { success: false, error: "Invalid status value" },
         { status: 400 },
@@ -67,7 +65,7 @@ export async function PATCH(
 
     const userId = access.userId;
 
-    const [updatedLead] = await prisma.$transaction([
+    const [updatedLead, activityLog] = await prisma.$transaction([
       prisma.lead.update({
         where: { id: leadId },
         data: { status: newStatus },
@@ -78,9 +76,24 @@ export async function PATCH(
           type: "STATUS_CHANGE",
           note: `Status changed from ${existingLead.status} to ${newStatus}`,
           userId,
+          previousStatus: existingLead.status,
+          newStatus,
+        },
+        include: {
+          user: { select: { id: true, name: true, image: true } },
+          lead: { select: { id: true, name: true } },
         },
       }),
     ]);
+
+    try {
+      await pusherServer.trigger(`private-org-${orgId}`, "lead:updated", {
+        log: activityLog,
+        lead: updatedLead,
+      });
+    } catch (error) {
+      console.error("Pusher trigger failed for lead status change:", error);
+    }
 
     return NextResponse.json({ success: true, data: updatedLead });
   } catch (error) {

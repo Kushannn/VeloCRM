@@ -16,6 +16,8 @@ import MagicBento from "../ui/MagicBento";
 import { useState } from "react";
 import { usePusherChannels } from "@/hooks/pusher/usePusherChannels";
 import { activityLogToFeedItem } from "@/lib/utils/activityLogsToFeedItem";
+import { usePusherEvents } from "@/hooks/pusher/usePusherEvents";
+import { leadActivityToFeedItem } from "@/lib/utils/leadActivityToFeedItem";
 
 interface userType {
   clerkId: string;
@@ -79,6 +81,18 @@ export default function MainDasboardSignedIn({
       setFeed((prev) => [feedItem!, ...(prev ?? [])]);
     },
   );
+
+  usePusherEvents(`private-org-${orgId}`, {
+    "lead:added": (data) => {
+      const feedItem = leadActivityToFeedItem(data.log);
+      setFeed((prev) => [feedItem!, ...(prev ?? [])]);
+    },
+    "lead:updated": (data) => {
+      console.log("data", data);
+      const feedItem = leadActivityToFeedItem(data.log);
+      setFeed((prev) => [feedItem!, ...(prev ?? [])]);
+    },
+  });
 
   const noOfProjects = user.userProjects.filter(
     (p) => p.project.organizationId == orgId,

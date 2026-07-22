@@ -2,7 +2,7 @@
 
 import CreateSprint from "@/components/sprint/createSprint/CreateSprint";
 import { ProjectType, SprintType, TaskType, UserType } from "@/lib/types";
-import { Chip } from "@heroui/react";
+import { Chip, toast } from "@heroui/react";
 import { Calendar, ChevronLeft, ChevronRight, Plus, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProjectDetailsMetricCards from "./ProjectDetailMetricCards";
@@ -40,6 +40,8 @@ export default function SingleProjectDetails({
   const [direction, setDirection] = useState(0);
   const [animating, setAnimating] = useState(false);
 
+  const [localStatus, setLocalStatus] = useState(project?.status);
+
   const [localSprints, setLocalSprints] = useState<SprintType[]>(
     project?.sprints ?? [],
   );
@@ -47,6 +49,10 @@ export default function SingleProjectDetails({
   useEffect(() => {
     setLocalSprints(project?.sprints ?? []);
   }, [project?.sprints]);
+
+  useEffect(() => {
+    setLocalStatus(project?.status);
+  }, [project?.status]);
 
   const totalPages = Math.ceil((localSprints?.length ?? 0) / PAGE_SIZE);
   useEffect(() => {
@@ -118,7 +124,7 @@ export default function SingleProjectDetails({
     }
   }
 
-  const statusConfig = getStatusConfig(project?.status);
+  const statusConfig = getStatusConfig(localStatus);
 
   usePusherEvents(`private-project-${project!.id}`, {
     "sprint:created": (data: { sprint: SprintType }) => {
@@ -131,6 +137,17 @@ export default function SingleProjectDetails({
     },
     "sprint:deleted": (data: { sprintId: string }) =>
       setLocalSprints((prev) => prev.filter((s) => s.id !== data.sprintId)),
+    "project:deleted": (data: { projectId: string }) => {
+      if (data.projectId == project?.id) {
+        toast.danger("This project has been deleted");
+        router.push(`/organization/${orgSlug}/projects`);
+      }
+    },
+    "project:status-changed": (data: { projectId: string; status: string }) => {
+      if (data.projectId === project?.id) {
+        setLocalStatus(data.status);
+      }
+    },
   });
 
   return (

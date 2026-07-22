@@ -54,7 +54,7 @@ export default function LayoutWithSidebar({
         )}
 
         <main
-          className={`flex-1 min-w-0 overflow-x-hidden transition-all duration-300 ease-in-out ml-0 sm:ml-(--sidebar-w) ${hasMainPadding ? "p-2 sm:p-6" : "p-0"}`}
+          className={`flex-1 min-w-0 transition-all duration-300 ease-in-out ml-0 sm:ml-(--sidebar-w) ${hasMainPadding ? "p-2 sm:p-6" : "p-0"}`}
           style={
             {
               "--sidebar-w": isPublicRoute

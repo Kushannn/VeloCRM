@@ -264,7 +264,6 @@ export default function SprintDashboard({
 
   usePusherEvents(`private-sprint-${sprint.id}`, {
     "task:created": (data: { task: TaskType }) => {
-      console.log("data ", data);
       setLocalSprint((prev: any) => {
         if (data.task.sprintId !== prev.id) return prev;
         if (prev.tasks.some((t: TaskType) => t.id === data.task.id))

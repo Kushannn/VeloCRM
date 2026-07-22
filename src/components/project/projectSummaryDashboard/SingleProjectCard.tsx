@@ -18,6 +18,7 @@ type Props = {
   onDelete: (id: string) => void;
   onAddMember: (id: string) => void;
   onOpenMembers: (project: any) => void;
+  onRemoveMember: (project: any) => void;
 };
 
 export default function SingleProjectCard({
@@ -30,6 +31,7 @@ export default function SingleProjectCard({
   onDelete,
   onAddMember,
   onOpenMembers,
+  onRemoveMember,
 }: Props) {
   const router = useRouter();
 
@@ -147,7 +149,10 @@ export default function SingleProjectCard({
                 </button>
                 <button
                   className="w-full px-4 py-2.5 text-left text-sm text-[#b8aed4] hover:bg-[#1a1232] hover:text-[#e8e4f0] transition-colors"
-                  onClick={() => setOpenOptions(null)}
+                  onClick={() => {
+                    onRemoveMember(project);
+                    setOpenOptions(null);
+                  }}
                 >
                   Remove member
                 </button>

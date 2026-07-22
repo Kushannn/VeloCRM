@@ -25,7 +25,7 @@ const statusStyles: Record<string, string> = {
   LOST: "bg-[#f87171]/10 text-[#f87171] border border-[#f87171]/20",
 };
 
-const ROWS_PER_PAGE = 4;
+const ROWS_PER_PAGE = 5;
 
 export default function LeadsTable({
   filteredLeads,

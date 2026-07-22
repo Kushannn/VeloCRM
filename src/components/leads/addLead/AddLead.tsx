@@ -17,6 +17,11 @@ import {
   ListBox,
 } from "@heroui/react";
 import { Leads, UserType } from "@/lib/types";
+import {
+  validateEmail,
+  validateLeadForm,
+  validatePhone,
+} from "@/lib/utils/validations";
 
 interface AddLeadProps {
   isOpen: boolean;
@@ -34,8 +39,7 @@ export default function AddLead({
   onSuccess,
   editingLead,
   user,
-}: //   onSuccess,
-AddLeadProps) {
+}: AddLeadProps) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,6 +50,9 @@ AddLeadProps) {
     expectedClose: "",
     status: "",
   });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [localStatus, setLocalStatus] = useState("");
 
   useEffect(() => {
     if (editingLead) {
@@ -59,7 +66,7 @@ AddLeadProps) {
         expectedClose: editingLead.expectedClose
           ? new Date(editingLead.expectedClose).toISOString()
           : "",
-        status: editingLead.status || "",
+        status: editingLead.status,
       });
     } else {
       setFormData({
@@ -72,7 +79,9 @@ AddLeadProps) {
         expectedClose: "",
         status: "",
       });
+      setLocalStatus("");
     }
+    setErrors({});
   }, [editingLead, isOpen]);
 
   const state = useOverlayState({
@@ -89,9 +98,26 @@ AddLeadProps) {
       ...prev,
       [field]: value,
     }));
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
   }
 
   async function handleSubmit() {
+    const validationErrors = validateLeadForm(formData);
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.danger(Object.values(validationErrors)[0]);
+      return;
+    }
+
+    setErrors({});
+
     if (!formData.name.trim()) {
       toast.danger("Lead name is required");
       return;
@@ -104,18 +130,27 @@ AddLeadProps) {
         ? `/api/organization/${organizationId}/leads/${editingLead.id}`
         : `/api/organization/${organizationId}/leads/add-lead`;
 
-      const method = editingLead ? "PUT" : "POST";
+      const method = editingLead ? "PATCH" : "POST";
+
+      const body = editingLead
+        ? {
+            ...formData,
+            organizationId,
+            user,
+          }
+        : {
+            ...formData,
+            status: localStatus || "NEW",
+            organizationId,
+            user,
+          };
 
       const res = await fetch(endpoint, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          organizationId,
-          user,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -136,8 +171,8 @@ AddLeadProps) {
           company: "",
           source: "",
           notes: "",
-          expectedClose: "",
           status: "",
+          expectedClose: "",
         });
 
         onSuccess?.();
@@ -180,7 +215,9 @@ AddLeadProps) {
                         onChange={(e) => handleChange("name", e.target.value)}
                         className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                       />
-                      <FieldError className="text-[#f87171] text-xs" />
+                      <FieldError className="text-[#f87171] text-xs">
+                        {errors.name}
+                      </FieldError>
                     </TextField>
 
                     <TextField name="email" className="flex-1">
@@ -191,7 +228,9 @@ AddLeadProps) {
                         onChange={(e) => handleChange("email", e.target.value)}
                         className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                       />
-                      <FieldError className="text-[#f87171] text-xs" />
+                      <FieldError className="text-[#f87171] text-xs">
+                        {errors.email}
+                      </FieldError>
                     </TextField>
                   </div>
 
@@ -204,7 +243,9 @@ AddLeadProps) {
                         onChange={(e) => handleChange("phone", e.target.value)}
                         className="w-full bg-[#0e0c17] border border-[#3d2d6b] hover:border-[#4c2d9e] rounded-lg text-[#e8e4f0] placeholder-[#7c6fa0] px-3 py-2 transition-colors data-focused:border-[#6c3fc4] data-focused:outline-none data-focused:ring-0 data-focused:shadow-none"
                       />
-                      <FieldError />
+                      <FieldError className="text-[#f87171] text-xs">
+                        {errors.phone}
+                      </FieldError>
                     </TextField>
 
                     <TextField name="company" className="flex-1">

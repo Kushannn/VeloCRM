@@ -4,11 +4,13 @@ import { toast } from "@heroui/react";
 import { CircleCheck, CirclePause, Plus, Zap } from "lucide-react";
 import CreateProject from "../createProject/CreateProject";
 import AddMemberModal from "../AddMemberModal/AddMemberModal";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useRef, useState } from "react";
 import { debounce } from "lodash";
 import ProjectMembersModal from "./ProjectMembersModal";
 import SingleProjectCard from "./SingleProjectCard";
+import { usePusherEvents } from "@/hooks/pusher/usePusherEvents";
+import { ProjectType } from "@/lib/types";
+import RemoveMemberModal from "../RemoveMembersModal/RemoveMembersModal";
 
 type Props = {
   orgId: string;
@@ -32,7 +34,9 @@ export default function ProjectSummaryDashboard({
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false);
   const [projectId, setProjectId] = useState("");
   const [selectedProjectStatus, setSelectedProjectStatus] = useState("ACTIVE");
-  const router = useRouter();
+
+  const [openRemoveMemberModal, setOpenRemoveMemberModal] = useState(false);
+  const [removeMemberLoading, setRemoveMemberLoading] = useState(false);
 
   //Below are for infinite scroll
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
@@ -140,12 +144,71 @@ export default function ProjectSummaryDashboard({
     ? projects.filter((p) => p.status === selectedProjectStatus)
     : projects;
 
-  const refreshProject = async (id: string) => {
-    const res = await fetch(`/api/project/${id}`);
-    const updatedProject = await res.json();
+  const handleProjectUpdated = (updatedProject: any) =>
+    setProjects((prev) =>
+      prev.map((p) => (p.id === updatedProject.id ? updatedProject : p)),
+    );
 
-    setProjects((prev) => prev.map((p) => (p.id === id ? updatedProject : p)));
+  const handleOpenRemoveMember = async (project: any) => {
+    setProjectId(project.id);
+    setOpenRemoveMemberModal(true);
+    setRemoveMemberLoading(true);
+
+    // If everything's already loaded, skip the fetch
+    if (project.projectUsers.length >= project._count.projectUsers) {
+      setProjectMembers(project.projectUsers.map((pu: any) => pu.user));
+      setRemoveMemberLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `/api/project/${project.id}/get-more-members?page=1&limit=${project._count.projectUsers}`,
+      );
+      const data = await res.json();
+      setProjectMembers(data.members ?? []);
+    } catch {
+      toast.danger("Failed to load members");
+      setProjectMembers(project.projectUsers.map((pu: any) => pu.user));
+    } finally {
+      setRemoveMemberLoading(false);
+    }
   };
+
+  usePusherEvents(`private-user-${user.id}`, {
+    "added-to:project": (data: { project: ProjectType }) => {
+      {
+        setProjects((prev: any[]) =>
+          prev.some((p) => p.id === data.project.id)
+            ? prev
+            : [data.project, ...prev],
+        );
+      }
+    },
+    "removed-from:project": (data: { projectId: string }) => {
+      setProjects((prev: any[]) => prev.filter((p) => p.id !== data.projectId));
+    },
+    "project:deleted": (data: { projectId: string }) => {
+      setProjects((prev) => prev.filter((p) => p.id !== data.projectId));
+    },
+    "project:status-changed": (data: { projectId: string; status: string }) => {
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === data.projectId ? { ...p, status: data.status } : p,
+        ),
+      );
+    },
+  });
+
+  // usePusherEvents(`private-org-${organization.id}`, {
+  //   "project:status-changed": (data: { projectId: string; status: string }) => {
+  //     setProjects((prev) =>
+  //       prev.map((p) =>
+  //         p.id === data.projectId ? { ...p, status: data.status } : p,
+  //       ),
+  //     );
+  //   },
+  // });
 
   return (
     <>
@@ -256,6 +319,7 @@ export default function ProjectSummaryDashboard({
                   setOpenAddMemberModal(true);
                   setProjectId(id);
                 }}
+                onRemoveMember={handleOpenRemoveMember}
                 onOpenMembers={openMembersModal}
               />
             ))
@@ -279,7 +343,7 @@ export default function ProjectSummaryDashboard({
         organizationMembers={organizationMembers}
         projectId={projectId}
         projectMembers={projectMembers}
-        refreshProject={refreshProject}
+        onMembersAdded={handleProjectUpdated}
       />
 
       <ProjectMembersModal
@@ -288,6 +352,16 @@ export default function ProjectSummaryDashboard({
         isLoading={membersLoading}
         onClose={closeMembersModal}
         onLoadMore={loadMoreMembers}
+      />
+
+      <RemoveMemberModal
+        isOpen={openRemoveMemberModal}
+        onClose={() => setOpenRemoveMemberModal(false)}
+        organization={organization}
+        projectId={projectId}
+        projectMembers={projectMembers}
+        isLoading={removeMemberLoading}
+        onMembersRemoved={handleProjectUpdated}
       />
     </>
   );

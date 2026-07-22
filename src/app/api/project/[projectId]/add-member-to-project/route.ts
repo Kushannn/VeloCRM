@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { prisma } from "@/lib/prisma";
 import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,21 +48,54 @@ export async function POST(req: NextRequest) {
 
     const existingIds = new Set(existing.map((e: any) => e.userId));
 
-    const newEntries = validUserIds
-      .filter((id) => !existingIds.has(id))
-      .map((userId) => ({
-        userId,
-        projectId,
-      }));
+    const newEntries = validUserIds.filter((id) => !existingIds.has(id));
 
-    if (newEntries.length > 0) {
-      await prisma.userProject.createMany({
-        data: newEntries,
-      });
+    if (newEntries.length == 0) {
+      return NextResponse.json(
+        { message: "All provided users are already members" },
+        { status: 200 },
+      );
     }
 
+    await prisma.userProject.createMany({
+      data: newEntries.map((userId) => ({ userId, projectId })),
+    });
+
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+        projectUsers: {
+          take: 3,
+          select: {
+            id: true,
+            user: {
+              select: { id: true, name: true, image: true, role: true },
+            },
+          },
+        },
+        _count: {
+          select: { sprints: true, tasks: true, projectUsers: true },
+        },
+      },
+    });
+
+    if (!project) {
+      return NextResponse.json(
+        { error: "Project not found after update." },
+        { status: 404 },
+      );
+    }
+
+    await Promise.all(
+      newEntries.map((userId) =>
+        pusherServer.trigger(`private-user-${userId}`, "added-to:project", {
+          project,
+        }),
+      ),
+    );
+
     return NextResponse.json(
-      { message: "Users added to project successfully." },
+      { message: "Users added to project successfully.", project },
       { status: 200 },
     );
   } catch (error) {
