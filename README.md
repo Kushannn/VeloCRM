@@ -1,36 +1,277 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VELOCRM
 
-## Getting Started
+<!-- <p align="center">
+  <img src="./assets/banner.png" alt="Velocity CRM Banner" width="100%">
+</p> -->
 
-First, run the development server:
+<p align="center">
+  <strong>From Lead to Launch — Manage it all in one place.</strong>
+</p>
+
+<p align="center">
+  A modern CRM built to streamline lead management, project planning, sprint execution, and team collaboration.
+</p>
+
+<p align="center">
+
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=nextdotjs)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
+![HeroUI](https://img.shields.io/badge/HeroUI-UI-000000?style=for-the-badge)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38BDF8?style=for-the-badge&logo=tailwindcss)
+
+</p>
+
+---
+
+# 📖 Overview
+
+Velocity CRM helps businesses organize their workflow from the moment a lead is generated until the final project delivery.
+
+Instead of switching between multiple applications, teams can:
+
+- 📋 Track Leads
+- 📂 Manage Projects
+- 🏃 Organize Sprints
+- ✅ Create Tasks
+- 👥 Collaborate with Teams
+- 📈 Monitor Progress
+
+---
+
+# ✨ Features
+
+## 🎯 Lead Management
+
+- Kanban Board
+- Table View
+- Advanced Filters
+- Lead Status Tracking
+- Search & Pagination
+
+<p align="center">
+<img src="./assets/kanban.png" width="90%">
+</p>
+
+---
+
+## 📁 Project Management
+
+- Create Projects
+- Project Overview
+- Team Assignment
+- Progress Tracking
+
+<p align="center">
+<img src="./assets/projects.png" width="90%">
+</p>
+
+---
+
+## 🏃 Sprint Planning
+
+- Sprint Creation
+- Start & End Dates
+- Active Sprint Management
+- Sprint Progress
+
+<p align="center">
+<img src="./assets/sprint.png" width="90%">
+</p>
+
+---
+
+## ✅ Task Management
+
+- Assign Tasks
+- Due Dates
+- Priorities
+- Status Updates
+- Task Tracking
+
+<p align="center">
+<img src="./assets/task.png" width="90%">
+</p>
+
+---
+
+## 📊 Dashboard
+
+Get an overview of your entire workspace.
+
+- Total Leads
+- Active Projects
+- Sprint Progress
+- Team Activity
+
+<p align="center">
+<img src="./assets/dashboard.png" width="90%">
+</p>
+
+---
+
+# 🛠 Tech Stack
+
+## Frontend
+
+- Next.js
+- React
+- HeroUI
+- Tailwind CSS
+- Framer Motion
+
+## Backend
+
+- Next.js API Routes
+- Prisma ORM
+
+## Database
+
+- MongoDB
+
+## Authentication
+
+- Clerk Authentication
+
+## Realtime
+
+- Pusher
+
+---
+
+# 📂 Project Structure
+
+```text
+app/
+components/
+hooks/
+lib/
+prisma/
+public/
+types/
+utils/
+```
+
+---
+
+# 🚀 Getting Started
+
+## Clone Repository
+
+```bash
+git clone https://github.com/yourusername/velocity-crm.git
+```
+
+```bash
+cd velocity-crm
+```
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+## Configure Environment Variables
+
+Create a `.env` file.
+
+```env
+DATABASE_URL=
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+
+PUSHER_APP_ID=
+PUSHER_SECRET=
+NEXT_PUBLIC_PUSHER_KEY=
+NEXT_PUBLIC_PUSHER_CLUSTER=
+```
+
+---
+
+## Start Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+# 📸 Screenshots
 
-To learn more about Next.js, take a look at the following resources:
+| Dashboard | Kanban |
+|------------|---------|
+| ![](./assets/dashboard.png) | ![](./assets/kanban.png) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Projects | Sprint |
+|------------|---------|
+| ![](./assets/projects.png) | ![](./assets/sprint.png) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+# 🎨 UI Highlights
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Modern Dashboard
+- Responsive Layout
+- Beautiful Animations
+- Glassmorphism
+- Smooth Page Transitions
+- Interactive Kanban Board
+- Dark Theme
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+# 🔮 Future Improvements
+
+- Notifications
+- Calendar View
+- Time Tracking
+- File Attachments
+- Team Chat
+- Email Integration
+- AI Insights
+- Reporting & Analytics
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+
+2. Create a new branch
+
+```bash
+git checkout -b feature-name
+```
+
+3. Commit your changes
+
+```bash
+git commit -m "Added feature"
+```
+
+4. Push
+
+```bash
+git push origin feature-name
+```
+
+5. Open a Pull Request
+
+---
+
+# ⭐ Support
+
+If you found this project useful, consider giving it a ⭐ on GitHub!
+
+It helps others discover the project.
