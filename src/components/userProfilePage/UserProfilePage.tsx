@@ -21,10 +21,10 @@ export default function UserProfilePage({
 }: {
   user: UserProfilePageProps;
   organization: OrganizationType | null;
-  totalProjects: number;
-  tasks: TaskType[];
-  totalLeads: number;
-  feed: FeedItem[];
+  totalProjects: number | null;
+  tasks: TaskType[] | null;
+  totalLeads: number | null;
+  feed: FeedItem[] | null;
 }) {
   return (
     <div>
@@ -33,7 +33,7 @@ export default function UserProfilePage({
       <div className="mt-8">
         <UserMetricCards
           totalProjects={totalProjects}
-          totalTasks={tasks.length}
+          totalTasks={tasks?.length ?? 0}
           totalLeads={totalLeads}
         />
       </div>

@@ -1,9 +1,10 @@
 "use client";
 
-import { Card, Input } from "@heroui/react";
+import { AlertDialog, Button, Card, Input, toast } from "@heroui/react";
 import ProfileImageUpload from "./ProfileImage";
 import { useState } from "react";
 import { OrganizationType, UserType } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 type UserProfilePageProps = UserType & {
   createdAt: Date;
@@ -29,6 +30,7 @@ export default function UserDetailsBasic({
     role: user.role ?? "",
     email: user.email ?? "",
   });
+  const router = useRouter();
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -49,11 +51,36 @@ export default function UserDetailsBasic({
         email: data.user.email,
       });
 
+      if (res.ok) {
+        router.push("/");
+        toast("Deletion successfull , redirection to homepage");
+      }
       setIsEditing(false);
     } catch (err) {
       console.error(err);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(`/api/user/${user.id}/delete-user`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) toast("Could not delete user");
+
+      setUserData({
+        name: "",
+        role: "",
+        email: "",
+      });
+
+      if (res.ok) toast("User has been deleted , redirecting to homepage");
+    } catch (error) {
+      toast("Internal server error");
+      console.log("Error");
     }
   };
 
@@ -164,44 +191,91 @@ export default function UserDetailsBasic({
                 </div>
               </div>
 
-              <div className="shrink-0 self-center flex gap-2">
+              <div className="shrink-0 self-center flex flex-col gap-2">
                 {isEditing ? (
                   <>
-                    <button
-                      onClick={handleCancel}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a1628] border border-[#2a2040] cursor-pointer text-[#b8aed4] text-sm font-medium transition-colors hover:bg-[#2a2040]"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={isSaving}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 cursor-pointer text-white text-sm font-medium transition-colors hover:bg-purple-500 disabled:opacity-50"
-                    >
-                      {isSaving ? "Saving..." : "Save"}
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleCancel}
+                        className="flex items-center justify-center px-4 py-2 rounded-xl bg-[#1a1628] border border-[#2a2040] cursor-pointer text-[#b8aed4] text-sm font-medium transition-colors hover:bg-[#2a2040]"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="flex items-center justify-center px-4 py-2 rounded-xl bg-purple-600 cursor-pointer text-white text-sm font-medium transition-colors hover:bg-purple-500 disabled:opacity-50"
+                      >
+                        {isSaving ? "Saving..." : "Save"}
+                      </button>
+                    </div>
                   </>
                 ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2d1d5e] cursor-pointer text-white text-sm font-medium transition-colors"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                  <>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#2d1d5e] cursor-pointer text-white text-sm font-medium transition-colors hover:bg-[#3b2778]"
                     >
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                    Edit
-                  </button>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                      Edit
+                    </button>
+
+                    <AlertDialog>
+                      <Button variant="danger">Delete Account</Button>
+                      <AlertDialog.Backdrop
+                        className="bg-[#09080f]/60"
+                        variant="blur"
+                      >
+                        <AlertDialog.Container>
+                          <AlertDialog.Dialog className="sm:max-w-100 bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
+                            <AlertDialog.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
+                            <AlertDialog.Header className="border-b border-[#2a2040] pb-4">
+                              <AlertDialog.Icon status="danger" />
+                              <AlertDialog.Heading className="text-[#e8e4f0] text-2xl font-semibold">
+                                Delete account permanently?
+                              </AlertDialog.Heading>
+                            </AlertDialog.Header>
+                            <AlertDialog.Body>
+                              <p className="text-[#7c6fa0] text-sm w-full">
+                                This will permanently delete your account and
+                                all of its data. This action cannot be undone.
+                              </p>
+                            </AlertDialog.Body>
+                            <AlertDialog.Footer className="border-t border-[#2a2040] pt-6">
+                              <Button
+                                slot="close"
+                                variant="ghost"
+                                className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                slot="close"
+                                variant="danger"
+                                onClick={handleDelete}
+                              >
+                                Delete Account
+                              </Button>
+                            </AlertDialog.Footer>
+                          </AlertDialog.Dialog>
+                        </AlertDialog.Container>
+                      </AlertDialog.Backdrop>
+                    </AlertDialog>
+                  </>
                 )}
               </div>
             </div>

@@ -10,10 +10,13 @@ interface CreateUserInput {
 
 export async function createUser(user: CreateUserInput) {
   try {
+    console.log("Entering the webhook api");
+
     const existingUser = await prisma.user.findUnique({
       where: { clerkId: user.clerkId },
     });
     if (existingUser) {
+      console.log("Already existing user");
       return { success: true, alreadyExists: true };
     }
 

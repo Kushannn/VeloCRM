@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/slices/authSlice";
 import { setOrganization } from "@/redux/slices/orgSlice";
+import Cookies from "js-cookie";
+import { prisma } from "@/lib/prisma";
 
 export default function useFetchUser() {
   const reduxUser = useAppSelector((state) => state.auth.user);
@@ -26,10 +28,27 @@ export default function useFetchUser() {
           const data = await res.json();
           const userData = data as UserType;
 
+          const organizations = [
+            ...(userData.ownedOrganizations ?? []),
+            ...(userData.membership?.map((m) => m.organization) ?? []),
+          ];
+
           dispatch(login(userData));
 
-          // Set default org in Redux if not already set
-          if (!currentOrg) {
+          const cookieOrgSlug = Cookies.get("orgSlug");
+
+          if (cookieOrgSlug) {
+            let selectedOrg = organizations.find(
+              (org) => org.slug === cookieOrgSlug,
+            );
+            if (!selectedOrg) {
+              selectedOrg = organizations[0] ?? null;
+            }
+
+            if (selectedOrg) {
+              dispatch(setOrganization(selectedOrg));
+            }
+          } else {
             const defaultOrg =
               userData.ownedOrganizations?.[0] ??
               userData.membership?.[0]?.organization ??

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getOrgMembershipById } from "@/lib/utils/authorizeUserOrgProject";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(req: Request) {
   try {
@@ -48,14 +49,26 @@ export async function POST(req: Request) {
       },
     });
 
-    await prisma.leadActivity.create({
+    const activityLog = await prisma.leadActivity.create({
       data: {
-        type: "NOTE",
-        note: "Lead created",
+        type: "CREATED",
+        note: null,
         leadId: newLead.id,
         userId: body.user.id,
       },
+      include: {
+        user: { select: { id: true, name: true, image: true } },
+        lead: { select: { id: true, name: true } },
+      },
     });
+
+    try {
+      await pusherServer.trigger(
+        `private-org-${body.organizationId}`,
+        "lead:added",
+        { log: activityLog, lead: newLead },
+      );
+    } catch (error) {}
 
     return NextResponse.json({ success: true, lead: newLead }, { status: 201 });
   } catch (error: any) {

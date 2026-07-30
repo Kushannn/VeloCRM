@@ -1,8 +1,6 @@
 "use client";
 
 import { Card } from "@heroui/react";
-
-import { MembershipRole, projectStatus } from "@prisma/client";
 import {
   FeedItem,
   SprintsCompactDetailsForDashboard,
@@ -14,6 +12,12 @@ import { InviteModal } from "../InviteUserModal";
 import RecentActivityCard from "../cards/dashboardCards/RecentActivityCard";
 import SprintDetailsCard from "../cards/dashboardCards/SprintDetailsCard";
 import TasksDueSoonCard from "../cards/dashboardCards/TasksDueSoonCard";
+import MagicBento from "../ui/MagicBento";
+import { useState } from "react";
+import { usePusherChannels } from "@/hooks/pusher/usePusherChannels";
+import { activityLogToFeedItem } from "@/lib/utils/activityLogsToFeedItem";
+import { usePusherEvents } from "@/hooks/pusher/usePusherEvents";
+import { leadActivityToFeedItem } from "@/lib/utils/leadActivityToFeedItem";
 
 interface userType {
   clerkId: string;
@@ -24,30 +28,12 @@ interface userType {
   name: string | null;
   role: string | null;
   membership: {
-    id: string;
-    role: MembershipRole;
-    userId: string;
     organizationId: string;
-    organization: {
-      id: string;
-      name: string;
-      createdAt: Date;
-      slug: string;
-      ownerId: string;
-    };
   }[];
   userProjects: {
-    id: string;
-    userId: string;
     projectId: string;
     project: {
-      id: string;
-      name: string;
-      description: string | null;
-      createdAt: Date;
       organizationId: string;
-      slug: string;
-      status: projectStatus;
     };
   }[];
 }
@@ -58,6 +44,7 @@ type PipelineItem = {
 };
 
 type Props = {
+  orgId: string;
   firstName: string;
   todayShort: string;
   user: userType;
@@ -70,16 +57,46 @@ type Props = {
 };
 
 export default function MainDasboardSignedIn({
+  orgId,
   firstName,
   user,
   activeTasks,
   totalLeads,
-  feed,
+  feed: initialFeed,
   sprintsDetails,
   dueTasks,
   pipelineData,
 }: Props) {
-  const noOfProjects = user?.userProjects?.length ?? 0;
+  const [feed, setFeed] = useState<FeedItem[] | null>(initialFeed);
+
+  const myProjectIds = user.userProjects
+    .filter((p) => p.project.organizationId === orgId)
+    .map((p) => p.projectId);
+
+  usePusherChannels<{ log: Parameters<typeof activityLogToFeedItem>[0] }>(
+    myProjectIds.map((id) => `private-project-${id}`),
+    "activity:new",
+    (data) => {
+      const feedItem = activityLogToFeedItem(data.log);
+      setFeed((prev) => [feedItem!, ...(prev ?? [])]);
+    },
+  );
+
+  usePusherEvents(`private-org-${orgId}`, {
+    "lead:added": (data) => {
+      const feedItem = leadActivityToFeedItem(data.log);
+      setFeed((prev) => [feedItem!, ...(prev ?? [])]);
+    },
+    "lead:updated": (data) => {
+      console.log("data", data);
+      const feedItem = leadActivityToFeedItem(data.log);
+      setFeed((prev) => [feedItem!, ...(prev ?? [])]);
+    },
+  });
+
+  const noOfProjects = user.userProjects.filter(
+    (p) => p.project.organizationId == orgId,
+  ).length;
 
   return (
     <>
@@ -88,15 +105,40 @@ export default function MainDasboardSignedIn({
           Welcome back, {firstName}
         </h1>
 
-        {/* Metrics */}
         <MetricCards
           noOfProjects={noOfProjects}
           activeTasks={activeTasks}
           totalLeads={totalLeads}
         />
 
-        {/* Row 1 */}
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="space-y-6 pb-4">
+          <MagicBento
+            cards={[
+              <RecentActivityCard feed={feed} />,
+              <SprintDetailsCard sprintsDetails={sprintsDetails} />,
+              <TasksDueSoonCard dueTasks={dueTasks} />,
+              <Card className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-5 w-full h-full flex flex-col">
+                <Card.Header className="w-full border-b border-[#4d3d7a] pb-3">
+                  <Card.Title className="text-[#7c6fa0] text-md font-semibold uppercase tracking-wide">
+                    Leads Pipeline
+                  </Card.Title>
+                </Card.Header>
+                <Card.Content className="flex-1 min-h-0">
+                  <LeadPipelineChart pipeline={pipelineData} />
+                </Card.Content>
+              </Card>,
+            ]}
+            enableStars
+            enableSpotlight
+            enableBorderGlow
+            enableTilt={false}
+            enableMagnetism={false}
+            clickEffect
+            glowColor="139, 92, 246"
+          />
+        </div>
+
+        {/* <div className="flex flex-col lg:flex-row gap-4">
           <div className="w-full lg:w-1/2">
             <div className="lg:h-125">
               <RecentActivityCard feed={feed} />
@@ -110,7 +152,6 @@ export default function MainDasboardSignedIn({
           </div>
         </div>
 
-        {/* Row 2 */}
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="w-full lg:w-1/2">
             <div className="lg:h-125">
@@ -133,9 +174,8 @@ export default function MainDasboardSignedIn({
               </Card>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
-
       <InviteModal />
     </>
   );

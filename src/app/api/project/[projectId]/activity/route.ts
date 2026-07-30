@@ -23,7 +23,14 @@ export async function GET(
     include: {
       user: { select: { name: true, image: true } },
       task: { select: { title: true } },
-      sprint: { select: { title: true } },
+      sprint: {
+        select: {
+          title: true,
+          endDate: true,
+          project: { select: { name: true } },
+          createdAt: true,
+        },
+      },
     },
   });
 

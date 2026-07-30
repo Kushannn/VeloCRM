@@ -2,6 +2,8 @@
 
 import { TaskType } from "@/lib/types";
 import {
+  AlertDialog,
+  Button,
   Calendar,
   DateField,
   DatePicker,
@@ -9,8 +11,10 @@ import {
   Label,
   ListBox,
   Select,
+  toast,
 } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
+import { Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 // import {parseDate} from "@in"
 
@@ -36,22 +40,48 @@ export default function TaskDrawer({
   task,
   onClose,
   onUpdate,
+  onDelete,
+  sprint,
 }: {
   task: any | null;
   onClose: () => void;
   onUpdate: (task: TaskType) => void;
+  onDelete: (task: TaskType) => void;
+  sprint: any;
 }) {
   const [localTask, setLocalTask] = useState(task);
 
   const hasChanges = JSON.stringify(localTask) != JSON.stringify(task);
+
+  const toISODateString = (date: Date | string) =>
+    (typeof date === "string" ? date : date.toISOString()).slice(0, 10);
+
+  const minValue = parseDate(toISODateString(sprint.startDate));
+  const maxValue = parseDate(toISODateString(sprint.endDate));
+
+  const isDateValid = (() => {
+    if (!localTask?.dueDate) return true; // treat "no due date" as valid — change to `false` if a date is required
+    try {
+      const due = parseDate(localTask.dueDate.split("T")[0]);
+      return due.compare(minValue) >= 0 && due.compare(maxValue) <= 0;
+    } catch {
+      return false;
+    }
+  })();
 
   const handleSave = async () => {
     await onUpdate(localTask);
     onClose();
   };
 
+  const handleDelete = async () => {
+    await onDelete(localTask);
+    onClose();
+  };
+
   useEffect(() => {
     setLocalTask(task);
+    console.log("Sprint", sprint);
   }, [task?.id]);
 
   return (
@@ -207,79 +237,138 @@ export default function TaskDrawer({
               </div>
 
               {/* Due date */}
-              <div>
-                <p className="text-xs text-[#b8aed4] mb-2 uppercase tracking-wider">
-                  Due Date
-                </p>
-                <div className="text-sm text-[#e8e4f0]">
-                  <DatePicker
-                    name="date"
-                    value={
-                      localTask?.dueDate
-                        ? parseDate(localTask?.dueDate.split("T")[0])
-                        : null
-                    }
-                    onChange={(value) =>
-                      setLocalTask({ ...localTask, dueDate: value?.toString() })
-                    }
-                    // className="bg-[#1D1B26]"
-                  >
-                    <DateField.Group
-                      fullWidth
-                      className="bg-[#0e0c17] border border-[#2a2040] text-[#c4a8f5] placeholder-[#4d3d7a] focus:outline-none focus:border-[#6c3fc4] focus:ring-1 focus:ring-[#6c3fc4]/30
+              <div className="flex items-center gap-2 flex-wrap">
+                <div>
+                  <p className="text-xs text-[#b8aed4] mb-2 uppercase tracking-wider">
+                    Due Date
+                  </p>
+                  <div className="text-sm text-[#e8e4f0]">
+                    <DatePicker
+                      name="date"
+                      value={
+                        localTask?.dueDate
+                          ? parseDate(localTask?.dueDate.split("T")[0])
+                          : null
+                      }
+                      onChange={(value) =>
+                        setLocalTask({
+                          ...localTask,
+                          dueDate: value?.toString(),
+                        })
+                      }
+                      minValue={minValue}
+                      maxValue={maxValue}
+
+                      // className="bg-[#1D1B26]"
+                    >
+                      <DateField.Group
+                        fullWidth
+                        className="bg-[#0e0c17] border border-[#2a2040] text-[#c4a8f5] placeholder-[#4d3d7a] focus:outline-none focus:border-[#6c3fc4] focus:ring-1 focus:ring-[#6c3fc4]/30
                 transition-all duration-200"
-                    >
-                      <DateField.Input>
-                        {(segment) => <DateField.Segment segment={segment} />}
-                      </DateField.Input>
-                      <DateField.Suffix>
-                        <DatePicker.Trigger>
-                          <DatePicker.TriggerIndicator />
-                        </DatePicker.Trigger>
-                      </DateField.Suffix>
-                    </DateField.Group>
-                    <DatePicker.Popover
-                      className="bg-[#1D1B26] text-white p-3"
-                      style={{ minWidth: 280 }}
-                    >
-                      <Calendar
-                        aria-label="Event date"
-                        // className="bg-[#1D1B26]"
-                        // style={{ width: 300 }}
                       >
-                        <Calendar.Header>
-                          <Calendar.YearPickerTrigger>
-                            <Calendar.YearPickerTriggerHeading />
-                            <Calendar.YearPickerTriggerIndicator />
-                          </Calendar.YearPickerTrigger>
-                          <Calendar.NavButton slot="previous" />
-                          <Calendar.NavButton slot="next" />
-                        </Calendar.Header>
-                        <Calendar.Grid>
-                          <Calendar.GridHeader>
-                            {(day) => (
-                              <Calendar.HeaderCell>{day}</Calendar.HeaderCell>
-                            )}
-                          </Calendar.GridHeader>
-                          <Calendar.GridBody>
-                            {(date) => (
-                              <Calendar.Cell
-                                date={date}
-                                className="hover:bg-purple-800"
-                              />
-                            )}
-                          </Calendar.GridBody>
-                        </Calendar.Grid>
-                        <Calendar.YearPickerGrid>
-                          <Calendar.YearPickerGridBody>
-                            {({ year }) => (
-                              <Calendar.YearPickerCell year={year} />
-                            )}
-                          </Calendar.YearPickerGridBody>
-                        </Calendar.YearPickerGrid>
-                      </Calendar>
-                    </DatePicker.Popover>
-                  </DatePicker>
+                        <DateField.Input>
+                          {(segment) => <DateField.Segment segment={segment} />}
+                        </DateField.Input>
+                        <DateField.Suffix>
+                          <DatePicker.Trigger>
+                            <DatePicker.TriggerIndicator />
+                          </DatePicker.Trigger>
+                        </DateField.Suffix>
+                      </DateField.Group>
+                      <DatePicker.Popover
+                        className="bg-[#1D1B26] text-white p-3"
+                        style={{ minWidth: 280 }}
+                      >
+                        <Calendar
+                          aria-label="Event date"
+                          // className="bg-[#1D1B26]"
+                          // style={{ width: 300 }}
+                        >
+                          <Calendar.Header>
+                            <Calendar.YearPickerTrigger>
+                              <Calendar.YearPickerTriggerHeading />
+                              <Calendar.YearPickerTriggerIndicator />
+                            </Calendar.YearPickerTrigger>
+                            <Calendar.NavButton slot="previous" />
+                            <Calendar.NavButton slot="next" />
+                          </Calendar.Header>
+                          <Calendar.Grid>
+                            <Calendar.GridHeader>
+                              {(day) => (
+                                <Calendar.HeaderCell>{day}</Calendar.HeaderCell>
+                              )}
+                            </Calendar.GridHeader>
+                            <Calendar.GridBody>
+                              {(date) => (
+                                <Calendar.Cell
+                                  date={date}
+                                  className="hover:bg-purple-800"
+                                />
+                              )}
+                            </Calendar.GridBody>
+                          </Calendar.Grid>
+                          <Calendar.YearPickerGrid>
+                            <Calendar.YearPickerGridBody>
+                              {({ year }) => (
+                                <Calendar.YearPickerCell year={year} />
+                              )}
+                            </Calendar.YearPickerGridBody>
+                          </Calendar.YearPickerGrid>
+                        </Calendar>
+                      </DatePicker.Popover>
+                    </DatePicker>
+                  </div>
+                </div>
+
+                <div>
+                  <AlertDialog>
+                    <Button
+                      size="sm"
+                      className="bg-[#110f1a] hover:bg-[#3d2d6b]"
+                    >
+                      <Trash className="h-4 w-4 text-red-500" />
+                    </Button>
+                    <AlertDialog.Backdrop
+                      className="bg-[#09080f]/60 z-110"
+                      variant="blur"
+                    >
+                      <AlertDialog.Container>
+                        <AlertDialog.Dialog className="sm:max-w-100 bg-[#110f1a] border border-[#2a2040] text-[#b8aed4] rounded-xl shadow-2xl shadow-black/40">
+                          <AlertDialog.CloseTrigger className="text-[#b8aed4] bg-[#110f1a] hover:bg-[#2b1e51] hover:text-[#e8e4f0] active:bg-[#2a2040] rounded-lg transition-colors" />
+                          <AlertDialog.Header className="border-b border-[#2a2040] pb-4">
+                            <AlertDialog.Icon status="danger" />
+                            <AlertDialog.Heading className="text-[#e8e4f0] text-2xl font-semibold">
+                              Delete task permanently?
+                            </AlertDialog.Heading>
+                          </AlertDialog.Header>
+                          <AlertDialog.Body>
+                            <p className="text-[#7c6fa0] text-sm w-full">
+                              This will permanently delete the task and all of
+                              its related data. This action cannot be undone.
+                            </p>
+                          </AlertDialog.Body>
+                          <AlertDialog.Footer className="border-t border-[#2a2040] pt-6">
+                            <Button
+                              slot="close"
+                              variant="ghost"
+                              className="text-[#7c6fa0] hover:text-[#e8e4f0] hover:bg-[#1a1232]"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              slot="close"
+                              variant="danger"
+                              onClick={() => {
+                                handleDelete();
+                              }}
+                            >
+                              Delete Task
+                            </Button>
+                          </AlertDialog.Footer>
+                        </AlertDialog.Dialog>
+                      </AlertDialog.Container>
+                    </AlertDialog.Backdrop>
+                  </AlertDialog>
                 </div>
               </div>
 
@@ -287,11 +376,22 @@ export default function TaskDrawer({
                 <div className="p-4 border-t border-[#2a2040]">
                   <button
                     onClick={handleSave}
-                    className="w-full py-2 rounded-lg bg-[#6c3fc4] border border-[#2a2040] text-[#ede8fb] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] active:bg-[#4c2d9e] transition-all duration-200 text-sm font-medium hover:scale-105 cursor-pointer"
+                    disabled={!isDateValid}
+                    className={`w-full py-2 rounded-lg border border-[#2a2040] text-[#ede8fb] transition-all duration-200 text-sm font-medium ${
+                      isDateValid
+                        ? "bg-[#6c3fc4] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] active:bg-[#4c2d9e] hover:scale-105 cursor-pointer"
+                        : "bg-[#3d2d6b]/50 text-[#7c6fa0] cursor-not-allowed"
+                    }`}
                   >
                     Save Changes
                   </button>
                 </div>
+              )}
+
+              {hasChanges && !isDateValid && (
+                <p className="text-xs text-red-400 px-4 -mt-3">
+                  Due date must be within the sprint range.
+                </p>
               )}
             </div>
           )}

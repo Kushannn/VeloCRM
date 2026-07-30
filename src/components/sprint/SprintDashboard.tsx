@@ -2,7 +2,7 @@
 
 import { Button, Modal, toast, useOverlayState } from "@heroui/react";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Calendar, Clock } from "lucide-react";
 import {
   DndContext,
@@ -22,6 +22,7 @@ import TaskCard from "../tasks/taskCard";
 import TaskDrawer from "../tasks/TaskDrawer";
 import { createPortal } from "react-dom";
 import { debounce } from "lodash";
+import { usePusherEvents } from "@/hooks/pusher/usePusherEvents";
 
 type TaskStatus = "IN_PROGRESS" | "PENDING" | "COMPLETED";
 
@@ -36,13 +37,14 @@ export default function SprintDashboard({
 }) {
   const [localSprint, setLocalSprint] = useState(sprint);
   const [openTaskModal, setOpenTaskModal] = useState(false);
-  // const [openDescModal, setOpenDescModal] = useState(false);
 
   //This determines which task has been selected to show the details
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
 
   //This determines which task has been selected to drag
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
+
+  const todaysDate = new Date().toLocaleString();
 
   const params = useParams<{
     orgId: string;
@@ -237,13 +239,52 @@ export default function SprintDashboard({
     }
   };
 
+  const handleTaskDelete = async (task: TaskType) => {
+    try {
+      const res = await fetch(`/api/task/${task.id}/delete-task`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: project?.id, sprintId: sprint?.id }),
+      });
+
+      if (!res.ok) {
+        toast.danger("The task could not be deleted");
+        return;
+      }
+
+      setLocalSprint((prev: any) => ({
+        ...prev,
+        tasks: prev.tasks.filter((t: TaskType) => t.id !== task.id),
+      }));
+
+      setSelectedTask(null);
+    } catch (error) {
+      toast.danger("Could not delete task");
+      console.log("error ", error);
+    }
+  };
+
+  usePusherEvents(`private-sprint-${sprint.id}`, {
+    "task:created": (data: { task: TaskType }) => {
+      setLocalSprint((prev: any) => {
+        if (data.task.sprintId !== prev.id) return prev;
+        if (prev.tasks.some((t: TaskType) => t.id === data.task.id))
+          return prev;
+        return { ...prev, tasks: [...prev.tasks, data.task] };
+      });
+    },
+
+    "task:deleted": (data: { taskId: string }) =>
+      setLocalSprint((prev: any) => ({
+        ...prev,
+        tasks: prev.tasks.filter((t: any) => t.id !== data.taskId),
+      })),
+  });
+
   return (
     <>
       <div className="h-full space-y-6 flex flex-col">
-        {/* Header */}
-        {/* ---- HEADER ---- */}
         <div className="bg-[#110f1a] border border-[#2a2040] hover:border-[#3d2d6b] rounded-xl p-3 sm:p-4 flex flex-col gap-3">
-          {/* Row 1: title + button */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               {isActive && (
@@ -268,13 +309,13 @@ export default function SprintDashboard({
             <Button
               onClick={() => setOpenTaskModal(true)}
               className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6c3fc4] border border-[#2a2040] text-[#ede8fb] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] hover:text-white active:bg-[#4c2d9e] transition-all text-sm font-medium hover:scale-105 duration-300"
+              isDisabled={todaysDate > localSprint.startDate}
             >
               <span className="text-base leading-none">+</span>
               New Task
             </Button>
           </div>
 
-          {/* Row 2: date strip */}
           <div className="flex items-center rounded-lg border border-zinc-800 bg-[#1a1232] px-3 py-2 gap-2 sm:gap-4 w-full sm:w-fit">
             <div className="flex items-center gap-1.5 text-xs text-gray-300">
               <Calendar className="w-3.5 h-3.5 shrink-0" />
@@ -297,7 +338,6 @@ export default function SprintDashboard({
           </div>
         </div>
 
-        {/* ---- BOARD ---- */}
         <DndContext
           collisionDetection={closestCenter}
           onDragStart={({ active }) => {
@@ -336,18 +376,22 @@ export default function SprintDashboard({
           </DragOverlay>
         </DndContext>
       </div>
-
-      {/* Create Task */}
       <CreateTask
         isOpen={openTaskModal}
         onClose={() => setOpenTaskModal(false)}
         sprintId={params?.sprintId}
         sprint={localSprint}
         project={project}
-        onTaskCreated={() => location.reload()}
+        onTaskCreated={(newTask: TaskType) => {
+          setLocalSprint((prev: any) => {
+            if (prev.tasks.some((t: TaskType) => t.id === newTask.id))
+              return prev;
+            return { ...prev, tasks: [...prev.tasks, newTask] };
+          });
+          setOpenTaskModal(false);
+        }}
       />
 
-      {/* Description Modal */}
       <Modal state={descState}>
         <Modal.Backdrop
           variant="blur"
@@ -385,13 +429,14 @@ export default function SprintDashboard({
           </Modal.Container>
         </Modal.Backdrop>
       </Modal>
-
       {typeof window !== "undefined" &&
         createPortal(
           <TaskDrawer
             task={selectedTask}
             onClose={() => setSelectedTask(null)}
             onUpdate={(task) => handleTaskDetailsUpdate(task)}
+            onDelete={(task) => handleTaskDelete(task)}
+            sprint={localSprint}
           />,
           document.body,
         )}

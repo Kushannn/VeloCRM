@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Modal, Button } from "@heroui/react";
+import { Modal, Button, toast } from "@heroui/react";
+import { useDispatch } from "react-redux";
+import { setOrganization } from "@/redux/slices/orgSlice";
+import Cookies from "js-cookie";
 
 export function InviteModal() {
   const [showModal, setShowModal] = useState(false);
@@ -10,6 +13,7 @@ export function InviteModal() {
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -31,11 +35,14 @@ export function InviteModal() {
     const result = await res.json();
 
     if (result.success) {
-      alert("Successfully joined the organization!");
+      dispatch(setOrganization(result.data));
+      Cookies.set("orgSlug", result.data.slug);
+      toast.success("Successfully joined the organization!");
       setShowModal(false);
-      router.replace("/dashboard");
+
+      router.replace(`/organization/${result.data.slug}/dashboard`);
     } else {
-      alert(result.error || "Failed to join.");
+      toast.danger(result.error || "Failed to join.");
     }
 
     setLoading(false);

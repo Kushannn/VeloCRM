@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getProjectAccessById } from "@/lib/utils/authorizeUserOrgProject";
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(
   req: Request,
@@ -59,7 +60,17 @@ export async function POST(
           userId,
         },
       });
+
+      return createdSprint;
     });
+
+    await pusherServer.trigger(
+      `private-project-${projectId}`,
+      "sprint:created",
+      {
+        sprint,
+      },
+    );
 
     return NextResponse.json({ success: true, sprint }, { status: 201 });
   } catch (error) {

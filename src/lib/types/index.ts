@@ -1,4 +1,4 @@
-import { LeadActivityType } from "@prisma/client";
+import { LeadActivityType, LeadStatus } from "@prisma/client";
 
 export interface OrganizationType {
   id: string;
@@ -113,7 +113,9 @@ type LeadActivityFeed = BaseActivity & {
   type: LeadActivityType;
   note: string | null;
   user: { name: string | null; image: string | null };
-  lead: { name: string };
+  lead: { name: string; id: string };
+  activityType: string;
+  transition?: { from: LeadStatus; to: LeadStatus };
 };
 
 type LeadCreatedFeed = BaseActivity & {
@@ -130,9 +132,22 @@ type TaskFeed = BaseActivity & {
   status: TaskStatus;
   user: { name: string | null; image: string | null };
   sprint: { title: string };
+  transition?: { from: TaskStatus; to: TaskStatus };
 };
 
-export type FeedItem = LeadActivityFeed | LeadCreatedFeed | TaskFeed;
+type SprintFeed = BaseActivity & {
+  kind: "sprint_created";
+  title: string;
+  project: { name: string } | null;
+  user: { name: string | null; image: string | null } | null;
+  endDate: Date;
+};
+
+export type FeedItem =
+  | LeadActivityFeed
+  | LeadCreatedFeed
+  | TaskFeed
+  | SprintFeed;
 
 export type TaskStats = {
   total: number;

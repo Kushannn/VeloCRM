@@ -6,7 +6,7 @@ export default function MetricCardsSkeleton() {
       {[1, 2, 3, 4].map((item) => (
         <div
           key={item}
-          className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-5 w-52 h-36 animate-pulse"
+          className="bg-[#110f1a] border border-[#2a2040] rounded-xl p-5 sm:w-[calc(50%-12px)] xl:w-52 h-36 animate-pulse"
         >
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -23,7 +23,7 @@ export default function MetricCardsSkeleton() {
           </div>
 
           {/* Footer */}
-          <div className="mt-6 h-3 w-20 rounded bg-[#1d3b2a]" />
+          <div className="mt-3 h-3 w-20 rounded bg-[#1d3b2a]" />
         </div>
       ))}
     </div>
