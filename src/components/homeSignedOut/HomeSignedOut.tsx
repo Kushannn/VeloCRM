@@ -272,30 +272,46 @@ function HomeSignedOut() {
               </div>
               {/* </p> */}
             </div>
+            <div className="mt-8 max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="flex flex-col">
+                  <h3 className="mb-4 text-lg font-semibold text-white">
+                    Traditional CRM
+                  </h3>
 
-            <div className="mt-4 relative w-full max-w-4xl mx-auto flex gap-12">
-              {/* <div className="absolute inset-0 blur-3xl rounded-full opacity-20 bg-violet-500/20" /> */}
-              <video
-                src="/KanbanBoards.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                preload="auto"
-                className="w-full h-full object-contain rounded-[24px]"
-              />
+                  <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#110d1d]">
+                    <video
+                      src="/KanbanBoards.mp4"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      controls={false}
+                      preload="auto"
+                      className="w-full aspect-video object-cover"
+                    />
+                  </div>
+                </div>
 
-              <video
-                src="/KanbanBoards.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                controls={false}
-                preload="auto"
-                className="w-full h-full object-contain rounded-[24px]"
-              />
+                <div className="flex flex-col">
+                  <h3 className="mb-4 text-lg font-semibold text-violet-300">
+                    Your CRM
+                  </h3>
+
+                  <div className="overflow-hidden rounded-3xl border border-violet-500/30 bg-[#110d1d]">
+                    <video
+                      src="/KanbanBoards.mp4"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      controls={false}
+                      preload="auto"
+                      className="w-full aspect-video object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="mt-10 flex flex-wrap justify-center items-center">

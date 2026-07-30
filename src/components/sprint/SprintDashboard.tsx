@@ -44,6 +44,8 @@ export default function SprintDashboard({
   //This determines which task has been selected to drag
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
 
+  const todaysDate = new Date().toLocaleString();
+
   const params = useParams<{
     orgId: string;
     projectId: string;
@@ -307,6 +309,7 @@ export default function SprintDashboard({
             <Button
               onClick={() => setOpenTaskModal(true)}
               className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#6c3fc4] border border-[#2a2040] text-[#ede8fb] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] hover:text-white active:bg-[#4c2d9e] transition-all text-sm font-medium hover:scale-105 duration-300"
+              isDisabled={todaysDate > localSprint.startDate}
             >
               <span className="text-base leading-none">+</span>
               New Task
@@ -433,6 +436,7 @@ export default function SprintDashboard({
             onClose={() => setSelectedTask(null)}
             onUpdate={(task) => handleTaskDetailsUpdate(task)}
             onDelete={(task) => handleTaskDelete(task)}
+            sprint={localSprint}
           />,
           document.body,
         )}

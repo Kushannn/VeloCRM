@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
+import LandingNavbar from "../homeSignedOut/LandingNavbar";
 
 export default function LayoutWithSidebar({
   children,
@@ -14,6 +15,7 @@ export default function LayoutWithSidebar({
   const [showSidebar, setShowSidebar] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const pathname = usePathname();
+  const isLandingPage = pathname === "/";
 
   const noSidebarRoutes = ["/", "/sign-in", "/sign-up", "/onboarding"];
   const isPublicRoute = noSidebarRoutes.includes(pathname);
@@ -23,7 +25,7 @@ export default function LayoutWithSidebar({
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09080f]">
-      <Navbar />
+      {isLandingPage ? <LandingNavbar /> : <Navbar />}
 
       <div className="flex flex-1">
         {!isPublicRoute && (

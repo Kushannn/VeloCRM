@@ -41,15 +41,33 @@ export default function TaskDrawer({
   onClose,
   onUpdate,
   onDelete,
+  sprint,
 }: {
   task: any | null;
   onClose: () => void;
   onUpdate: (task: TaskType) => void;
   onDelete: (task: TaskType) => void;
+  sprint: any;
 }) {
   const [localTask, setLocalTask] = useState(task);
 
   const hasChanges = JSON.stringify(localTask) != JSON.stringify(task);
+
+  const toISODateString = (date: Date | string) =>
+    (typeof date === "string" ? date : date.toISOString()).slice(0, 10);
+
+  const minValue = parseDate(toISODateString(sprint.startDate));
+  const maxValue = parseDate(toISODateString(sprint.endDate));
+
+  const isDateValid = (() => {
+    if (!localTask?.dueDate) return true; // treat "no due date" as valid — change to `false` if a date is required
+    try {
+      const due = parseDate(localTask.dueDate.split("T")[0]);
+      return due.compare(minValue) >= 0 && due.compare(maxValue) <= 0;
+    } catch {
+      return false;
+    }
+  })();
 
   const handleSave = async () => {
     await onUpdate(localTask);
@@ -63,6 +81,7 @@ export default function TaskDrawer({
 
   useEffect(() => {
     setLocalTask(task);
+    console.log("Sprint", sprint);
   }, [task?.id]);
 
   return (
@@ -237,6 +256,9 @@ export default function TaskDrawer({
                           dueDate: value?.toString(),
                         })
                       }
+                      minValue={minValue}
+                      maxValue={maxValue}
+
                       // className="bg-[#1D1B26]"
                     >
                       <DateField.Group
@@ -316,12 +338,12 @@ export default function TaskDrawer({
                           <AlertDialog.Header className="border-b border-[#2a2040] pb-4">
                             <AlertDialog.Icon status="danger" />
                             <AlertDialog.Heading className="text-[#e8e4f0] text-2xl font-semibold">
-                              Delete sprint permanently?
+                              Delete task permanently?
                             </AlertDialog.Heading>
                           </AlertDialog.Header>
                           <AlertDialog.Body>
                             <p className="text-[#7c6fa0] text-sm w-full">
-                              This will permanently delete the sprint and all of
+                              This will permanently delete the task and all of
                               its related data. This action cannot be undone.
                             </p>
                           </AlertDialog.Body>
@@ -340,7 +362,7 @@ export default function TaskDrawer({
                                 handleDelete();
                               }}
                             >
-                              Delete Sprint
+                              Delete Task
                             </Button>
                           </AlertDialog.Footer>
                         </AlertDialog.Dialog>
@@ -354,11 +376,22 @@ export default function TaskDrawer({
                 <div className="p-4 border-t border-[#2a2040]">
                   <button
                     onClick={handleSave}
-                    className="w-full py-2 rounded-lg bg-[#6c3fc4] border border-[#2a2040] text-[#ede8fb] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] active:bg-[#4c2d9e] transition-all duration-200 text-sm font-medium hover:scale-105 cursor-pointer"
+                    disabled={!isDateValid}
+                    className={`w-full py-2 rounded-lg border border-[#2a2040] text-[#ede8fb] transition-all duration-200 text-sm font-medium ${
+                      isDateValid
+                        ? "bg-[#6c3fc4] hover:bg-[#8b5cf6] hover:border-[#3d2d6b] active:bg-[#4c2d9e] hover:scale-105 cursor-pointer"
+                        : "bg-[#3d2d6b]/50 text-[#7c6fa0] cursor-not-allowed"
+                    }`}
                   >
                     Save Changes
                   </button>
                 </div>
+              )}
+
+              {hasChanges && !isDateValid && (
+                <p className="text-xs text-red-400 px-4 -mt-3">
+                  Due date must be within the sprint range.
+                </p>
               )}
             </div>
           )}
