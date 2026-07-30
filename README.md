@@ -51,7 +51,7 @@ Instead of switching between multiple applications, teams can:
 - Search & Pagination
 
 <p align="center">
-<img src="./assets/kanban.png" width="90%">
+<img src="./public/Leads-Board.png" width="90%">
 </p>
 
 ---
@@ -64,7 +64,7 @@ Instead of switching between multiple applications, teams can:
 - Progress Tracking
 
 <p align="center">
-<img src="./assets/projects.png" width="90%">
+<img src="./public/DemoProject.png" width="90%">
 </p>
 
 ---
@@ -77,7 +77,7 @@ Instead of switching between multiple applications, teams can:
 - Sprint Progress
 
 <p align="center">
-<img src="./assets/sprint.png" width="90%">
+<img src="./public/sprint-board.png" width="90%">
 </p>
 
 ---
@@ -91,7 +91,7 @@ Instead of switching between multiple applications, teams can:
 - Task Tracking
 
 <p align="center">
-<img src="./assets/task.png" width="90%">
+<img src="./public/KanbanBoards.gif" width="90%">
 </p>
 
 ---
@@ -106,7 +106,7 @@ Get an overview of your entire workspace.
 - Team Activity
 
 <p align="center">
-<img src="./assets/dashboard.png" width="90%">
+<img src="./public/baseImage1.png" width="90%">
 </p>
 
 ---
@@ -209,11 +209,11 @@ http://localhost:3000
 
 | Dashboard | Kanban |
 |------------|---------|
-| ![](./assets/dashboard.png) | ![](./assets/kanban.png) |
+| ![](./public/baseImage1.png) | ![](./public/KanbanBoards.png) |
 
 | Projects | Sprint |
 |------------|---------|
-| ![](./assets/projects.png) | ![](./assets/sprint.png) |
+| ![](./public/DemoProject.png) | ![](./public/sprint-board.png) |
 
 ---
 
